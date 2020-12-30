@@ -1,8 +1,8 @@
 {
-  "name": "spielunke2",
+  "name": "kartomat",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {},
   "author": "",
   "license": "",

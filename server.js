@@ -90,7 +90,7 @@ function handleJoinGame(socket, msg) {
   const gameId = msg.gameId || generateGameId();
   const playerId = msg.playerId || generatePlayerId();
 
-  var board = JSON.parse(fs.readFileSync(boardId + ".json"));
+  var board = JSON.parse(fs.readFileSync("boards/" + boardId + ".json"));
 
   if (!runningGames.hasOwnProperty(gameId)) {
     runningGames[gameId] = {
