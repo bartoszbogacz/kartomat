@@ -985,7 +985,7 @@
     "zIndex": 0
   },
   "marble1": {
-    "upToTick": 229,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "mediumorchid",
@@ -996,7 +996,7 @@
     "zIndex": 0
   },
   "marble2": {
-    "upToTick": 92,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "dodgerblue",
@@ -1007,7 +1007,7 @@
     "zIndex": 0
   },
   "marble3": {
-    "upToTick": 88,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "dodgerblue",
@@ -1018,7 +1018,7 @@
     "zIndex": 0
   },
   "marble4": {
-    "upToTick": 84,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "dodgerblue",
@@ -1029,7 +1029,7 @@
     "zIndex": 0
   },
   "marble5": {
-    "upToTick": 231,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "mediumorchid",
@@ -1040,7 +1040,7 @@
     "zIndex": 0
   },
   "marble6": {
-    "upToTick": 143,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "forestgreen",
@@ -1051,7 +1051,7 @@
     "zIndex": 0
   },
   "marble7": {
-    "upToTick": 139,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "forestgreen",
@@ -1062,7 +1062,7 @@
     "zIndex": 0
   },
   "marble8": {
-    "upToTick": 134,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "forestgreen",
@@ -1073,7 +1073,7 @@
     "zIndex": 0
   },
   "marble9": {
-    "upToTick": 157,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "dimgray",
@@ -1084,7 +1084,7 @@
     "zIndex": 0
   },
   "marble10": {
-    "upToTick": 165,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "dimgray",
@@ -1095,7 +1095,7 @@
     "zIndex": 0
   },
   "marble11": {
-    "upToTick": 235,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "mediumorchid",
@@ -1106,7 +1106,7 @@
     "zIndex": 0
   },
   "marble12": {
-    "upToTick": 160,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "dimgray",
@@ -1117,7 +1117,7 @@
     "zIndex": 0
   },
   "marble13": {
-    "upToTick": 226,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "orange",
@@ -1128,7 +1128,7 @@
     "zIndex": 0
   },
   "marble14": {
-    "upToTick": 114,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "gold",
@@ -1139,7 +1139,7 @@
     "zIndex": 0
   },
   "marble15": {
-    "upToTick": 110,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "gold",
@@ -1150,7 +1150,7 @@
     "zIndex": 0
   },
   "marble16": {
-    "upToTick": 106,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "gold",
@@ -1161,7 +1161,7 @@
     "zIndex": 0
   },
   "marble17": {
-    "upToTick": 340,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "orange",
@@ -1172,7 +1172,7 @@
     "zIndex": 0
   },
   "marble18": {
-    "upToTick": 190,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "crimson",
@@ -1183,7 +1183,7 @@
     "zIndex": 0
   },
   "marble19": {
-    "upToTick": 181,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "crimson",
@@ -1194,7 +1194,7 @@
     "zIndex": 0
   },
   "marble20": {
-    "upToTick": 186,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "crimson",
@@ -1205,7 +1205,7 @@
     "zIndex": 0
   },
   "marble21": {
-    "upToTick": 199,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "darkturquoise",
@@ -1216,7 +1216,7 @@
     "zIndex": 0
   },
   "marble22": {
-    "upToTick": 203,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "darkturquoise",
@@ -1227,7 +1227,7 @@
     "zIndex": 0
   },
   "marble23": {
-    "upToTick": 207,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "darkturquoise",
@@ -1238,7 +1238,7 @@
     "zIndex": 0
   },
   "marble24": {
-    "upToTick": 220,
+    "upToTick": 0,
     "ownedBy": "p1",
     "behavesAs": "Marble",
     "backgroundColor": "orange",
