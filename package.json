@@ -1,0 +1,12 @@
+{
+  "name": "spielunke2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "ws": "^7.4.1"
+  }
+}
