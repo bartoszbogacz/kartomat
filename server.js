@@ -256,4 +256,4 @@ httpServer.listen(httpPort, httpHost, () => {
 Clients have no tick and are driven by the server.
 */
 
-setInterval(announceSceneModified, 1000);
+setInterval(announceSceneModified, 100);

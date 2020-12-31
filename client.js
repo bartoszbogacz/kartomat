@@ -112,6 +112,7 @@ const TURN_DECK_CONTROL = "TurnDeckControl";
   Global State
 */
 
+let _websocket = null;
 let _drag = null;
 let _boardId = null;
 let _gameId = null;
@@ -1349,9 +1350,8 @@ function keepWebsocketConnected() {
   };
 }
 
-let _websocket = null;
 keepWebsocketConnected();
 
-document.onmousedown = onMouseDown;
-document.onmousemove = onMouseMove;
-document.onmouseup = onMouseUp;
+document.body.onmousedown = onMouseDown;
+document.body.onmousemove = onMouseMove;
+document.body.onmouseup = onMouseUp;
