@@ -243,20 +243,19 @@ function renderPlayerAvatar(thingId) {
     element = document.createElement("textarea");
     element.id = thingId;
     element.value = thing.text;
-
-    if (_clientScene[thingId].represents === _playerId) {
-      element.className = THIS_PLAYER_AVATAR;
-      element.disabled = false;
-      element.onkeyup = onKeyUp;
-    } else if (_clientScene[thingId].represents !== null) {
-      element.className = OTHER_PLAYER_AVATAR;
-      element.disabled = true;
-    } else if (_clientScene[thingId].represents === null) {
-      element.className = NO_PLAYER_AVATAR;
-      element.disabled = true;
-    }
-
+    element.onkeyup = onKeyUp;
     document.body.appendChild(element);
+  }
+
+  if (_clientScene[thingId].represents === _playerId) {
+    element.className = THIS_PLAYER_AVATAR;
+    element.disabled = false;
+  } else if (_clientScene[thingId].represents !== null) {
+    element.className = OTHER_PLAYER_AVATAR;
+    element.disabled = true;
+  } else if (_clientScene[thingId].represents === null) {
+    element.className = NO_PLAYER_AVATAR;
+    element.disabled = true;
   }
 
   element.style.top = thing.computedTop + "px";
@@ -264,6 +263,16 @@ function renderPlayerAvatar(thingId) {
   element.style.width = thing.computedWidth + "px";
   element.style.height = thing.computedHeight + "px";
   element.style.zIndex = thing.computedZIndex;
+
+  if (
+    thing.ownedBy === null ||
+    thing.ownedBy === _playerId ||
+    thing.upToTick + 5 < _gameTicks
+  ) {
+    // Easier to understand condition than a negation
+  } else {
+    element.value = thing.text;
+  }
 }
 
 function editPlayerAvatar(thingId, text) {
@@ -305,6 +314,7 @@ function renderTextArea(thingId) {
   element.style.width = thing.computedWidth + "px";
   element.style.height = thing.computedHeight + "px";
   element.style.zIndex = thing.computedZIndex;
+
   if (
     thing.ownedBy === null ||
     thing.ownedBy === _playerId ||
