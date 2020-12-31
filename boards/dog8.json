@@ -104,6 +104,30 @@
     "width": 200,
     "zIndex": 0
   },
+  "player7": {
+    "upToTick": 0,
+    "ownedBy": null,
+    "behavesAs": "PlayerAvatar",
+    "represents": null,
+    "text": "Player7",
+    "top": 150,
+    "left": 920,
+    "height": 30,
+    "width": 200,
+    "zIndex": 0
+  },
+  "player8": {
+    "upToTick": 0,
+    "ownedBy": null,
+    "behavesAs": "PlayerAvatar",
+    "represents": null,
+    "text": "Player8",
+    "top": 150,
+    "left": 1130,
+    "height": 30,
+    "width": 200,
+    "zIndex": 0
+  },
   "card1": {
     "upToTick": 0,
     "ownedBy": null,

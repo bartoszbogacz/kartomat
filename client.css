@@ -79,10 +79,33 @@
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
 
-.PlayerAvatar {
+.OtherPlayerAvatar {
   background-color: #eeeae2;
   border: 2px solid #93a1a1;
   color: #586e75;
+  font-family: monospace;
+  font-size: 16px;
+  outline: none;
+  position: absolute;
+  resize: none;
+  user-select: none;
+}
+
+.ThisPlayerAvatar {
+  background-color: yellow;
+  border: 2px solid #93a1a1;
+  color: #586e75;
+  font-family: monospace;
+  font-size: 16px;
+  outline: none;
+  position: absolute;
+  resize: none;
+  user-select: none;
+}
+
+.NoPlayerAvatar {
+  background-color: snow;
+  color: lightgray;
   font-family: monospace;
   font-size: 16px;
   outline: none;
@@ -97,19 +120,6 @@
   left: 0px;
   position: absolute;
   top: 160px;
-}
-
-.ThisPlayerAvatar {
-  background-color: yellow;
-  border: 1px solid black;
-  border: 2px solid #93a1a1;
-  color: #586e75;
-  font-family: monospace;
-  font-size: 16px;
-  outline: none;
-  position: absolute;
-  resize: none;
-  user-select: none;
 }
 
 .PlayingBoard {

@@ -1,5 +1,5 @@
 body {
-  background-color: lightyellow;
+  background-color: snow;
   margin: auto;
   max-width: 400px;
 }
@@ -18,7 +18,7 @@ h1 {
 }
 
 .Game {
-  background-color: lemonchiffon;
+  background-color: lightyellow;
   border: 0.2em solid dimgray;
   margin: 1em;
   padding: 1em;

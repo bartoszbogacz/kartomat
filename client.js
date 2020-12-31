@@ -21,6 +21,9 @@
 // TODO: - Move derived property computation out of render and
 //        into object specific classes
 
+// TODO: Do not mix behaviour constants and CSS class name constants,
+//  e.g. PLAYER_AVATAR, THIS_PLAYER_AVATAR, OTHER_PLAYER_AVATAR, NO_PLAYER_AVATAR
+
 /*
   Constants
 */
@@ -59,6 +62,8 @@ const TEXT_AREA_SYNCHRONIZED_PROPERTIES = [
 
 const PLAYER_TAG = "PlayerTag";
 const THIS_PLAYER_AVATAR = "ThisPlayerAvatar";
+const OTHER_PLAYER_AVATAR = "OtherPlayerAvatar";
+const NO_PLAYER_AVATAR = "NoPlayerAvatar";
 const PLAYER_AVATAR = "PlayerAvatar";
 // Do not synchronize represents, effectively preventing
 // modification of other players names.
@@ -243,8 +248,11 @@ function renderPlayerAvatar(thingId) {
       element.className = THIS_PLAYER_AVATAR;
       element.disabled = false;
       element.onkeyup = onKeyUp;
-    } else {
-      element.className = PLAYER_AVATAR;
+    } else if (_clientScene[thingId].represents !== null) {
+      element.className = OTHER_PLAYER_AVATAR;
+      element.disabled = true;
+    } else if (_clientScene[thingId].represents === null) {
+      element.className = NO_PLAYER_AVATAR;
       element.disabled = true;
     }
 
