@@ -1,6 +1,8 @@
 "use strict";
 
-// TODO: Automatic re-connection
+// TODO: Game joining interface
+// TODO: Game state hydration from game config.
+
 // TODO: Fix touchmove on cards
 // TODO: Moveable player Avatars
 // TODO: Wizard board
@@ -11,7 +13,8 @@
 // TODO: Introduce entity component traits for things to avoid this
 //      weird dispatch code.
 
-// TODO: Datastructure with computed values
+// TODO: Hierarchical derived data structure from CRDT scene with computed values, e.g.
+//  {overlaps: ...., players: ...., decks: ..., cards: ..., areas: ..., ...}
 // TODO: - Player tags should have player names
 // TODO: - Do not use computed values anymore for computations,
 //        only rendering.
