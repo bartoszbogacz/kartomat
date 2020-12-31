@@ -892,7 +892,7 @@ function render() {
       privateAreaZIndex = card.computedZIndex;
     }
   }
-  privateAreaZIndex += 1;
+  privateAreaZIndex += DECK_Z_DEPTH;
 
   for (const [areaId, area] of Object.entries(_clientScene)) {
     if (area.behavesAs === PRIVATE_AREA) {
@@ -915,10 +915,7 @@ function render() {
   const computedDecks = recondenseCardDecks();
   for (const [deckId, deckCardIds] of Object.entries(computedDecks)) {
     const leadCard = _clientScene[deckId];
-
-    leadCard.computedTop = leadCard.top;
-    leadCard.computedLeft = leadCard.left;
-    leadCard.computedZIndex = leadCard.zIndex;
+    // Derived properties already computed above
     leadCard.computedLeadsDeck = true;
 
     let accum = 0;
