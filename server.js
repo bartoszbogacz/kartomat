@@ -39,6 +39,13 @@ function handleHTTPRequest(req, res) {
       res.end(data);
     });
   }
+  if (path === "/index.css") {
+    fs.readFile("index.css", {}, function (err, data) {
+      res.setHeader("Content-Type", "text/css");
+      res.writeHead(200);
+      res.end(data);
+    });
+  }
   if (path === "/client.html") {
     fs.readFile("client.html", {}, function (err, data) {
       res.setHeader("Content-Type", "text/html");
