@@ -60,6 +60,10 @@ const TEXT_AREA_SYNCHRONIZED_PROPERTIES = [
   "text",
 ];
 
+const PLAYER_CURSOR = "PlayerCursor";
+const THIS_PLAYER_CURSOR = "ThisPlayerCursor";
+const OTHER_PLAYER_CURSOR = "OtherPlayerCursor";
+const NO_PLAYER_CURSOR = "NoPlayerCursor";
 const PLAYER_TAG = "PlayerTag";
 const THIS_PLAYER_AVATAR = "ThisPlayerAvatar";
 const OTHER_PLAYER_AVATAR = "OtherPlayerAvatar";
@@ -73,6 +77,8 @@ const PLAYER_AVATAR_SYNCHRONIZED_PROPERTIES = [
   "left",
   "zIndex",
   "text",
+  "cursorLeft",
+  "cursorTop",
 ];
 
 const PRIVATE_AREA = "PrivateArea";
@@ -106,6 +112,7 @@ const TURN_DECK_CONTROL = "TurnDeckControl";
   Global State
 */
 
+let _drag = null;
 let _boardId = null;
 let _gameId = null;
 let _playerId = null;
@@ -113,6 +120,7 @@ let _gameTicks = 0;
 let _serverScene = {};
 let _clientScene = {};
 let _diffToServer = {};
+let _cachedPlayerAvatarIds = {};
 
 /*
  ____  _             _             ____                      _
@@ -238,22 +246,34 @@ function rollDice(thingId) {
 
 function renderPlayerAvatar(thingId) {
   const thing = _clientScene[thingId];
+
   let element = document.getElementById(thingId);
   if (element === null) {
     element = document.createElement("textarea");
     element.id = thingId;
     element.value = thing.text;
     element.onkeyup = onKeyUp;
+
     document.body.appendChild(element);
   }
 
+  let cursorElement = document.getElementById(thingId + PLAYER_CURSOR);
+  if (cursorElement === null) {
+    cursorElement = document.createElement("div");
+    cursorElement.id = thingId + PLAYER_CURSOR;
+    document.body.appendChild(cursorElement);
+  }
+
   if (_clientScene[thingId].represents === _playerId) {
+    cursorElement.className = THIS_PLAYER_CURSOR;
     element.className = THIS_PLAYER_AVATAR;
     element.disabled = false;
   } else if (_clientScene[thingId].represents !== null) {
+    cursorElement.className = OTHER_PLAYER_CURSOR;
     element.className = OTHER_PLAYER_AVATAR;
     element.disabled = true;
   } else if (_clientScene[thingId].represents === null) {
+    cursorElement.className = NO_PLAYER_CURSOR;
     element.className = NO_PLAYER_AVATAR;
     element.disabled = true;
   }
@@ -273,12 +293,22 @@ function renderPlayerAvatar(thingId) {
   } else {
     element.value = thing.text;
   }
+
+  cursorElement.style.top = thing.cursorTop;
+  cursorElement.style.left = thing.cursorLeft;
+  cursorElement.style.zIndex = thing.computedZIndex;
+  cursorElement.innerHTML = thing.text;
 }
 
 function editPlayerAvatar(thingId, text) {
   if (_clientScene[thingId].represents === _playerId) {
     _clientScene[thingId].text = text;
   }
+}
+
+function moveCursor(thingId, left, top) {
+  _clientScene[thingId].cursorLeft = left;
+  _clientScene[thingId].cursorTop = top;
 }
 
 /*
@@ -892,6 +922,13 @@ function render() {
     }
   }
 
+  // Cache player avatars
+  for (const [thingId, thing] of Object.entries(_clientScene)) {
+    if (thing.behavesAs === PLAYER_AVATAR) {
+      _cachedPlayerAvatarIds[thing.represents] = thingId;
+    }
+  }
+
   // Compute positions for all cards
   for (const [thingId, thing] of Object.entries(_clientScene)) {
     if (thing.behavesAs === PLAYING_CARD) {
@@ -1074,7 +1111,7 @@ function onMouseDown(event) {
   const clientY = touch ? event.touches[0].clientY : event.clientY;
   const clientX = touch ? event.touches[0].clientX : event.clientX;
 
-  const drag = {
+  _drag = {
     target: event.target,
     targetTop: event.target.offsetTop,
     targetLeft: event.target.offsetLeft,
@@ -1083,7 +1120,7 @@ function onMouseDown(event) {
     wasOutside: false,
   };
 
-  const thingId = drag.target.id;
+  const thingId = _drag.target.id;
 
   if (thingId.endsWith(MOVE_DECK_CONTROL)) {
     takeCardDeck(thingId.slice(0, -MOVE_DECK_CONTROL.length));
@@ -1093,32 +1130,34 @@ function onMouseDown(event) {
     }
   }
 
-  document.onmousemove = function (event) {
-    onMouseMove(drag, event);
-  };
-  document.onmouseup = function (event) {
-    onMouseUp(drag, event);
-  };
-
   window.requestAnimationFrame(render);
 }
 
-function onMouseMove(drag, event) {
+function onMouseMove(event) {
   event.preventDefault();
 
   const touch = event.type === "touchmove";
   const clientY = touch ? event.touches[0].clientY : event.clientY;
   const clientX = touch ? event.touches[0].clientX : event.clientX;
-  const top = drag.targetTop - drag.startY + clientY;
-  const left = drag.targetLeft - drag.startX + clientX;
+
+  if (_cachedPlayerAvatarIds.hasOwnProperty(_playerId)) {
+    moveCursor(_cachedPlayerAvatarIds[_playerId], clientX, clientY);
+  }
+
+  if (_drag === null) {
+    return;
+  }
+
+  const top = _drag.targetTop - _drag.startY + clientY;
+  const left = _drag.targetLeft - _drag.startX + clientX;
   const isOutside =
-    Math.abs(drag.startY - event.clientY) +
-      Math.abs(drag.startX - event.clientX) >
+    Math.abs(_drag.startY - event.clientY) +
+      Math.abs(_drag.startX - event.clientX) >
     50;
 
-  drag.wasOutside = drag.wasOutside || isOutside;
+  _drag.wasOutside = _drag.wasOutside || isOutside;
 
-  const thingId = drag.target.id;
+  const thingId = _drag.target.id;
 
   if (thingId.endsWith(MOVE_DECK_CONTROL)) {
     moveCardDeck(thingId.slice(0, -MOVE_DECK_CONTROL.length), top, left);
@@ -1137,28 +1176,32 @@ function onMouseMove(drag, event) {
   window.requestAnimationFrame(render);
 }
 
-function onMouseUp(drag, event) {
+function onMouseUp(event) {
   event.preventDefault();
+
+  if (_drag === null) {
+    return;
+  }
 
   const touch = event.type === "touchmove";
   const clientY = touch ? event.touches[0].clientY : event.clientY;
   const clientX = touch ? event.touches[0].clientX : event.clientX;
-  const top = drag.targetTop - drag.startY + clientY;
-  const left = drag.targetLeft - drag.startX + clientX;
+  const top = _drag.targetTop - _drag.startY + clientY;
+  const left = _drag.targetLeft - _drag.startX + clientX;
   const isOutside =
-    Math.abs(drag.startY - event.clientY) +
-      Math.abs(drag.startX - event.clientX) >
+    Math.abs(_drag.startY - event.clientY) +
+      Math.abs(_drag.startX - event.clientX) >
     50;
 
-  drag.wasOutside = drag.wasOutside || isOutside;
+  _drag.wasOutside = _drag.wasOutside || isOutside;
 
-  const thingId = drag.target.id;
+  const thingId = _drag.target.id;
 
   if (thingId.endsWith(MOVE_DECK_CONTROL)) {
     placeCardDeck(thingId.slice(0, -MOVE_DECK_CONTROL.length), top, left);
   } else {
     if (_clientScene[thingId].behavesAs === PLAYING_CARD) {
-      if (drag.wasOutside) {
+      if (_drag.wasOutside) {
         placePlayingCard(thingId, top, left);
       } else {
         placePlayingCard(thingId, top, left);
@@ -1166,7 +1209,7 @@ function onMouseUp(drag, event) {
       }
     }
     if (_clientScene[thingId].behavesAs === DICE) {
-      if (drag.wasOutside) {
+      if (_drag.wasOutside) {
         moveDice(thingId, top, left);
       } else {
         moveDice(thingId, top, left);
@@ -1178,8 +1221,8 @@ function onMouseUp(drag, event) {
     }
   }
 
-  document.onmousemove = null;
-  document.onmouseup = null;
+  _drag = null;
+
   window.requestAnimationFrame(render);
 }
 
@@ -1308,3 +1351,7 @@ function keepWebsocketConnected() {
 
 let _websocket = null;
 keepWebsocketConnected();
+
+document.onmousedown = onMouseDown;
+document.onmousemove = onMouseMove;
+document.onmouseup = onMouseUp;
