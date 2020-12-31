@@ -229,10 +229,12 @@ function rollDice(thingId) {
 */
 
 function renderPlayerAvatar(thingId) {
+  const thing = _clientScene[thingId];
   let element = document.getElementById(thingId);
   if (element === null) {
     element = document.createElement("textarea");
     element.id = thingId;
+    element.value = thing.text;
 
     if (_clientScene[thingId].represents === _playerId) {
       element.className = THIS_PLAYER_AVATAR;
@@ -246,16 +248,11 @@ function renderPlayerAvatar(thingId) {
     document.body.appendChild(element);
   }
 
-  const thing = _clientScene[thingId];
   element.style.top = thing.computedTop + "px";
   element.style.left = thing.computedLeft + "px";
   element.style.width = thing.computedWidth + "px";
   element.style.height = thing.computedHeight + "px";
   element.style.zIndex = thing.computedZIndex;
-  if (element.value !== thing.text) {
-    // Setting the content resets cursor position.
-    element.value = thing.text;
-  }
 }
 
 function editPlayerAvatar(thingId, text) {
@@ -281,8 +278,14 @@ function renderTextArea(thingId) {
     // DOM properties
     element.id = thingId;
     element.className = TEXT_AREA;
+    element.value = thing.text;
     element.onkeyup = onKeyUp;
 
+    // Player Avatar tag
+    const tagElem = document.createElement("div");
+    tagElem.className = PLAYER_TAG;
+
+    element.appendChild(tagElem);
     document.body.appendChild(element);
   }
 
@@ -291,9 +294,18 @@ function renderTextArea(thingId) {
   element.style.width = thing.computedWidth + "px";
   element.style.height = thing.computedHeight + "px";
   element.style.zIndex = thing.computedZIndex;
-  if (element.value !== thing.text) {
-    // Setting the content resets cursor position.
+  if (
+    thing.ownedBy === null ||
+    thing.ownedBy === _playerId ||
+    thing.upToTick + 5 < _gameTicks
+  ) {
+    element.disabled = false;
+    element.childNodes[0].style.visibility = "hidden";
+  } else {
     element.value = thing.text;
+    element.disabled = true;
+    element.childNodes[0].style.visibility = "visible";
+    element.childNodes[0].innerHTML = _clientScene[thingId].ownedBy;
   }
 }
 
@@ -1191,6 +1203,10 @@ function handleGameJoined(msg) {
   _boardId = msg.boardId;
   _gameId = msg.gameId;
   _playerId = msg.playerId;
+  _gameTicks = 0;
+  _serverScene = {};
+  _clientScene = {};
+  _diffToServer = {};
   const url = new URL(window.location);
   url.searchParams.set("board", _boardId);
   url.searchParams.set("game", _gameId);
@@ -1246,18 +1262,31 @@ function parseUrl(url) {
 |___|_| |_|_|\__|_|\__,_|_|_/___\__,_|\__|_|\___/|_| |_|
 */
 
-const _websocket = new WebSocket("ws://" + window.location.hostname + ":8080");
+function keepWebsocketConnected() {
+  _websocket = new WebSocket("ws://" + window.location.hostname + ":8080");
 
-_websocket.onopen = function () {
-  requestJoinGame();
-};
+  _websocket.onopen = function () {
+    requestJoinGame();
+  };
 
-_websocket.onmessage = function (msg) {
-  const obj = JSON.parse(msg.data);
-  if (obj.announce === "gameJoined") {
-    handleGameJoined(obj);
-  }
-  if (obj.announce === "sceneModified") {
-    handleSceneModified(obj);
-  }
-};
+  _websocket.onmessage = function (msg) {
+    const obj = JSON.parse(msg.data);
+    if (obj.announce === "gameJoined") {
+      handleGameJoined(obj);
+    }
+    if (obj.announce === "sceneModified") {
+      handleSceneModified(obj);
+    }
+  };
+
+  _websocket.onerror = function () {
+    window.setTimeout(keepWebsocketConnected, 2000);
+  };
+
+  _websocket.onclose = function () {
+    window.setTimeout(keepWebsocketConnected, 2000);
+  };
+}
+
+let _websocket = null;
+keepWebsocketConnected();
