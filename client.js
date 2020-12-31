@@ -1,6 +1,5 @@
 "use strict";
 
-// TODO: Game joining interface
 // TODO: Game state hydration from game config.
 
 // TODO: Fix touchmove on cards
