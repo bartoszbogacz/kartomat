@@ -1,28 +1,5 @@
 "use strict";
 
-// TODO: Game state hydration from game config.
-
-// TODO: Fix touchmove on cards
-// TODO: Moveable player Avatars
-// TODO: Wizard board
-
-// TODO: Reify decks into game objects, i.e. their controls
-// TODO: - Instead of left for deck ordering introduce deckIndex
-
-// TODO: Introduce entity component traits for things to avoid this
-//      weird dispatch code.
-
-// TODO: Hierarchical derived data structure from CRDT scene with computed values, e.g.
-//  {overlaps: ...., players: ...., decks: ..., cards: ..., areas: ..., ...}
-// TODO: - Player tags should have player names
-// TODO: - Do not use computed values anymore for computations,
-//        only rendering.
-// TODO: - Move derived property computation out of render and
-//        into object specific classes
-
-// TODO: Do not mix behaviour constants and CSS class name constants,
-//  e.g. PLAYER_AVATAR, THIS_PLAYER_AVATAR, OTHER_PLAYER_AVATAR, NO_PLAYER_AVATAR
-
 /*
   Constants
 */
