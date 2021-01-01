@@ -1121,6 +1121,11 @@ function onMouseMove(event) {
     moveCursor(_cachedPlayerAvatarIds[_playerId], clientX, clientY);
   }
 
+  // Do not require a animation frame render after just moving the
+  // without an object being actively dragged. It is not necessary,
+  // i.e. we do not render our own cursor, and the performance suffers
+  // greatly.
+
   if (_drag === null) {
     return;
   }
