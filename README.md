@@ -15,6 +15,8 @@ licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1)
 
 # Issues
 
+- There can only be one view per player, since sockets has an index on player.
+
 - Touch movement does not work across all devices and browsers
 
 - Concurrent addition and removal from cards of a deck, especially of
@@ -27,16 +29,13 @@ playing area and that cards do hide within decks having wrong zIndices.
 
 - Allow simply copying of URL for other players to join the game
 
-The playerId could be stored in localStorage?
-
-- A Wizard game board
+- Global player UUID that remembers the playerAvatar.text so that
+  if a player joins his name is set automatically
 
 # Nive to have
 
 - Player Avatars that can be dragged
 
-- A board editor that saves the current state
+- Ability to remove elements from the editor
 
-Saved state should be sanitized, by resetting all upToTick,
-ownedBy, PlayerAvatar.represents and PlayerAvatar.text to
-their defaults.
+- A Wizard game board

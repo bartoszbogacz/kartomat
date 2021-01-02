@@ -6,36 +6,10 @@
 
 const MINIMUM_OVERLAP = 500;
 const DECK_Z_DEPTH = 200;
-
 const PLAYING_BOARD = "PlayingBoard";
-const PLAYING_BOARD_SYNCHRONIZED_PROPERTIES = [
-  "ownedBy",
-  "top",
-  "left",
-  "zIndex",
-];
-
 const MARBLE = "Marble";
-const MARBLE_SYNCHRONIZED_PROPERTIES = ["ownedBy", "top", "left", "zIndex"];
-
 const DICE = "Dice";
-const DICE_SYNCHRONIZED_PROPERTIES = [
-  "ownedBy",
-  "top",
-  "left",
-  "sideUp",
-  "zIndex",
-];
-
 const TEXT_AREA = "TextArea";
-const TEXT_AREA_SYNCHRONIZED_PROPERTIES = [
-  "ownedBy",
-  "top",
-  "left",
-  "zIndex",
-  "text",
-];
-
 const PLAYER_CURSOR = "PlayerCursor";
 const THIS_PLAYER_CURSOR = "ThisPlayerCursor";
 const OTHER_PLAYER_CURSOR = "OtherPlayerCursor";
@@ -45,40 +19,8 @@ const THIS_PLAYER_AVATAR = "ThisPlayerAvatar";
 const OTHER_PLAYER_AVATAR = "OtherPlayerAvatar";
 const NO_PLAYER_AVATAR = "NoPlayerAvatar";
 const PLAYER_AVATAR = "PlayerAvatar";
-// Do not synchronize represents, effectively preventing
-// modification of other players names.
-const PLAYER_AVATAR_SYNCHRONIZED_PROPERTIES = [
-  "ownedBy",
-  "top",
-  "left",
-  "zIndex",
-  "text",
-  "cursorLeft",
-  "cursorTop",
-];
-
 const PRIVATE_AREA = "PrivateArea";
-const PRIVATE_AREA_SYNCHRONIZED_PROPERTIES = [
-  "ownedBy",
-  "top",
-  "left",
-  "height",
-  "width",
-  "zIndex",
-];
-
 const PLAYING_CARD = "PlayingCard";
-const PLAYING_CARD_SYNCHRONIZED_PROPERTIES = [
-  "ownedBy",
-  "isFaceup",
-  "onDeck",
-  "isFolded",
-  "stride",
-  "top",
-  "left",
-  "zIndex",
-];
-
 const MOVE_DECK_CONTROL = "MoveDeckControl";
 const SHUFFLE_DECK_CONTROL = "ShuffleDeckControl";
 const FOLD_DECK_CONTROL = "FoldDeckControl";
@@ -107,6 +49,31 @@ let _cachedPlayerAvatarIds = {};
 |_|   |_|\__,_|\__, |_|_| |_|\__, |____/ \___/ \__,_|_|  \__,_|
                |___/         |___/
 */
+
+function createEditablePlayingBoard() {
+  let thingId = null;
+  for (let i = 0; i < 100; i++) {
+    if (_clientScene.hasOwnProperty("PlayingBoard" + i) === false) {
+      thingId = "PlayingBoard" + i;
+      break;
+    }
+  }
+
+  console.assert(thingId !== null);
+
+  _clientScene[thingId] = {
+    upToTick: _gameTicks,
+    ownedBy: _playerId,
+    behavesAs: PLAYING_BOARD,
+    canBeEdited: true,
+    image: "boards/dog8.png",
+    top: 0,
+    left: 0,
+    width: 400,
+    height: 400,
+    zIndex: 0,
+  };
+}
 
 function renderPlayingBoard(thingId) {
   let element = document.getElementById(thingId);
@@ -139,6 +106,31 @@ function renderPlayingBoard(thingId) {
 | |  | | (_| | |  | |_) | |  __/
 |_|  |_|\__,_|_|  |_.__/|_|\___|
 */
+
+function createEditableMarble() {
+  let thingId = null;
+  for (let i = 0; i < 100; i++) {
+    if (_clientScene.hasOwnProperty("Marble" + i) === false) {
+      thingId = "Marble" + i;
+      break;
+    }
+  }
+
+  console.assert(thingId !== null);
+
+  _clientScene[thingId] = {
+    upToTick: _gameTicks,
+    ownedBy: _playerId,
+    behavesAs: MARBLE,
+    canBeEdited: true,
+    backgroundColor: "snow",
+    top: 0,
+    left: 0,
+    width: 400,
+    height: 400,
+    zIndex: 0,
+  };
+}
 
 function renderMarble(thingId) {
   let element = document.getElementById(thingId);
@@ -175,6 +167,39 @@ function moveMarble(thingId, top, left) {
 | |_| | | (_|  __/
 |____/|_|\___\___|
 */
+
+function createEditableDice() {
+  let thingId = null;
+  for (let i = 0; i < 100; i++) {
+    if (_clientScene.hasOwnProperty("Dice" + i) === false) {
+      thingId = "Dice" + i;
+      break;
+    }
+  }
+
+  console.assert(thingId !== null);
+
+  _clientScene[thingId] = {
+    upToTick: 0,
+    ownedBy: null,
+    behavesAs: "Dice",
+    canBeEdited: true,
+    sides: [
+      "dices/dice6_side1.png",
+      "dices/dice6_side2.png",
+      "dices/dice6_side3.png",
+      "dices/dice6_side4.png",
+      "dices/dice6_side5.png",
+      "dices/dice6_side6.png",
+    ],
+    sideUp: 0,
+    top: 30,
+    left: 830,
+    height: 50,
+    width: 50,
+    zIndex: 0,
+  };
+}
 
 function renderDice(thingId) {
   let element = document.getElementById(thingId);
@@ -220,6 +245,34 @@ function rollDice(thingId) {
 |_|   |_|\__,_|\__, |\___|_|/_/   \_\_/ \__,_|\__\__,_|_|
                |___/
 */
+
+function createEditablePlayerAvatar() {
+  let thingId = null;
+  for (let i = 0; i < 100; i++) {
+    if (_clientScene.hasOwnProperty("PlayerAvatar" + i) === false) {
+      thingId = "PlayerAvatar" + i;
+      break;
+    }
+  }
+
+  console.assert(thingId !== null);
+
+  _clientScene[thingId] = {
+    upToTick: 0,
+    ownedBy: null,
+    behavesAs: "PlayerAvatar",
+    canBeEdited: true,
+    represents: null,
+    text: "Player1",
+    top: 30,
+    left: 920,
+    height: 30,
+    width: 200,
+    zIndex: 0,
+    cursorTop: 0,
+    cursorLeft: 0,
+  };
+}
 
 function renderPlayerAvatar(thingId) {
   const thing = _clientScene[thingId];
@@ -296,6 +349,31 @@ function moveCursor(thingId, left, top) {
   |_|\___/_/\_\\__/_/   \_|_|  \___|\__,_|
 */
 
+function createEditableTextArea() {
+  let thingId = null;
+  for (let i = 0; i < 100; i++) {
+    if (_clientScene.hasOwnProperty("TextArea" + i) === false) {
+      thingId = "TextArea" + i;
+      break;
+    }
+  }
+
+  console.assert(thingId !== null);
+
+  _clientScene[thingId] = {
+    upToTick: 0,
+    ownedBy: null,
+    canBeEdited: true,
+    behavesAs: TEXT_AREA,
+    text: "Hello World",
+    top: 200,
+    left: 1130,
+    height: 250,
+    width: 200,
+    zIndex: 0,
+  };
+}
+
 function renderTextArea(thingId) {
   const thing = _clientScene[thingId];
   let element = document.getElementById(thingId);
@@ -349,6 +427,30 @@ function editTextArea(thingId, text) {
 |_|   |_|  |_| \_/ \__,_|\__\___/_/   \_|_|  \___|\__,_|
 */
 
+function createEditablePrivateArea() {
+  let thingId = null;
+  for (let i = 0; i < 100; i++) {
+    if (_clientScene.hasOwnProperty("PrivateArea" + i) === false) {
+      thingId = "PrivateArea" + i;
+      break;
+    }
+  }
+
+  console.assert(thingId !== null);
+
+  _clientScene[thingId] = {
+    upToTick: 0,
+    ownedBy: null,
+    behavesAs: PRIVATE_AREA,
+    canBeEdited: true,
+    top: 470,
+    left: 830,
+    height: 300,
+    width: 500,
+    zIndex: 0,
+  };
+}
+
 function renderPrivateArea(thingId) {
   let element = document.getElementById(thingId);
   if (element === null) {
@@ -378,6 +480,39 @@ function renderPrivateArea(thingId) {
 |_|   |_|\__,_|\__, |_|_| |_|\__, |\____\__,_|_|  \__,_|___/
                |___/         |___/
 */
+
+// TODO: Cards are dices that can be stacked and have two sides
+// with and a [0 1; 1 0] transition probability matrix.
+
+function createEditableCard() {
+  let thingId = null;
+  for (let i = 0; i < 100; i++) {
+    if (_clientScene.hasOwnProperty("Card" + i) === false) {
+      thingId = "Card" + i;
+      break;
+    }
+  }
+
+  console.assert(thingId !== null);
+
+  _clientScene[thingId] = {
+    upToTick: 0,
+    ownedBy: null,
+    behavesAs: "PlayingCard",
+    canBeEdited: true,
+    faceImage: "rummy/club_1.png",
+    backImage: "rummy/back_red.png",
+    isFaceup: true,
+    onDeck: null,
+    isFolded: true,
+    stride: 30,
+    top: 270,
+    left: 830,
+    height: 150,
+    width: 100,
+    zIndex: 0,
+  };
+}
 
 function findOrCreatePlayingCard(thingId) {
   let element = document.getElementById(thingId);
@@ -827,12 +962,258 @@ function recondenseCardDecks() {
 }
 
 /*
+ _____    _ _ _    ____            _             _
+| ____|__| (_| |_ / ___|___  _ __ | |_ _ __ ___ | |___
+|  _| / _` | | __| |   / _ \| '_ \| __| '__/ _ \| / __|
+| |__| (_| | | |_| |__| (_) | | | | |_| | | (_) | \__ \
+|_____\__,_|_|\__|\____\___/|_| |_|\__|_|  \___/|_|___/
+*/
+
+function renderModifyBackgroundControls(thingId) {
+  const thing = _clientScene[thingId];
+  let element = document.getElementById(thingId + "ModifyBackground");
+  if (element === null) {
+    element = document.createElement("textarea");
+    element.id = thingId + "ModifyBackground";
+    element.onkeyup = onKeyUp;
+    element.className = "ModifyBackground";
+    element.value = thing.backgroundColor;
+    element.style.position = "absolute";
+    document.body.appendChild(element);
+  }
+
+  element.style.top = thing.computedTop + 60 + "px";
+  element.style.left = thing.computedLeft + "px";
+  element.style.zIndex = thing.zIndex + 1;
+
+  if (
+    thing.ownedBy === null ||
+    thing.ownedBy === _playerId ||
+    thing.upToTick + 5 < _gameTicks
+  ) {
+    element.disabled = false;
+  } else {
+    element.value = thing.text;
+    element.disabled = true;
+  }
+}
+
+function modifyBackground(thingId, text) {
+  _clientScene[thingId].backgroundColor = text;
+}
+
+function renderModifyImageControls(thingId) {
+  const thing = _clientScene[thingId];
+  let element = document.getElementById(thingId + "ModifyImage");
+  if (element === null) {
+    element = document.createElement("textarea");
+    element.id = thingId + "ModifyImage";
+    element.onkeyup = onKeyUp;
+    element.className = "ModifyImage";
+    element.innerHTML = thing.image;
+    element.style.position = "absolute";
+    document.body.appendChild(element);
+  }
+
+  element.style.top = thing.computedTop + 50 + "px";
+  element.style.left = thing.computedLeft + "px";
+  element.style.zIndex = thing.zIndex + 1;
+
+  if (
+    thing.ownedBy === null ||
+    thing.ownedBy === _playerId ||
+    thing.upToTick + 5 < _gameTicks
+  ) {
+    element.disabled = false;
+  } else {
+    element.value = thing.text;
+    element.disabled = true;
+  }
+}
+
+function modifyImage(thingId, text) {
+  _clientScene[thingId].image = text;
+}
+
+function renderTransformControls(thingId) {
+  const thing = _clientScene[thingId];
+  let moveControl = document.getElementById(thingId + "MoveControl");
+  if (moveControl === null) {
+    moveControl = document.createElement("div");
+    moveControl.id = thingId + "MoveControl";
+    moveControl.onmousedown = onMouseDown;
+    moveControl.className = "MoveControl";
+    moveControl.innerHTML = thing.behavesAs;
+    moveControl.style.userSelect = "none";
+    moveControl.style.position = "absolute";
+    moveControl.style.borderWidth = "1px";
+    moveControl.style.borderStyle = "solid none none solid";
+    moveControl.style.borderColor = "black";
+    moveControl.style.backgroundColor = "snow";
+    document.body.appendChild(moveControl);
+  }
+
+  let resizeControl = document.getElementById(thingId + "ResizeControl");
+  if (resizeControl === null) {
+    resizeControl = document.createElement("div");
+    resizeControl.id = thingId + "ResizeControl";
+    resizeControl.onmousedown = onMouseDown;
+    resizeControl.className = "ResizeControl";
+    resizeControl.style.userSelect = "none";
+    resizeControl.style.position = "absolute";
+    resizeControl.style.width = "30px";
+    resizeControl.style.height = "30px";
+    resizeControl.style.borderWidth = "1px";
+    resizeControl.style.borderStyle = "none solid solid none";
+    resizeControl.style.borderColor = "black";
+    resizeControl.style.backgroundColor = "snow";
+    document.body.appendChild(resizeControl);
+  }
+
+  moveControl.style.top = thing.computedTop + "px";
+  moveControl.style.left = thing.computedLeft + "px";
+  moveControl.style.zIndex = thing.computedZIndex + 1;
+
+  resizeControl.style.top =
+    thing.computedTop + thing.computedHeight - 30 + "px";
+  resizeControl.style.left =
+    thing.computedLeft + thing.computedWidth - 30 + "px";
+  resizeControl.style.zIndex = thing.computedZIndex + 1;
+}
+
+function resizeEditableThing(thingId, top, left) {
+  const thing = _clientScene[thingId];
+  if (thing.canBeEdited === false) {
+    return;
+  }
+
+  thing.height = top - thing.computedTop + 30;
+  thing.width = left - thing.computedLeft + 30;
+}
+
+function moveEditableThing(thingId, top, left) {
+  const thing = _clientScene[thingId];
+  if (thing.canBeEdited === false) {
+    return;
+  }
+
+  thing.top = top;
+  thing.left = left;
+}
+
+function renderModifySidesControls(thingId) {
+  const thing = _clientScene[thingId];
+  let element = document.getElementById(thingId + "ModifySides");
+  if (element === null) {
+    element = document.createElement("textarea");
+    element.id = thingId + "ModifySides";
+    element.onkeyup = onKeyUp;
+    element.className = "ModifySides";
+    element.value = JSON.stringify(thing.sides, null, "  ");
+    element.style.position = "absolute";
+    document.body.appendChild(element);
+  }
+
+  element.style.top = thing.computedTop + 60 + "px";
+  element.style.left = thing.computedLeft + "px";
+  element.style.zIndex = thing.zIndex + 1;
+
+  if (
+    thing.ownedBy === null ||
+    thing.ownedBy === _playerId ||
+    thing.upToTick + 5 < _gameTicks
+  ) {
+    element.disabled = false;
+  } else {
+    element.value = JSON.stringify(thing.sides, null, "  ");
+    element.disabled = true;
+  }
+}
+
+function modifySides(thingId, text) {
+  _clientScene[thingId].sides = JSON.parse(text);
+}
+
+function renderModifyFaceControls(thingId) {
+  const thing = _clientScene[thingId];
+  let faceText = document.getElementById(thingId + "ModifyFaceImage");
+  if (faceText === null) {
+    faceText = document.createElement("textarea");
+    faceText.id = thingId + "ModifyFaceImage";
+    faceText.onkeyup = onKeyUp;
+    faceText.className = "ModifyFaceImage";
+    faceText.value = thing.faceImage;
+    faceText.style.position = "absolute";
+    document.body.appendChild(faceText);
+  }
+
+  let backText = document.getElementById(thingId + "ModifyBackImage");
+  if (backText === null) {
+    backText = document.createElement("textarea");
+    backText.id = thingId + "ModifyBackImage";
+    backText.onkeyup = onKeyUp;
+    backText.className = "ModifyBackImage";
+    backText.value = thing.backImage;
+    backText.style.position = "absolute";
+    document.body.appendChild(backText);
+  }
+
+  faceText.style.top = thing.computedTop + 30 + "px";
+  faceText.style.left = thing.computedLeft + "px";
+  faceText.style.zIndex = thing.computedZIndex + 1;
+
+  backText.style.top = thing.computedTop + 90 + "px";
+  backText.style.left = thing.computedLeft + "px";
+  backText.style.zIndex = thing.computedZIndex + 1;
+
+  if (
+    thing.ownedBy === null ||
+    thing.ownedBy === _playerId ||
+    thing.upToTick + 5 < _gameTicks
+  ) {
+    faceText.disabled = false;
+    backText.disabled = false;
+  } else {
+    faceText.value = thing.faceImage;
+    faceText.disabled = true;
+    backText.value = thing.faceImage;
+    backText.disabled = true;
+  }
+}
+
+function modifyFaceImage(thingId, text) {
+  _clientScene[thingId].faceImage = text;
+}
+
+function modifyBackImage(thingId, text) {
+  _clientScene[thingId].backImage = text;
+}
+
+/*
  ____                   _                     _          _   _
 / ___| _   _ _ __   ___| |__  _ __ ___  _ __ (_)______ _| |_(_) ___  _ __
 \___ \| | | | '_ \ / __| '_ \| '__/ _ \| '_ \| |_  / _` | __| |/ _ \| '_ \
  ___) | |_| | | | | (__| | | | | | (_) | | | | |/ | (_| | |_| | (_) | | | |
 |____/ \__, |_| |_|\___|_| |_|_|  \___/|_| |_|_/___\__,_|\__|_|\___/|_| |_|
        |___/
+*/
+
+/* TODO:
+- Enitity component system with state being
+
+> {"synchronized": {id1: {owners: p1, clock: [1, 2]}},
+> "visible": {id1: {text: "Hello"}, id2: {image: ".png"}},
+> "movable": {id1: {x: 0, y: 0}, id2: {x: 1, y:1}},
+> "turnable": {dice1: {images: [1, 2, 3]}, card4: {images: [1, 2]}}
+> "stacking": {deck1: {0.1: card1, 0.9: card2, 0.07: card3}}
+> "editable": {id1: true, id2: false}}
+
+- and projections computed on basis of, e.g. stacking:
+
+> {"overlaps": {(id1, id2): 10, (id1, id3): 0},
+> "movable": {card1ondeck1: {x: 0 + 1, y: 0 + 0}}}
+
+- and a proper convergent replicated data type for synchronization.
 */
 
 function render() {
@@ -845,30 +1226,6 @@ function render() {
       _clientScene[thingId] = {};
     }
 
-    // Only synchronize a specific set of properties
-    let synchronizedProperties = [];
-    if (_clientScene[thingId].behavesAs === PLAYING_CARD) {
-      synchronizedProperties = PLAYING_CARD_SYNCHRONIZED_PROPERTIES;
-    }
-    if (_clientScene[thingId].behavesAs === PRIVATE_AREA) {
-      synchronizedProperties = PRIVATE_AREA_SYNCHRONIZED_PROPERTIES;
-    }
-    if (_clientScene[thingId].behavesAs === TEXT_AREA) {
-      synchronizedProperties = TEXT_AREA_SYNCHRONIZED_PROPERTIES;
-    }
-    if (_clientScene[thingId].behavesAs === PLAYER_AVATAR) {
-      synchronizedProperties = PLAYER_AVATAR_SYNCHRONIZED_PROPERTIES;
-    }
-    if (_clientScene[thingId].behavesAs === DICE) {
-      synchronizedProperties = DICE_SYNCHRONIZED_PROPERTIES;
-    }
-    if (_clientScene[thingId].behavesAs === MARBLE) {
-      synchronizedProperties = MARBLE_SYNCHRONIZED_PROPERTIES;
-    }
-    if (_clientScene[thingId].behavesAs === PLAYING_BOARD) {
-      synchronizedProperties = PLAYING_BOARD_SYNCHRONIZED_PROPERTIES;
-    }
-
     // Determine if clientScene changed w.r.t. serverScene and
     // whether such change is allowed at all.
     if (
@@ -876,8 +1233,12 @@ function render() {
       _serverScene[thingId].ownedBy === _playerId ||
       _serverScene[thingId].upToTick + 5 < _gameTicks
     ) {
-      for (const prop of synchronizedProperties) {
-        if (_clientScene[thingId][prop] !== _serverScene[thingId][prop]) {
+      for (const prop of Object.keys(_clientScene[thingId])) {
+        if (
+          prop !== "ownedBy" &&
+          prop !== "upToTick" &&
+          _clientScene[thingId][prop] !== _serverScene[thingId][prop]
+        ) {
           _clientScene[thingId].ownedBy = _playerId;
           _clientScene[thingId].upToTick = _gameTicks + 1;
           break;
@@ -889,12 +1250,24 @@ function render() {
     // revert any dis-allowed differences to server.
     if (_serverScene[thingId].upToTick < _clientScene[thingId].upToTick) {
       _diffToServer[thingId] = {};
-      for (const prop of synchronizedProperties) {
+      for (const prop of Object.keys(_clientScene[thingId])) {
         _diffToServer[thingId][prop] = _clientScene[thingId][prop];
       }
     } else {
       for (const [prop, value] of Object.entries(_serverScene[thingId])) {
         _clientScene[thingId][prop] = value;
+      }
+    }
+  }
+
+  // Synchronize new objects from client to server
+  for (const thingId of Object.keys(_clientScene)) {
+    if (_serverScene.hasOwnProperty(thingId) === false) {
+      _clientScene[thingId].ownedBy = _playerId;
+      _clientScene[thingId].upToTick = _gameTicks + 1;
+      _diffToServer[thingId] = {};
+      for (const prop of Object.keys(_clientScene[thingId])) {
+        _diffToServer[thingId][prop] = _clientScene[thingId][prop];
       }
     }
   }
@@ -911,6 +1284,8 @@ function render() {
     if (thing.behavesAs === PLAYING_CARD) {
       thing.computedTop = thing.top;
       thing.computedLeft = thing.left;
+      thing.computedHeight = thing.height;
+      thing.computedWidth = thing.width;
       thing.computedZIndex = thing.zIndex;
       thing.computedLeadsDeck = false;
     }
@@ -1043,6 +1418,40 @@ function render() {
     if (_clientScene[thingId].behavesAs === PLAYING_BOARD) {
       renderPlayingBoard(thingId);
     }
+    if (
+      _clientScene[thingId].canBeEdited === true &&
+      _clientScene[thingId].hasOwnProperty("top") &&
+      _clientScene[thingId].hasOwnProperty("left") &&
+      _clientScene[thingId].hasOwnProperty("height") &&
+      _clientScene[thingId].hasOwnProperty("width")
+    ) {
+      renderTransformControls(thingId);
+    }
+    if (
+      _clientScene[thingId].canBeEdited === true &&
+      _clientScene[thingId].hasOwnProperty("image")
+    ) {
+      renderModifyImageControls(thingId);
+    }
+    if (
+      _clientScene[thingId].canBeEdited === true &&
+      _clientScene[thingId].hasOwnProperty("backgroundColor")
+    ) {
+      renderModifyBackgroundControls(thingId);
+    }
+    if (
+      _clientScene[thingId].canBeEdited === true &&
+      _clientScene[thingId].hasOwnProperty("sides")
+    ) {
+      renderModifySidesControls(thingId);
+    }
+    if (
+      _clientScene[thingId].canBeEdited === true &&
+      _clientScene[thingId].hasOwnProperty("faceImage") &&
+      _clientScene[thingId].hasOwnProperty("backImage")
+    ) {
+      renderModifyFaceControls(thingId);
+    }
   }
 }
 
@@ -1064,10 +1473,31 @@ function render() {
 // for DOM elements that would be different after an update.
 
 function onMouseClick(event) {
-  event.preventDefault();
+  // event.preventDefault();
 
   const thingId = event.target.id;
 
+  if (thingId === "CreateEditablePlayingBoard") {
+    createEditablePlayingBoard();
+  }
+  if (thingId === "CreateEditableMarble") {
+    createEditableMarble();
+  }
+  if (thingId === "CreateEditableDice") {
+    createEditableDice();
+  }
+  if (thingId === "CreateEditablePrivateArea") {
+    createEditablePrivateArea();
+  }
+  if (thingId === "CreateEditablePlayerAvatar") {
+    createEditablePlayerAvatar();
+  }
+  if (thingId === "CreateEditableCard") {
+    createEditableCard();
+  }
+  if (thingId === "CreateEditableTextArea") {
+    createEditableTextArea();
+  }
   if (thingId.endsWith(SHUFFLE_DECK_CONTROL)) {
     shuffleCardDeck(thingId.slice(0, -SHUFFLE_DECK_CONTROL.length));
   }
@@ -1082,7 +1512,14 @@ function onMouseClick(event) {
 }
 
 function onMouseDown(event) {
-  event.preventDefault();
+  /* TODO
+  - dragAndDropOnMoves(element, this, ["top", "left"]); 
+  registers the proper DOM callbacks and calls back the right class functions. Allieviates the need to write
+  a handler for each element. Or keep a {"canBeMoved": ...} in the projected scene graph which one single
+  handler iterates through. Probably more intuitive.
+  */
+
+  // event.preventDefault();
 
   const touch = event.type === "touchmove";
   const clientY = touch ? event.touches[0].clientY : event.clientY;
@@ -1101,7 +1538,9 @@ function onMouseDown(event) {
 
   if (thingId.endsWith(MOVE_DECK_CONTROL)) {
     takeCardDeck(thingId.slice(0, -MOVE_DECK_CONTROL.length));
-  } else {
+  }
+
+  if (_clientScene.hasOwnProperty(thingId)) {
     if (_clientScene[thingId].behavesAs === PLAYING_CARD) {
       takePlayingCard(thingId);
     }
@@ -1111,7 +1550,7 @@ function onMouseDown(event) {
 }
 
 function onMouseMove(event) {
-  event.preventDefault();
+  // event.preventDefault();
 
   const touch = event.type === "touchmove";
   const clientY = touch ? event.touches[0].clientY : event.clientY;
@@ -1143,7 +1582,16 @@ function onMouseMove(event) {
 
   if (thingId.endsWith(MOVE_DECK_CONTROL)) {
     moveCardDeck(thingId.slice(0, -MOVE_DECK_CONTROL.length), top, left);
-  } else {
+  }
+
+  if (thingId.endsWith("ResizeControl")) {
+    resizeEditableThing(thingId.slice(0, -"ResizeControl".length), top, left);
+  }
+  if (thingId.endsWith("MoveControl")) {
+    moveEditableThing(thingId.slice(0, -"MoveControl".length), top, left);
+  }
+
+  if (_clientScene.hasOwnProperty(thingId)) {
     if (_clientScene[thingId].behavesAs == PLAYING_CARD) {
       movePlayingCard(thingId, top, left);
     }
@@ -1159,7 +1607,7 @@ function onMouseMove(event) {
 }
 
 function onMouseUp(event) {
-  event.preventDefault();
+  // event.preventDefault();
 
   if (_drag === null) {
     return;
@@ -1181,7 +1629,16 @@ function onMouseUp(event) {
 
   if (thingId.endsWith(MOVE_DECK_CONTROL)) {
     placeCardDeck(thingId.slice(0, -MOVE_DECK_CONTROL.length), top, left);
-  } else {
+  }
+
+  if (thingId.endsWith("ResizeControl")) {
+    resizeEditableThing(thingId.slice(0, -"ResizeControl".length), top, left);
+  }
+  if (thingId.endsWith("MoveControl")) {
+    moveEditableThing(thingId.slice(0, -"MoveControl".length), top, left);
+  }
+
+  if (_clientScene.hasOwnProperty(thingId)) {
     if (_clientScene[thingId].behavesAs === PLAYING_CARD) {
       if (_drag.wasOutside) {
         placePlayingCard(thingId, top, left);
@@ -1210,11 +1667,45 @@ function onMouseUp(event) {
 
 function onKeyUp(event) {
   const thingId = event.target.id;
-  if (_clientScene[thingId].behavesAs === TEXT_AREA) {
-    editTextArea(thingId, event.target.value);
+
+  // TODO: textAreaControls(this, "backgroundColor")
+  // Sets up an DOM element, wires handlers, handles lock-out and
+  // and modifies property of scene that gets automatically synchronized
+  // Or a handler iterates {canBeEdited: {id1: true}} and
+  // {hasBackgroundColor: {id1: "blue"}} automatically. Probably more intuitive.
+
+  if (thingId.endsWith("ModifyBackground")) {
+    modifyBackground(
+      thingId.slice(0, -"ModifyBackground".length),
+      event.target.value
+    );
   }
-  if (_clientScene[thingId].behavesAs === PLAYER_AVATAR) {
-    editPlayerAvatar(thingId, event.target.value);
+  if (thingId.endsWith("ModifyImage")) {
+    modifyImage(thingId.slice(0, -"ModifyImage".length), event.target.value);
+  }
+  if (thingId.endsWith("ModifySides")) {
+    modifySides(thingId.slice(0, -"ModifySides".length), event.target.value);
+  }
+  if (thingId.endsWith("ModifyFaceImage")) {
+    modifyFaceImage(
+      thingId.slice(0, -"ModifyFaceImage".length),
+      event.target.value
+    );
+  }
+  if (thingId.endsWith("ModifyBackImage")) {
+    modifyBackImage(
+      thingId.slice(0, -"ModifyBackImage".length),
+      event.target.value
+    );
+  }
+
+  if (_clientScene.hasOwnProperty(thingId)) {
+    if (_clientScene[thingId].behavesAs === TEXT_AREA) {
+      editTextArea(thingId, event.target.value);
+    }
+    if (_clientScene[thingId].behavesAs === PLAYER_AVATAR) {
+      editPlayerAvatar(thingId, event.target.value);
+    }
   }
 
   window.requestAnimationFrame(render);
@@ -1333,6 +1824,46 @@ function keepWebsocketConnected() {
 
 keepWebsocketConnected();
 
-document.body.onmousedown = onMouseDown;
 document.body.onmousemove = onMouseMove;
 document.body.onmouseup = onMouseUp;
+
+// Wire input handlers for elements already present in the HTML
+
+const createEditablePlayingBoardElement = document.getElementById(
+  "CreateEditablePlayingBoard"
+);
+if (createEditablePlayingBoard !== null) {
+  createEditablePlayingBoardElement.onclick = onMouseClick;
+}
+const createEditableMarbleElement = document.getElementById(
+  "CreateEditableMarble"
+);
+if (createEditableMarbleElement !== null) {
+  createEditableMarbleElement.onclick = onMouseClick;
+}
+const createEditableDiceElement = document.getElementById("CreateEditableDice");
+if (createEditableDiceElement !== null) {
+  createEditableDiceElement.onclick = onMouseClick;
+}
+const createEditablePrivateAreaElement = document.getElementById(
+  "CreateEditablePrivateArea"
+);
+if (createEditablePrivateAreaElement !== null) {
+  createEditablePrivateAreaElement.onclick = onMouseClick;
+}
+const createEditablePlayerAvatarElement = document.getElementById(
+  "CreateEditablePlayerAvatar"
+);
+if (createEditablePlayerAvatarElement !== null) {
+  createEditablePlayerAvatarElement.onclick = onMouseClick;
+}
+const createEditableCardElement = document.getElementById("CreateEditableCard");
+if (createEditableCardElement !== null) {
+  createEditableCardElement.onclick = onMouseClick;
+}
+const createEditableTextAreaElement = document.getElementById(
+  "CreateEditableTextArea"
+);
+if (createEditableTextAreaElement !== null) {
+  createEditableTextAreaElement.onclick = onMouseClick;
+}

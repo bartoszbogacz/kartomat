@@ -74,6 +74,20 @@ function handleHTTPRequest(req, res) {
       res.end(data);
     });
   }
+  if (path.endsWith(".jpeg")) {
+    fs.readFile("images" + path, {}, function (err, data) {
+      res.setHeader("Content-Type", "image/jpeg");
+      res.writeHead(200);
+      res.end(data);
+    });
+  }
+  if (path === "/editor.html") {
+    fs.readFile("editor.html", {}, function (err, data) {
+      res.setHeader("Content-Type", "text/html");
+      res.writeHead(200);
+      res.end(data);
+    });
+  }
 }
 
 function handleSocketConnection(socket, request) {
@@ -188,6 +202,15 @@ function handleModifyScene(msg) {
   const changes = msg.changes;
 
   for (const [thingId, diff] of Object.entries(changes)) {
+    // Create a dummy thing if it does not exist on server yet
+    if (runningGames[gameId].scene.hasOwnProperty(thingId) === false) {
+      runningGames[gameId].scene[thingId] = {
+        ownedBy: null,
+        upToTick: 0,
+      };
+    }
+
+    // Check if client is allowed to modify thing, otherwise bail
     const thing = runningGames[gameId].scene[thingId];
     if (
       thing.ownedBy !== null &&
