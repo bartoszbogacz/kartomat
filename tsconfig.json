@@ -4,5 +4,5 @@
     "module": "commonjs",
     "strict": true
   },
-  "files": ["ts/decks.ts"]
+  "include": ["ts/*.ts"]
 }
