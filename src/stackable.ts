@@ -23,37 +23,52 @@ function stackableStacks(stackables: {
 
 function stackableTransform(
   stacks: { [key: string]: [string] },
-  movables: { [key: string]: Moveable }
-) {
+  moveables: { [key: string]: Moveable }
+): { [key: string]: Moveable } {
+  let result: { [key: string]: Moveable } = {};
+
   for (const [key, stack] of Object.entries(stacks)) {
     for (let i = 0; i < stack.length; i++) {
-      movables[stack[i]] = {
-        tick: movables[stack[i]].tick,
-        ownedBy: movables[stack[i]].ownedBy,
-        x: movables[stack[i]].x,
-        y: movables[stack[i]].y,
-        z: movables[stack[i]].z,
-        w: movables[stack[i]].w,
-        h: movables[stack[i]].h,
+      result[stack[i]] = {
+        tick: moveables[stack[i]].tick,
+        ownedBy: moveables[stack[i]].ownedBy,
+        x: moveables[stack[i]].x,
+        y: moveables[stack[i]].y,
+        z: moveables[stack[i]].z,
+        w: moveables[stack[i]].w,
+        h: moveables[stack[i]].h,
       };
     }
   }
+
+  for (const [key, m] of Object.entries(moveables)) {
+    if (result.hasOwnProperty(key)) {
+      // Moveable already transformed
+    } else {
+      result[key] = {
+        tick: m.tick,
+        ownedBy: m.ownedBy,
+        x: m.x,
+        y: m.y,
+        z: m.z,
+        w: m.w,
+        h: m.h,
+      };
+    }
+  }
+
+  return result;
 }
 
 function stackableJoinStacking(
   stackableId: string,
   stackables: { [key: string]: Stackable },
   stacks: { [key: string]: [string] },
-  overlaps: { [a: string]: { [b: string]: number } },
-  game: Game
+  overlaps: { [a: string]: { [b: string]: number } }
 ) {
   const largest = stackableFindStacking(stackableId, stacks, overlaps);
-  stackables[stackableId] = {
-    tick: game.tick,
-    ownedBy: game.playerId,
-    onStacking: largest,
-    atIndex: 0,
-  };
+  stackables[stackableId].onStacking = largest;
+  stackables[stackableId].atIndex = 0;
 }
 
 function stackableLeaveStacking(

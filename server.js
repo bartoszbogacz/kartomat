@@ -60,16 +60,16 @@ function handleHTTPRequest(req, res) {
       res.end(data);
     });
   }
-  if (path === "/client.js") {
-    fs.readFile("js/client.js", {}, function (err, data) {
-      res.setHeader("Content-Type", "text/javascript");
+  if (path === "/editor.html") {
+    fs.readFile("html/editor.html", {}, function (err, data) {
+      res.setHeader("Content-Type", "text/html");
       res.writeHead(200);
       res.end(data);
     });
   }
-  if (path === "/editor.html") {
-    fs.readFile("html/editor.html", {}, function (err, data) {
-      res.setHeader("Content-Type", "text/html");
+  if (path.endsWith(".js")) {
+    fs.readFile("src" + path, {}, function (err, data) {
+      res.setHeader("Content-Type", "text/javascript");
       res.writeHead(200);
       res.end(data);
     });

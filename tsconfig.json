@@ -4,5 +4,12 @@
     "module": "commonjs",
     "strict": true
   },
-  "include": ["ts/*.ts"]
+  "files": [
+    "src/cvrdt.ts",
+    "src/game.ts",
+    "src/moveable.ts",
+    "src/stackable.ts",
+    "src/stacking.ts",
+    "src/turnable.ts"
+  ]
 }
