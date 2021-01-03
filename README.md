@@ -9,7 +9,8 @@ initial implementation by Julia Portl, Ole Johannson, and Bartosz Bogacz.
 
 BSD-3-Clause
 
-Modified [svg-cards](http://svg-cards.sourceforge.net/),
+Modified [svg-cards](http://svg-cards.sourceforge.net/)
+licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1),
 originally by [David Bellot](http://david.bellot.free.fr/)
 licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1)
 
@@ -24,6 +25,17 @@ licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1)
 
 Allieviate the issue by ensuring that cards are restted to the
 playing area and that cards do hide within decks having wrong zIndices.
+
+# External
+
+- tsc will not start without modifying PowerShell execution policy
+
+See: [NPM Issue 470](https://github.com/npm/cli/issues/470)
+
+- VSCode complains about duplicated functions
+
+Make sure a tsconfig.json is present that does not include build outputs,
+then restart VSCode
 
 # Immediate TODOs
 

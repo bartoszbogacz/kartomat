@@ -33,57 +33,57 @@ function handleHTTPRequest(req, res) {
   const [path, params] = parseUrl(req.url);
   console.log(path, params);
   if (path === "/") {
-    fs.readFile("index.html", {}, function (err, data) {
+    fs.readFile("html/index.html", {}, function (err, data) {
       res.setHeader("Content-Type", "text/html");
       res.writeHead(200);
       res.end(data);
     });
   }
   if (path === "/index.css") {
-    fs.readFile("index.css", {}, function (err, data) {
+    fs.readFile("css/index.css", {}, function (err, data) {
       res.setHeader("Content-Type", "text/css");
       res.writeHead(200);
       res.end(data);
     });
   }
   if (path === "/client.html") {
-    fs.readFile("client.html", {}, function (err, data) {
+    fs.readFile("html/client.html", {}, function (err, data) {
       res.setHeader("Content-Type", "text/html");
       res.writeHead(200);
       res.end(data);
     });
   }
-  if (path === "/client.js") {
-    fs.readFile("client.js", {}, function (err, data) {
-      res.setHeader("Content-Type", "text/javascript");
-      res.writeHead(200);
-      res.end(data);
-    });
-  }
   if (path === "/client.css") {
-    fs.readFile("client.css", {}, function (err, data) {
+    fs.readFile("css/client.css", {}, function (err, data) {
       res.setHeader("Content-Type", "text/css");
       res.writeHead(200);
       res.end(data);
     });
   }
+  if (path === "/client.js") {
+    fs.readFile("js/client.js", {}, function (err, data) {
+      res.setHeader("Content-Type", "text/javascript");
+      res.writeHead(200);
+      res.end(data);
+    });
+  }
+  if (path === "/editor.html") {
+    fs.readFile("html/editor.html", {}, function (err, data) {
+      res.setHeader("Content-Type", "text/html");
+      res.writeHead(200);
+      res.end(data);
+    });
+  }
   if (path.endsWith(".png")) {
-    fs.readFile("images" + path, {}, function (err, data) {
+    fs.readFile("img" + path, {}, function (err, data) {
       res.setHeader("Content-Type", "image/png");
       res.writeHead(200);
       res.end(data);
     });
   }
   if (path.endsWith(".jpeg")) {
-    fs.readFile("images" + path, {}, function (err, data) {
+    fs.readFile("img" + path, {}, function (err, data) {
       res.setHeader("Content-Type", "image/jpeg");
-      res.writeHead(200);
-      res.end(data);
-    });
-  }
-  if (path === "/editor.html") {
-    fs.readFile("editor.html", {}, function (err, data) {
-      res.setHeader("Content-Type", "text/html");
       res.writeHead(200);
       res.end(data);
     });

@@ -1,0 +1,34 @@
+body {
+  background-color: snow;
+  margin: auto;
+  max-width: 400px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.BoardName {
+  font-family: monospace;
+  color: darkolivegreen;
+}
+
+.Join {
+  font-size: 2em;
+}
+
+.Game {
+  background-color: lightyellow;
+  border: 0.2em solid dimgray;
+  margin: 1em;
+  padding: 1em;
+}
+
+.GameDescription {
+  font-size: 2em;
+}
+
+.GameName {
+  font-family: monospace;
+  color: deeppink;
+}

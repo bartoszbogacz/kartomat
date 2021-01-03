@@ -4,6 +4,9 @@
   Constants
 */
 
+// TODO: Remove all string constants used for binding DOM IDs and CSS classes
+// They do not really help. Keep the numerical constants.
+
 const MINIMUM_OVERLAP = 500;
 const DECK_Z_DEPTH = 200;
 const PLAYING_BOARD = "PlayingBoard";
