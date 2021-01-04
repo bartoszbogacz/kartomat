@@ -51,3 +51,14 @@ then restart VSCode
 - Ability to remove elements from the editor
 
 - A Wizard game board
+
+# Bibliography
+
+Adventures in data oriented design: Part 2
+[Hierarchical Data](https://blog.molecular-matters.com/2013/02/22/adventures-in-data-oriented-design-part-2-hierarchical-data/)
+
+Building a Data-oriented Entity System: Part 3
+[The Transform Component](http://bitsquid.blogspot.com/2014/10/building-data-oriented-entity-system.html)
+
+Practical Examples in Data Oriented Design
+[Niklas](https://docs.google.com/present/view?id=0AYqySQy4JUK1ZGNzNnZmNWpfMzJkaG5yM3pjZA&hl=en)

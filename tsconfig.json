@@ -5,7 +5,7 @@
     "strict": true
   },
   "files": [
-    "src/cvrdt.ts",
+    "src/synchronize.ts",
     "src/game.ts",
     "src/moveable.ts",
     "src/stackable.ts",

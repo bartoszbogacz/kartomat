@@ -1,4 +1,4 @@
-interface Moveable extends Synchronized {
+interface MoveableItem extends Synchronized {
   x: number;
   y: number;
   z: number;
@@ -6,49 +6,15 @@ interface Moveable extends Synchronized {
   h: number;
 }
 
-function moveablesRender(moveables: { [key: string]: Moveable }) {
-  for (const [movableId, moveable] of Object.entries(moveables)) {
-    let elem = document.getElementById(movableId);
-    if (elem === null) {
-      elem = document.createElement("div");
-      elem.id = movableId + "OwnerTag";
-      elem.className = "OwnerTag";
-      document.body.appendChild(elem);
-    }
-
-    elem.style.top = moveable.y + moveable.h + "px";
-    elem.style.left = moveable.x + moveable.w + "px";
-    elem.style.zIndex = (moveable.z + 1).toString();
-    if (moveable.ownedBy === null) {
-      elem.style.visibility = "hidden";
-    } else {
-      elem.style.visibility = "visible";
-      elem.innerHTML = moveable.ownedBy;
-    }
-  }
+function moveablesSynchronize(local: LocalGame, remote: RemoteGame) {
+  local.moveables = unionLastWriterWins(local.moveables, remote.moveables);
 }
 
-function moveablesTake(moveableId: string, m: { [key: string]: Moveable }) {
-  m[moveableId].z = moveablesFindTop(m);
-}
-
-function moveablesMove(
-  moveableId: string,
-  m: { [key: string]: Moveable },
-  x: number,
-  y: number
-) {
-  m[moveableId].x = x;
-  m[moveableId].y = y;
-}
-
-function moveablesOverlaps(movable: {
-  [key: string]: Moveable;
-}): { [a: string]: { [b: string]: number } } {
-  const overlaps: { [a: string]: { [b: string]: number } } = {};
-  for (const [cardId, card] of Object.entries(movable)) {
-    overlaps[cardId] = {};
-    for (const [otherId, other] of Object.entries(movable)) {
+function moveablesCompute(local: LocalGame) {
+  local.overlaps = {};
+  for (const [cardId, card] of Object.entries(local.moveables)) {
+    local.overlaps[cardId] = {};
+    for (const [otherId, other] of Object.entries(local.moveables)) {
       if (otherId === cardId) {
         continue;
       }
@@ -59,18 +25,58 @@ function moveablesOverlaps(movable: {
         Math.min(card.y + card.w, other.y + other.h) -
         Math.max(card.y, other.y);
 
-      overlaps[cardId][otherId] = Math.max(0, h) * Math.max(0, v);
+      local.overlaps[cardId][otherId] = Math.max(0, h) * Math.max(0, v);
     }
   }
-  return overlaps;
+
+  local.topZ = 0;
+  for (const [_, item] of Object.entries(local.moveables)) {
+    if (item.z > local.topZ) {
+      local.topZ = item.z;
+    }
+  }
 }
 
-function moveablesFindTop(movables: { [key: string]: Moveable }) {
-  let result = 0;
-  for (const [cardId, card] of Object.entries(movables)) {
-    if (card.z > result) {
-      result = card.z;
+function moveablesRender(local: LocalGame) {
+  for (const [movableId, moveable] of Object.entries(local.moveables)) {
+    let elem = document.getElementById(movableId + "Moveable");
+    if (elem === null) {
+      elem = document.createElement("div");
+      elem.id = movableId + "Moveable";
+      elem.className = "Moveable";
+      elem.style.position = "absolute";
+      elem.style.userSelect = "none";
+      document.body.appendChild(elem);
+    }
+
+    elem.style.top = moveable.y + moveable.h + "px";
+    elem.style.left = moveable.x + moveable.w + "px";
+    elem.style.zIndex = (moveable.z + 1).toString();
+    if (moveable.tick + 5 < local.tick || moveable.ownedBy === null) {
+      elem.style.visibility = "hidden";
+    } else {
+      elem.style.visibility = "visible";
+      elem.innerHTML = moveable.ownedBy;
     }
   }
-  return result;
+}
+
+function moveablesTake(local: LocalGame, itemId: string) {
+  if (local.topZ === null) {
+    throw new Error("topZ not yet computed.");
+  }
+  local.moveables[itemId].tick = local.tick + 1;
+  local.moveables[itemId].ownedBy = local.playerId;
+  local.moveables[itemId].z = local.topZ + 1;
+}
+
+function moveablesMove(local: LocalGame, itemId: string, x: number, y: number) {
+  local.moveables[itemId].tick = local.tick + 1;
+  local.moveables[itemId].ownedBy = local.playerId;
+  local.moveables[itemId].x = x;
+  local.moveables[itemId].y = y;
+}
+
+function moveablesPlace(local: LocalGame, itemId: string) {
+  //
 }

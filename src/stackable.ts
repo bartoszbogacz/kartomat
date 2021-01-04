@@ -1,97 +1,89 @@
-interface Stackable extends Synchronized {
+interface StackableItem extends Synchronized {
   onStacking: string | null;
   atIndex: number;
 }
 
-function stackableStacks(stackables: {
-  [key: string]: Stackable;
-}): { [key: string]: [string] } {
-  const stacks: { [key: string]: [string] } = {};
+function stackablesSynchronize(local: LocalGame, remote: RemoteGame) {
+  local.stackables = unionLastWriterWins(local.stackables, remote.stackables);
+}
 
-  for (const [key, st] of Object.entries(stackables)) {
+function stackablesCompute(local: LocalGame) {
+  local.stacks = {};
+
+  for (const [key, st] of Object.entries(local.stackables)) {
     if (st.onStacking !== null) {
-      stacks[st.onStacking].push(key);
+      if (local.stacks.hasOwnProperty(st.onStacking)) {
+        local.stacks[st.onStacking].push(key);
+      } else {
+        local.stacks[st.onStacking] = [key];
+      }
     }
   }
 
-  for (const [_, st] of Object.entries(stacks)) {
-    st.sort((a, b) => stackables[a].atIndex - stackables[b].atIndex);
+  for (const [_, st] of Object.entries(local.stacks)) {
+    st.sort(
+      (a, b) => local.stackables[a].atIndex - local.stackables[b].atIndex
+    );
   }
 
-  return stacks;
-}
-
-function stackableTransform(
-  stacks: { [key: string]: [string] },
-  moveables: { [key: string]: Moveable }
-): { [key: string]: Moveable } {
-  let result: { [key: string]: Moveable } = {};
-
-  for (const [key, stack] of Object.entries(stacks)) {
+  for (const [stackingId, stack] of Object.entries(local.stacks)) {
+    const stacking_s = local.stackings[stackingId];
+    const stacking_m = local.moveables[stackingId];
+    const stride = stacking_s.strides[stacking_s.current];
     for (let i = 0; i < stack.length; i++) {
-      result[stack[i]] = {
-        tick: moveables[stack[i]].tick,
-        ownedBy: moveables[stack[i]].ownedBy,
-        x: moveables[stack[i]].x,
-        y: moveables[stack[i]].y,
-        z: moveables[stack[i]].z,
-        w: moveables[stack[i]].w,
-        h: moveables[stack[i]].h,
-      };
+      local.moveables[stack[i]].x = stacking_m.x + (i + 1) * stride;
+      local.moveables[stack[i]].y = stacking_m.y;
+      local.moveables[stack[i]].z = i + 1;
     }
   }
+}
 
-  for (const [key, m] of Object.entries(moveables)) {
-    if (result.hasOwnProperty(key)) {
-      // Moveable already transformed
-    } else {
-      result[key] = {
-        tick: m.tick,
-        ownedBy: m.ownedBy,
-        x: m.x,
-        y: m.y,
-        z: m.z,
-        w: m.w,
-        h: m.h,
-      };
+function stackablesRender(local: LocalGame) {
+  //
+}
+
+function stackablesTake(local: LocalGame, itemId: string) {
+  local.stackables[itemId].onStacking = null;
+}
+
+function stackablesMove(
+  local: LocalGame,
+  itemId: string,
+  x: number,
+  y: number
+) {
+  //
+}
+
+function stackablesPlace(local: LocalGame, itemId: string) {
+  const largest = stackableFindOverlapping(local, itemId);
+  if (largest !== null) {
+    let stackingId = local.stackables[largest].onStacking;
+    if (stackingId === null) {
+      stackingId = stackingsCreateFor(local, largest);
     }
+    local.stackables[largest].onStacking = stackingId;
+    local.stackables[largest].atIndex = 0;
+    local.stackables[itemId].onStacking = stackingId;
+    local.stackables[itemId].atIndex = 0;
   }
-
-  return result;
 }
 
-function stackableJoinStacking(
-  stackableId: string,
-  stackables: { [key: string]: Stackable },
-  stacks: { [key: string]: [string] },
-  overlaps: { [a: string]: { [b: string]: number } }
-) {
-  const largest = stackableFindStacking(stackableId, stacks, overlaps);
-  stackables[stackableId].onStacking = largest;
-  stackables[stackableId].atIndex = 0;
-}
-
-function stackableLeaveStacking(
-  stackableId: string,
-  stackables: { [key: string]: Stackable }
-) {
-  stackables[stackableId].onStacking = null;
-}
-
-function stackableFindStacking(
-  stackableId: string,
-  stacks: { [key: string]: [string] },
-  overlaps: { [a: string]: { [b: string]: number } }
+function stackableFindOverlapping(
+  local: LocalGame,
+  itemId: string
 ): string | null {
-  let pixels: number | null = null;
+  let pixels: number = 500;
   let largest: string | null = null;
 
-  for (const [stackingId, stack] of Object.entries(stacks)) {
-    for (const otherId of stack) {
-      if (pixels !== null && overlaps[stackableId][otherId] > pixels) {
-        pixels = overlaps[stackableId][otherId];
-        largest = stackingId;
-      }
+  if (local.stacks === null || local.overlaps === null) {
+    throw new Error("Stacks or overlaps not yet computed");
+  }
+
+  for (const [otherId, stackable] of Object.entries(local.stackables)) {
+    if (local.overlaps[itemId][otherId] > pixels) {
+      pixels = local.overlaps[itemId][otherId];
+      largest = otherId;
     }
   }
 

@@ -39,29 +39,15 @@ function handleHTTPRequest(req, res) {
       res.end(data);
     });
   }
-  if (path === "/index.css") {
-    fs.readFile("css/index.css", {}, function (err, data) {
+  if (path.endsWith(".css")) {
+    fs.readFile("css" + path, {}, function (err, data) {
       res.setHeader("Content-Type", "text/css");
       res.writeHead(200);
       res.end(data);
     });
   }
-  if (path === "/client.html") {
-    fs.readFile("html/client.html", {}, function (err, data) {
-      res.setHeader("Content-Type", "text/html");
-      res.writeHead(200);
-      res.end(data);
-    });
-  }
-  if (path === "/client.css") {
-    fs.readFile("css/client.css", {}, function (err, data) {
-      res.setHeader("Content-Type", "text/css");
-      res.writeHead(200);
-      res.end(data);
-    });
-  }
-  if (path === "/editor.html") {
-    fs.readFile("html/editor.html", {}, function (err, data) {
+  if (path.endsWith(".html")) {
+    fs.readFile("html" + path, {}, function (err, data) {
       res.setHeader("Content-Type", "text/html");
       res.writeHead(200);
       res.end(data);

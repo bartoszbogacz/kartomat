@@ -1835,7 +1835,7 @@ document.body.onmouseup = onMouseUp;
 const createEditablePlayingBoardElement = document.getElementById(
   "CreateEditablePlayingBoard"
 );
-if (createEditablePlayingBoard !== null) {
+if (createEditablePlayingBoardElement !== null) {
   createEditablePlayingBoardElement.onclick = onMouseClick;
 }
 const createEditableMarbleElement = document.getElementById(
