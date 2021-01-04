@@ -10,6 +10,7 @@
     "src/moveable.ts",
     "src/stackable.ts",
     "src/stacking.ts",
-    "src/turnable.ts"
+    "src/turnable.ts",
+    "src/layered.ts"
   ]
 }

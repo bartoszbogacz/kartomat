@@ -135,6 +135,7 @@ function stackingClick(local, itemId) {
     if (itemId.endsWith("FoldControl")) {
         const properId = itemId.slice(0, -"FoldControl".length);
         if (local.stackings.hasOwnProperty(properId)) {
+            // Fold cards by advancing to next stride
             local.stackings[properId].current =
                 (local.stackings[properId].current + 1) %
                     local.stackings[properId].strides.length;
@@ -143,6 +144,7 @@ function stackingClick(local, itemId) {
     if (local.stacks !== null && itemId.endsWith("TurnControl")) {
         const properId = itemId.slice(0, -"TurnControl".length);
         if (local.stackings.hasOwnProperty(properId)) {
+            // Turn cards by advancing to next side
             for (const stackableId of local.stacks[properId]) {
                 if (local.turnables.hasOwnProperty(stackableId)) {
                     turnablesTurn(local, stackableId);
@@ -153,6 +155,7 @@ function stackingClick(local, itemId) {
     if (local.stacks !== null && itemId.endsWith("ShuffleControl")) {
         const properId = itemId.slice(0, -"ShuffleControl".length);
         if (local.stackings.hasOwnProperty(properId)) {
+            // Shuffle cards by assigning random fractional index
             for (const stackableId of local.stacks[properId]) {
                 local.moveables[stackableId].x = Math.random();
             }
