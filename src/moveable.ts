@@ -62,21 +62,22 @@ function moveablesRender(local: LocalGame) {
 }
 
 function moveablesTake(local: LocalGame, itemId: string) {
-  if (local.topZ === null) {
-    throw new Error("topZ not yet computed.");
+  if (local.topZ !== null && local.moveables.hasOwnProperty(itemId)) {
+    local.moveables[itemId].tick = local.tick + 1;
+    local.moveables[itemId].ownedBy = local.playerId;
+    local.moveables[itemId].z = local.topZ + 1;
   }
-  local.moveables[itemId].tick = local.tick + 1;
-  local.moveables[itemId].ownedBy = local.playerId;
-  local.moveables[itemId].z = local.topZ + 1;
 }
 
 function moveablesMove(local: LocalGame, itemId: string, x: number, y: number) {
-  local.moveables[itemId].tick = local.tick + 1;
-  local.moveables[itemId].ownedBy = local.playerId;
-  local.moveables[itemId].x = x;
-  local.moveables[itemId].y = y;
+  if (local.moveables.hasOwnProperty(itemId)) {
+    local.moveables[itemId].tick = local.tick + 1;
+    local.moveables[itemId].ownedBy = local.playerId;
+    local.moveables[itemId].x = x;
+    local.moveables[itemId].y = y;
+  }
 }
 
-function moveablesPlace(local: LocalGame, itemId: string) {
+function moveablesPlace(local: LocalGame, itemId: string, wasOutside: boolean) {
   //
 }

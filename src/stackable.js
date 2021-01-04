@@ -15,16 +15,16 @@ function stackablesCompute(local) {
         }
     }
     for (const [_, st] of Object.entries(local.stacks)) {
-        st.sort((a, b) => local.stackables[a].atIndex - local.stackables[b].atIndex);
+        st.sort((a, b) => local.moveables[a].x - local.moveables[b].x);
     }
     for (const [stackingId, stack] of Object.entries(local.stacks)) {
         const stacking_s = local.stackings[stackingId];
         const stacking_m = local.moveables[stackingId];
         const stride = stacking_s.strides[stacking_s.current];
         for (let i = 0; i < stack.length; i++) {
-            local.moveables[stack[i]].x = stacking_m.x + (i + 1) * stride;
+            local.moveables[stack[i]].x = stacking_m.x + i * stride;
             local.moveables[stack[i]].y = stacking_m.y;
-            local.moveables[stack[i]].z = i + 1;
+            local.moveables[stack[i]].z = stacking_m.z + i;
         }
     }
 }
@@ -32,22 +32,26 @@ function stackablesRender(local) {
     //
 }
 function stackablesTake(local, itemId) {
-    local.stackables[itemId].onStacking = null;
+    if (local.stackables.hasOwnProperty(itemId)) {
+        local.stackables[itemId].onStacking = null;
+    }
 }
 function stackablesMove(local, itemId, x, y) {
-    //
+    if (local.stackables.hasOwnProperty(itemId)) {
+        //
+    }
 }
-function stackablesPlace(local, itemId) {
-    const largest = stackableFindOverlapping(local, itemId);
-    if (largest !== null) {
-        let stackingId = local.stackables[largest].onStacking;
-        if (stackingId === null) {
-            stackingId = stackingsCreateFor(local, largest);
+function stackablesPlace(local, itemId, wasOutside) {
+    if (local.stackables.hasOwnProperty(itemId)) {
+        const largest = stackableFindOverlapping(local, itemId);
+        if (largest !== null) {
+            let stackingId = local.stackables[largest].onStacking;
+            if (stackingId === null) {
+                stackingId = stackingsCreateFor(local, largest);
+                local.stackables[largest].onStacking = stackingId;
+            }
+            local.stackables[itemId].onStacking = stackingId;
         }
-        local.stackables[largest].onStacking = stackingId;
-        local.stackables[largest].atIndex = 0;
-        local.stackables[itemId].onStacking = stackingId;
-        local.stackables[itemId].atIndex = 0;
     }
 }
 function stackableFindOverlapping(local, itemId) {

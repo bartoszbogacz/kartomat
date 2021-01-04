@@ -1,5 +1,5 @@
 interface TurnableItem extends Synchronized {
-  sides: [string];
+  sides: string[];
   current: number;
 }
 
@@ -38,13 +38,27 @@ function turnablesRender(local: LocalGame) {
 }
 
 function turnablesTake(local: LocalGame, itemId: string) {
-  //
+  if (local.turnables.hasOwnProperty(itemId)) {
+    //
+  }
 }
 
 function turnablesMove(local: LocalGame, itemId: string, x: number, y: number) {
-  //
+  if (local.turnables.hasOwnProperty(itemId)) {
+    //
+  }
 }
 
-function turnablesPlace(local: LocalGame, itemId: string) {
-  //
+function turnablesPlace(local: LocalGame, itemId: string, wasOutside: boolean) {
+  if (wasOutside === false) {
+    turnablesTurn(local, itemId);
+  }
+}
+
+function turnablesTurn(local: LocalGame, itemId: string) {
+  if (local.turnables.hasOwnProperty(itemId)) {
+    local.turnables[itemId].current =
+      (local.turnables[itemId].current + 1) %
+      local.turnables[itemId].sides.length;
+  }
 }

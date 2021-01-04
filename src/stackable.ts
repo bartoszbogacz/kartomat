@@ -1,6 +1,5 @@
 interface StackableItem extends Synchronized {
   onStacking: string | null;
-  atIndex: number;
 }
 
 function stackablesSynchronize(local: LocalGame, remote: RemoteGame) {
@@ -21,9 +20,7 @@ function stackablesCompute(local: LocalGame) {
   }
 
   for (const [_, st] of Object.entries(local.stacks)) {
-    st.sort(
-      (a, b) => local.stackables[a].atIndex - local.stackables[b].atIndex
-    );
+    st.sort((a, b) => local.moveables[a].x - local.moveables[b].x);
   }
 
   for (const [stackingId, stack] of Object.entries(local.stacks)) {
@@ -31,9 +28,9 @@ function stackablesCompute(local: LocalGame) {
     const stacking_m = local.moveables[stackingId];
     const stride = stacking_s.strides[stacking_s.current];
     for (let i = 0; i < stack.length; i++) {
-      local.moveables[stack[i]].x = stacking_m.x + (i + 1) * stride;
+      local.moveables[stack[i]].x = stacking_m.x + i * stride;
       local.moveables[stack[i]].y = stacking_m.y;
-      local.moveables[stack[i]].z = i + 1;
+      local.moveables[stack[i]].z = stacking_m.z + i;
     }
   }
 }
@@ -43,7 +40,9 @@ function stackablesRender(local: LocalGame) {
 }
 
 function stackablesTake(local: LocalGame, itemId: string) {
-  local.stackables[itemId].onStacking = null;
+  if (local.stackables.hasOwnProperty(itemId)) {
+    local.stackables[itemId].onStacking = null;
+  }
 }
 
 function stackablesMove(
@@ -52,20 +51,26 @@ function stackablesMove(
   x: number,
   y: number
 ) {
-  //
+  if (local.stackables.hasOwnProperty(itemId)) {
+    //
+  }
 }
 
-function stackablesPlace(local: LocalGame, itemId: string) {
-  const largest = stackableFindOverlapping(local, itemId);
-  if (largest !== null) {
-    let stackingId = local.stackables[largest].onStacking;
-    if (stackingId === null) {
-      stackingId = stackingsCreateFor(local, largest);
+function stackablesPlace(
+  local: LocalGame,
+  itemId: string,
+  wasOutside: boolean
+) {
+  if (local.stackables.hasOwnProperty(itemId)) {
+    const largest = stackableFindOverlapping(local, itemId);
+    if (largest !== null) {
+      let stackingId = local.stackables[largest].onStacking;
+      if (stackingId === null) {
+        stackingId = stackingsCreateFor(local, largest);
+        local.stackables[largest].onStacking = stackingId;
+      }
+      local.stackables[itemId].onStacking = stackingId;
     }
-    local.stackables[largest].onStacking = stackingId;
-    local.stackables[largest].atIndex = 0;
-    local.stackables[itemId].onStacking = stackingId;
-    local.stackables[itemId].atIndex = 0;
   }
 }
 

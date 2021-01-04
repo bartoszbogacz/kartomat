@@ -29,11 +29,24 @@ function turnablesRender(local) {
     }
 }
 function turnablesTake(local, itemId) {
-    //
+    if (local.turnables.hasOwnProperty(itemId)) {
+        //
+    }
 }
 function turnablesMove(local, itemId, x, y) {
-    //
+    if (local.turnables.hasOwnProperty(itemId)) {
+        //
+    }
 }
-function turnablesPlace(local, itemId) {
-    //
+function turnablesPlace(local, itemId, wasOutside) {
+    if (wasOutside === false) {
+        turnablesTurn(local, itemId);
+    }
+}
+function turnablesTurn(local, itemId) {
+    if (local.turnables.hasOwnProperty(itemId)) {
+        local.turnables[itemId].current =
+            (local.turnables[itemId].current + 1) %
+                local.turnables[itemId].sides.length;
+    }
 }

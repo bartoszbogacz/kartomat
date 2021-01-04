@@ -48,19 +48,20 @@ function moveablesRender(local) {
     }
 }
 function moveablesTake(local, itemId) {
-    if (local.topZ === null) {
-        throw new Error("topZ not yet computed.");
+    if (local.topZ !== null && local.moveables.hasOwnProperty(itemId)) {
+        local.moveables[itemId].tick = local.tick + 1;
+        local.moveables[itemId].ownedBy = local.playerId;
+        local.moveables[itemId].z = local.topZ + 1;
     }
-    local.moveables[itemId].tick = local.tick + 1;
-    local.moveables[itemId].ownedBy = local.playerId;
-    local.moveables[itemId].z = local.topZ + 1;
 }
 function moveablesMove(local, itemId, x, y) {
-    local.moveables[itemId].tick = local.tick + 1;
-    local.moveables[itemId].ownedBy = local.playerId;
-    local.moveables[itemId].x = x;
-    local.moveables[itemId].y = y;
+    if (local.moveables.hasOwnProperty(itemId)) {
+        local.moveables[itemId].tick = local.tick + 1;
+        local.moveables[itemId].ownedBy = local.playerId;
+        local.moveables[itemId].x = x;
+        local.moveables[itemId].y = y;
+    }
 }
-function moveablesPlace(local, itemId) {
+function moveablesPlace(local, itemId, wasOutside) {
     //
 }
