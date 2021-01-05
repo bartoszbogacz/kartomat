@@ -28,6 +28,16 @@ function turnablesRender(local) {
         elem.style.backgroundImage = "url(" + trn.sides[trn.current] + ")";
     }
 }
+function turnablesClick(local, itemId) {
+    if (local.turnables.hasOwnProperty(itemId)) {
+        //
+    }
+}
+function turnablesKeyUp(local, itemId) {
+    if (local.turnables.hasOwnProperty(itemId)) {
+        //
+    }
+}
 function turnablesTake(local, itemId) {
     if (local.turnables.hasOwnProperty(itemId)) {
         //

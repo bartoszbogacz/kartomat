@@ -31,6 +31,16 @@ function stackablesCompute(local) {
 function stackablesRender(local) {
     //
 }
+function stackablesClick(local, itemId) {
+    if (local.stackables.hasOwnProperty(itemId)) {
+        //
+    }
+}
+function stackablesKeyUp(local, itemId) {
+    if (local.stackables.hasOwnProperty(itemId)) {
+        //
+    }
+}
 function stackablesTake(local, itemId) {
     if (local.stackables.hasOwnProperty(itemId)) {
         local.stackables[itemId].onStacking = null;

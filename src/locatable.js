@@ -47,6 +47,16 @@ function locatablesRender(local) {
         }
     }
 }
+function locatablesClick(local, itemId) {
+    if (local.locatables.hasOwnProperty(itemId)) {
+        //
+    }
+}
+function locatablesKeyUp(local, itemId) {
+    if (local.locatables.hasOwnProperty(itemId)) {
+        //
+    }
+}
 function locatablesTake(local, itemId) {
     //
 }

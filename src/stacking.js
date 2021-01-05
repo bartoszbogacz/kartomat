@@ -131,7 +131,7 @@ function stackingsCreateFor(local, stackableId) {
     }
     throw new Error("Exhausted stacking ids.");
 }
-function stackingClick(local, itemId) {
+function stackingsClick(local, itemId) {
     if (itemId.endsWith("FoldControl")) {
         const properId = itemId.slice(0, -"FoldControl".length);
         if (local.stackings.hasOwnProperty(properId)) {
@@ -162,6 +162,11 @@ function stackingClick(local, itemId) {
         }
     }
 }
+function stackingsKeyUp(local, itemId) {
+    if (local.stackings.hasOwnProperty(itemId)) {
+        //
+    }
+}
 function stackingsTake(local, itemId) {
     if (local.stackings.hasOwnProperty(itemId)) {
         //
@@ -174,7 +179,7 @@ function stackingsMove(local, itemId, x, y) {
 }
 function stackingsPlace(local, itemId, wasOutside) {
     if (local.stacks !== null && local.stackings.hasOwnProperty(itemId)) {
-        const largest = stackingFindOverlapping(local, itemId);
+        const largest = stackingsFindOverlapping(local, itemId);
         if (largest !== null) {
             let stackingId = local.stackables[largest].onStacking;
             if (stackingId === null) {
@@ -188,7 +193,7 @@ function stackingsPlace(local, itemId, wasOutside) {
         }
     }
 }
-function stackingFindOverlapping(local, itemId) {
+function stackingsFindOverlapping(local, itemId) {
     let pixels = 500;
     let largest = null;
     if (local.stacks === null || local.overlaps === null) {

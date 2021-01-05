@@ -148,7 +148,7 @@ function stackingsCreateFor(local: LocalGame, stackableId: string): string {
   throw new Error("Exhausted stacking ids.");
 }
 
-function stackingClick(local: LocalGame, itemId: string) {
+function stackingsClick(local: LocalGame, itemId: string) {
   if (itemId.endsWith("FoldControl")) {
     const properId = itemId.slice(0, -"FoldControl".length);
     if (local.stackings.hasOwnProperty(properId)) {
@@ -180,6 +180,12 @@ function stackingClick(local: LocalGame, itemId: string) {
   }
 }
 
+function stackingsKeyUp(local: LocalGame, itemId: string) {
+  if (local.stackings.hasOwnProperty(itemId)) {
+    //
+  }
+}
+
 function stackingsTake(local: LocalGame, itemId: string) {
   if (local.stackings.hasOwnProperty(itemId)) {
     //
@@ -194,7 +200,7 @@ function stackingsMove(local: LocalGame, itemId: string, x: number, y: number) {
 
 function stackingsPlace(local: LocalGame, itemId: string, wasOutside: boolean) {
   if (local.stacks !== null && local.stackings.hasOwnProperty(itemId)) {
-    const largest = stackingFindOverlapping(local, itemId);
+    const largest = stackingsFindOverlapping(local, itemId);
     if (largest !== null) {
       let stackingId = local.stackables[largest].onStacking;
       if (stackingId === null) {
@@ -208,7 +214,7 @@ function stackingsPlace(local: LocalGame, itemId: string, wasOutside: boolean) {
   }
 }
 
-function stackingFindOverlapping(
+function stackingsFindOverlapping(
   local: LocalGame,
   itemId: string
 ): string | null {

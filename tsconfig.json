@@ -12,6 +12,7 @@
     "src/stackable.ts",
     "src/stacking.ts",
     "src/turnable.ts",
+    "src/writeable.ts",
     "src/layered.ts"
   ]
 }

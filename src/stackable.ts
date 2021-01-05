@@ -39,6 +39,18 @@ function stackablesRender(local: LocalGame) {
   //
 }
 
+function stackablesClick(local: LocalGame, itemId: string) {
+  if (local.stackables.hasOwnProperty(itemId)) {
+    //
+  }
+}
+
+function stackablesKeyUp(local: LocalGame, itemId: string) {
+  if (local.stackables.hasOwnProperty(itemId)) {
+    //
+  }
+}
+
 function stackablesTake(local: LocalGame, itemId: string) {
   if (local.stackables.hasOwnProperty(itemId)) {
     local.stackables[itemId].onStacking = null;

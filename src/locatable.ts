@@ -61,6 +61,18 @@ function locatablesRender(local: LocalGame) {
   }
 }
 
+function locatablesClick(local: LocalGame, itemId: string) {
+  if (local.locatables.hasOwnProperty(itemId)) {
+    //
+  }
+}
+
+function locatablesKeyUp(local: LocalGame, itemId: string) {
+  if (local.locatables.hasOwnProperty(itemId)) {
+    //
+  }
+}
+
 function locatablesTake(local: LocalGame, itemId: string) {
   //
 }

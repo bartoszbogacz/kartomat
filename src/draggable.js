@@ -8,6 +8,16 @@ function draggablesCompute(local) {
 function draggablesRender(local) {
     //
 }
+function draggablesClick(local, itemId) {
+    if (local.draggables.hasOwnProperty(itemId)) {
+        //
+    }
+}
+function draggablesKeyUp(local, itemId) {
+    if (local.draggables.hasOwnProperty(itemId)) {
+        //
+    }
+}
 function draggablesTake(local, itemId) {
     if (local.topZ !== null && local.locatables.hasOwnProperty(itemId)) {
         local.locatables[itemId].tick = local.tick + 1;

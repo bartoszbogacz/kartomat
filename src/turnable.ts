@@ -37,6 +37,18 @@ function turnablesRender(local: LocalGame) {
   }
 }
 
+function turnablesClick(local: LocalGame, itemId: string) {
+  if (local.turnables.hasOwnProperty(itemId)) {
+    //
+  }
+}
+
+function turnablesKeyUp(local: LocalGame, itemId: string) {
+  if (local.turnables.hasOwnProperty(itemId)) {
+    //
+  }
+}
+
 function turnablesTake(local: LocalGame, itemId: string) {
   if (local.turnables.hasOwnProperty(itemId)) {
     //

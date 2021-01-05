@@ -7,6 +7,7 @@ const _remoteGame = {
         card2: { tick: 0, ownedBy: null, x: 110, y: 0, z: 0, w: 100, h: 150 },
         card3: { tick: 0, ownedBy: null, x: 220, y: 0, z: 0, w: 100, h: 150 },
         card4: { tick: 0, ownedBy: null, x: 330, y: 0, z: 0, w: 100, h: 150 },
+        write1: { tick: 0, ownedBy: null, x: 10, y: 500, z: 0, w: 300, h: 300 },
     },
     draggables: {
         card1: { tick: 0, ownedBy: null },
@@ -51,6 +52,13 @@ const _remoteGame = {
             current: 0,
         },
     },
+    writeables: {
+        write1: {
+            tick: 0,
+            ownedBy: null,
+            text: "",
+        },
+    },
 };
 let _localGame = {
     tick: 0,
@@ -63,6 +71,7 @@ let _localGame = {
     stackings: _remoteGame.stackings,
     stackables: _remoteGame.stackables,
     turnables: _remoteGame.turnables,
+    writeables: _remoteGame.writeables,
 };
 let _drag = null;
 function onClick(event) {
@@ -70,7 +79,25 @@ function onClick(event) {
         return;
     }
     const thingId = event.target.id;
-    stackingClick(_localGame, thingId);
+    locatablesClick(_localGame, thingId);
+    draggablesClick(_localGame, thingId);
+    stackingsClick(_localGame, thingId);
+    stackablesClick(_localGame, thingId);
+    turnablesClick(_localGame, thingId);
+    writeablesClick(_localGame, thingId);
+    window.requestAnimationFrame(render);
+}
+function onKeyUp(event) {
+    if (event.target === null) {
+        return;
+    }
+    const thingId = event.target.id;
+    locatablesKeyUp(_localGame, thingId);
+    draggablesKeyUp(_localGame, thingId);
+    stackingsKeyUp(_localGame, thingId);
+    stackablesKeyUp(_localGame, thingId);
+    turnablesKeyUp(_localGame, thingId);
+    writeablesKeyUp(_localGame, thingId);
     window.requestAnimationFrame(render);
 }
 function onMouseDown(event) {
@@ -99,6 +126,7 @@ function onMouseDown(event) {
         stackingsTake(_localGame, thingId);
         stackablesTake(_localGame, thingId);
         turnablesTake(_localGame, thingId);
+        writeablesTake(_localGame, thingId);
         window.requestAnimationFrame(render);
     }
 }
@@ -127,6 +155,7 @@ function onMouseMove(event) {
         stackingsMove(_localGame, thingId, x, y);
         stackablesMove(_localGame, thingId, x, y);
         turnablesMove(_localGame, thingId, x, y);
+        writeablesMove(_localGame, thingId, x, y);
         window.requestAnimationFrame(render);
     }
 }
@@ -155,11 +184,13 @@ function onMouseUp(event) {
         stackingsMove(_localGame, thingId, x, y);
         stackablesMove(_localGame, thingId, x, y);
         turnablesMove(_localGame, thingId, x, y);
+        writeablesMove(_localGame, thingId, x, y);
         locatablesPlace(_localGame, thingId, _drag.wasOutside);
         draggablesPlace(_localGame, thingId, _drag.wasOutside);
         stackingsPlace(_localGame, thingId, _drag.wasOutside);
         stackablesPlace(_localGame, thingId, _drag.wasOutside);
         turnablesPlace(_localGame, thingId, _drag.wasOutside);
+        writeablesPlace(_localGame, thingId, _drag.wasOutside);
         window.requestAnimationFrame(render);
     }
     _drag = null;
@@ -170,16 +201,19 @@ function render() {
     stackingsSynchronize(_localGame, _remoteGame);
     stackablesSynchronize(_localGame, _remoteGame);
     turnablesSynchronize(_localGame, _remoteGame);
+    writeablesSynchronize(_localGame, _remoteGame);
     locatablesCompute(_localGame);
     draggablesCompute(_localGame);
     stackingsCompute(_localGame);
     stackablesCompute(_localGame);
     turnablesCompute(_localGame);
+    writeablesCompute(_localGame);
     locatablesRender(_localGame);
     draggablesRender(_localGame);
     stackingsRender(_localGame);
     stackablesRender(_localGame);
     turnablesRender(_localGame);
+    writeablesRender(_localGame);
     debugElem.innerHTML = JSON.stringify(_localGame, null, 2);
 }
 document.body.onmousemove = onMouseMove;
