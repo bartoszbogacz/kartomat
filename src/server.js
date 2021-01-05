@@ -108,7 +108,7 @@ function handleHTTPRequest(req, res) {
     });
   }
   if (path.endsWith(".js")) {
-    fs.readFile("src" + path, {}, function (err, data) {
+    fs.readFile("dist" + path, {}, function (err, data) {
       res.setHeader("Content-Type", "text/javascript");
       res.writeHead(200);
       res.end(data);
