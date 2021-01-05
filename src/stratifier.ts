@@ -11,17 +11,18 @@ function stratifiersSynchronize(local: LocalGame, remote: RemoteGame) {
 }
 
 function stratifiersCompute(local: LocalGame) {
-  for (const [stratifierId, stratifier] of Object.entries(local.stratifiers)) {
+  const stratifierIds = Object.keys(local.stratifiers);
+  stratifierIds.sort((a, b) => local.locatables[a].z - local.locatables[b].z);
+  let accumZ = 0;
+
+  for (const stratifierId of stratifierIds) {
+    const stratifier = local.stratifiers[stratifierId];
+
     stratifier.group.sort(
       (a, b) => local.locatables[a].z - local.locatables[b].z
     );
 
     if (stratifier.splitByPlayer) {
-      let accumZ = Math.min(
-        local.locatables[stratifierId].z,
-        local.locatables[stratifier.group[0]].z
-      );
-
       for (const itemId of stratifier.group) {
         if (local.locatables[itemId].ownedBy !== local.playerId) {
           local.locatables[itemId].z = accumZ;
@@ -39,8 +40,7 @@ function stratifiersCompute(local: LocalGame) {
         }
       }
     } else {
-      let accumZ = local.locatables[stratifierId].z;
-      accumZ = accumZ + 1;
+      local.locatables[stratifierId].z = accumZ;
 
       for (const itemId of stratifier.group) {
         local.locatables[itemId].z = accumZ;
