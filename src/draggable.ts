@@ -1,4 +1,6 @@
-interface DraggableItem extends Synchronized {}
+interface DraggableItem extends Synchronized {
+  //
+}
 
 function draggablesSynchronize(local: LocalGame, remote: RemoteGame) {
   local.draggables = unionLastWriterWins(local.draggables, remote.draggables);

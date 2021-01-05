@@ -7,6 +7,7 @@ interface RemoteGame {
   stackings: { [key: string]: StackingItem };
   turnables: { [key: string]: TurnableItem };
   writeables: { [key: string]: WriteableItem };
+  stratifiers: { [key: string]: StrafierItem };
 }
 
 interface LocalGame {
@@ -21,6 +22,7 @@ interface LocalGame {
   stackings: { [key: string]: StackingItem };
   turnables: { [key: string]: TurnableItem };
   writeables: { [key: string]: WriteableItem };
+  stratifiers: { [key: string]: StrafierItem };
 }
 
 interface Drag {
@@ -41,6 +43,8 @@ const _remoteGame: RemoteGame = {
     card3: { tick: 0, ownedBy: null, x: 220, y: 0, z: 0, w: 100, h: 150 },
     card4: { tick: 0, ownedBy: null, x: 330, y: 0, z: 0, w: 100, h: 150 },
     write1: { tick: 0, ownedBy: null, x: 10, y: 500, z: 0, w: 300, h: 300 },
+    strat1: { tick: 0, ownedBy: null, x: 400, y: 500, z: 0, w: 300, h: 300 },
+    strat2: { tick: 0, ownedBy: null, x: 0, y: 1000, z: 1, w: 300, h: 300 },
   },
   draggables: {
     card1: { tick: 0, ownedBy: null },
@@ -92,6 +96,20 @@ const _remoteGame: RemoteGame = {
       text: "",
     },
   },
+  stratifiers: {
+    strat1: {
+      tick: 0,
+      ownedBy: null,
+      splitByPlayer: true,
+      group: ["card1", "card2"],
+    },
+    strat2: {
+      tick: 0,
+      ownedBy: null,
+      splitByPlayer: true,
+      group: ["card3", "card4"],
+    },
+  },
 };
 
 let _localGame = {
@@ -106,6 +124,7 @@ let _localGame = {
   stackables: _remoteGame.stackables,
   turnables: _remoteGame.turnables,
   writeables: _remoteGame.writeables,
+  stratifiers: _remoteGame.stratifiers,
 };
 
 let _drag: Drag | null = null;
@@ -123,6 +142,7 @@ function onClick(event: MouseEvent) {
   stackablesClick(_localGame, thingId);
   turnablesClick(_localGame, thingId);
   writeablesClick(_localGame, thingId);
+  stratifiersClick(_localGame, thingId);
 
   window.requestAnimationFrame(render);
 }
@@ -140,6 +160,7 @@ function onKeyUp(event: KeyboardEvent) {
   stackablesKeyUp(_localGame, thingId);
   turnablesKeyUp(_localGame, thingId);
   writeablesKeyUp(_localGame, thingId);
+  stratifiersKeyUp(_localGame, thingId);
 
   window.requestAnimationFrame(render);
 }
@@ -175,6 +196,7 @@ function onMouseDown(event: MouseEvent | TouchEvent) {
     stackablesTake(_localGame, thingId);
     turnablesTake(_localGame, thingId);
     writeablesTake(_localGame, thingId);
+    stratifiersTake(_localGame, thingId);
 
     window.requestAnimationFrame(render);
   }
@@ -213,6 +235,7 @@ function onMouseMove(event: MouseEvent | TouchEvent) {
     stackablesMove(_localGame, thingId, x, y);
     turnablesMove(_localGame, thingId, x, y);
     writeablesMove(_localGame, thingId, x, y);
+    stratifiersMove(_localGame, thingId, x, y);
 
     window.requestAnimationFrame(render);
   }
@@ -252,6 +275,7 @@ function onMouseUp(event: MouseEvent | TouchEvent) {
     stackablesMove(_localGame, thingId, x, y);
     turnablesMove(_localGame, thingId, x, y);
     writeablesMove(_localGame, thingId, x, y);
+    stratifiersMove(_localGame, thingId, x, y);
 
     locatablesPlace(_localGame, thingId, _drag.wasOutside);
     draggablesPlace(_localGame, thingId, _drag.wasOutside);
@@ -259,6 +283,7 @@ function onMouseUp(event: MouseEvent | TouchEvent) {
     stackablesPlace(_localGame, thingId, _drag.wasOutside);
     turnablesPlace(_localGame, thingId, _drag.wasOutside);
     writeablesPlace(_localGame, thingId, _drag.wasOutside);
+    stratifiersPlace(_localGame, thingId, _drag.wasOutside);
 
     window.requestAnimationFrame(render);
   }
@@ -273,6 +298,7 @@ function render() {
   stackablesSynchronize(_localGame, _remoteGame);
   turnablesSynchronize(_localGame, _remoteGame);
   writeablesSynchronize(_localGame, _remoteGame);
+  stratifiersSynchronize(_localGame, _remoteGame);
 
   locatablesCompute(_localGame);
   draggablesCompute(_localGame);
@@ -280,6 +306,7 @@ function render() {
   stackablesCompute(_localGame);
   turnablesCompute(_localGame);
   writeablesCompute(_localGame);
+  stratifiersCompute(_localGame);
 
   locatablesRender(_localGame);
   draggablesRender(_localGame);
@@ -287,8 +314,9 @@ function render() {
   stackablesRender(_localGame);
   turnablesRender(_localGame);
   writeablesRender(_localGame);
+  stratifiersRender(_localGame);
 
-  debugElem.innerHTML = JSON.stringify(_localGame, null, 2);
+  locatablesDebug.innerHTML = JSON.stringify(_localGame.locatables, null, 2);
 }
 
 document.body.onmousemove = onMouseMove;
@@ -296,8 +324,8 @@ document.body.onmouseup = onMouseUp;
 window.setInterval(render, 1000);
 
 // Debug
-let debugElem = document.createElement("pre");
-debugElem.style.position = "absolute";
-debugElem.style.left = 1000 + "px";
-debugElem.style.userSelect = "none";
-document.body.appendChild(debugElem);
+let locatablesDebug = document.createElement("pre");
+locatablesDebug.style.position = "absolute";
+locatablesDebug.style.left = "400px";
+locatablesDebug.style.userSelect = "none";
+document.body.appendChild(locatablesDebug);
