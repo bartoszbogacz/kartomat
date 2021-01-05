@@ -15,16 +15,16 @@ function stackablesCompute(local) {
         }
     }
     for (const [_, st] of Object.entries(local.stacks)) {
-        st.sort((a, b) => local.moveables[a].x - local.moveables[b].x);
+        st.sort((a, b) => local.locatables[a].x - local.locatables[b].x);
     }
     for (const [stackingId, stack] of Object.entries(local.stacks)) {
         const stacking_s = local.stackings[stackingId];
-        const stacking_m = local.moveables[stackingId];
+        const stacking_m = local.locatables[stackingId];
         const stride = stacking_s.strides[stacking_s.current];
         for (let i = 0; i < stack.length; i++) {
-            local.moveables[stack[i]].x = stacking_m.x + i * stride;
-            local.moveables[stack[i]].y = stacking_m.y;
-            local.moveables[stack[i]].z = stacking_m.z + i;
+            local.locatables[stack[i]].x = stacking_m.x + i * stride;
+            local.locatables[stack[i]].y = stacking_m.y;
+            local.locatables[stack[i]].z = stacking_m.z + i;
         }
     }
 }
@@ -43,7 +43,7 @@ function stackablesMove(local, itemId, x, y) {
 }
 function stackablesPlace(local, itemId, wasOutside) {
     if (local.stackables.hasOwnProperty(itemId)) {
-        const largest = stackableFindOverlapping(local, itemId);
+        const largest = stackablesFindOverlapping(local, itemId);
         if (largest !== null) {
             let stackingId = local.stackables[largest].onStacking;
             if (stackingId === null) {
@@ -54,7 +54,7 @@ function stackablesPlace(local, itemId, wasOutside) {
         }
     }
 }
-function stackableFindOverlapping(local, itemId) {
+function stackablesFindOverlapping(local, itemId) {
     let pixels = 500;
     let largest = null;
     if (local.stacks === null || local.overlaps === null) {

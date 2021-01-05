@@ -63,38 +63,38 @@ function stackingsRender(local) {
             document.body.appendChild(turn);
         }
         const s = local.stacks.hasOwnProperty(itemId) && local.stacks[itemId].length > 1;
-        const m = local.moveables[itemId];
+        const loc = local.locatables[itemId];
         if (s === true) {
-            move.style.left = m.x - 30 + "px";
-            move.style.top = m.y + "px";
-            move.style.zIndex = m.z.toString();
+            move.style.left = loc.x - 30 + "px";
+            move.style.top = loc.y + "px";
+            move.style.zIndex = loc.z.toString();
             move.style.visibility = "visible";
         }
         else {
             move.style.visibility = "hidden";
         }
         if (s === true) {
-            shuffle.style.left = m.x - 30 + "px";
-            shuffle.style.top = m.y + 30 + "px";
-            shuffle.style.zIndex = m.z.toString();
+            shuffle.style.left = loc.x - 30 + "px";
+            shuffle.style.top = loc.y + 30 + "px";
+            shuffle.style.zIndex = loc.z.toString();
             shuffle.style.visibility = "visible";
         }
         else {
             shuffle.style.visibility = "hidden";
         }
         if (s === true) {
-            fold.style.left = m.x - 30 + "px";
-            fold.style.top = m.y + 60 + "px";
-            fold.style.zIndex = m.z.toString();
+            fold.style.left = loc.x - 30 + "px";
+            fold.style.top = loc.y + 60 + "px";
+            fold.style.zIndex = loc.z.toString();
             fold.style.visibility = "visible";
         }
         else {
             fold.style.visibility = "hidden";
         }
         if (s === true) {
-            turn.style.left = m.x - 30 + "px";
-            turn.style.top = m.y + 90 + "px";
-            turn.style.zIndex = m.z.toString();
+            turn.style.left = loc.x - 30 + "px";
+            turn.style.top = loc.y + 90 + "px";
+            turn.style.zIndex = loc.z.toString();
             turn.style.visibility = "visible";
         }
         else {
@@ -112,14 +112,14 @@ function stackingsCreateFor(local, stackableId) {
             local.stacks[stackingId].length > 0) {
             continue;
         }
-        local.moveables[stackingId] = {
+        local.locatables[stackingId] = {
             tick: local.tick + 1,
             ownedBy: local.playerId,
-            x: local.moveables[stackableId].x,
-            y: local.moveables[stackableId].y,
-            z: local.moveables[stackableId].z,
-            w: local.moveables[stackableId].w,
-            h: local.moveables[stackableId].h,
+            x: local.locatables[stackableId].x,
+            y: local.locatables[stackableId].y,
+            z: local.locatables[stackableId].z,
+            w: local.locatables[stackableId].w,
+            h: local.locatables[stackableId].h,
         };
         local.stackings[stackingId] = {
             tick: local.tick + 1,
@@ -157,7 +157,7 @@ function stackingClick(local, itemId) {
         if (local.stackings.hasOwnProperty(properId)) {
             // Shuffle cards by assigning random fractional index
             for (const stackableId of local.stacks[properId]) {
-                local.moveables[stackableId].x = Math.random();
+                local.locatables[stackableId].x = Math.random();
             }
         }
     }

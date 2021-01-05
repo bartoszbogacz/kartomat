@@ -2,11 +2,17 @@
 const _remoteGame = {
     tick: 0,
     playerId: "player1",
-    moveables: {
+    locatables: {
         card1: { tick: 0, ownedBy: null, x: 0, y: 0, z: 0, w: 100, h: 150 },
         card2: { tick: 0, ownedBy: null, x: 110, y: 0, z: 0, w: 100, h: 150 },
         card3: { tick: 0, ownedBy: null, x: 220, y: 0, z: 0, w: 100, h: 150 },
         card4: { tick: 0, ownedBy: null, x: 330, y: 0, z: 0, w: 100, h: 150 },
+    },
+    draggables: {
+        card1: { tick: 0, ownedBy: null },
+        card2: { tick: 0, ownedBy: null },
+        card3: { tick: 0, ownedBy: null },
+        card4: { tick: 0, ownedBy: null },
     },
     stackings: {},
     stackables: {
@@ -52,7 +58,8 @@ let _localGame = {
     topZ: null,
     overlaps: null,
     stacks: null,
-    moveables: _remoteGame.moveables,
+    locatables: _remoteGame.locatables,
+    draggables: _remoteGame.draggables,
     stackings: _remoteGame.stackings,
     stackables: _remoteGame.stackables,
     turnables: _remoteGame.turnables,
@@ -87,7 +94,8 @@ function onMouseDown(event) {
     };
     const thingId = _drag.target.id;
     if (_localGame !== null) {
-        moveablesTake(_localGame, thingId);
+        locatablesTake(_localGame, thingId);
+        draggablesTake(_localGame, thingId);
         stackingsTake(_localGame, thingId);
         stackablesTake(_localGame, thingId);
         turnablesTake(_localGame, thingId);
@@ -114,7 +122,8 @@ function onMouseMove(event) {
     _drag.wasOutside = _drag.wasOutside || isOutside;
     const thingId = _drag.target.id;
     if (_localGame !== null) {
-        moveablesMove(_localGame, thingId, x, y);
+        locatablesMove(_localGame, thingId, x, y);
+        draggablesMove(_localGame, thingId, x, y);
         stackingsMove(_localGame, thingId, x, y);
         stackablesMove(_localGame, thingId, x, y);
         turnablesMove(_localGame, thingId, x, y);
@@ -141,11 +150,13 @@ function onMouseUp(event) {
     _drag.wasOutside = _drag.wasOutside || isOutside;
     const thingId = _drag.target.id;
     if (_drag != null && _localGame !== null) {
-        moveablesMove(_localGame, thingId, x, y);
+        locatablesMove(_localGame, thingId, x, y);
+        draggablesMove(_localGame, thingId, x, y);
         stackingsMove(_localGame, thingId, x, y);
         stackablesMove(_localGame, thingId, x, y);
         turnablesMove(_localGame, thingId, x, y);
-        moveablesPlace(_localGame, thingId, _drag.wasOutside);
+        locatablesPlace(_localGame, thingId, _drag.wasOutside);
+        draggablesPlace(_localGame, thingId, _drag.wasOutside);
         stackingsPlace(_localGame, thingId, _drag.wasOutside);
         stackablesPlace(_localGame, thingId, _drag.wasOutside);
         turnablesPlace(_localGame, thingId, _drag.wasOutside);
@@ -154,15 +165,18 @@ function onMouseUp(event) {
     _drag = null;
 }
 function render() {
-    moveablesSynchronize(_localGame, _remoteGame);
+    locatablesSynchronize(_localGame, _remoteGame);
+    draggablesSynchronize(_localGame, _remoteGame);
     stackingsSynchronize(_localGame, _remoteGame);
     stackablesSynchronize(_localGame, _remoteGame);
     turnablesSynchronize(_localGame, _remoteGame);
-    moveablesCompute(_localGame);
+    locatablesCompute(_localGame);
+    draggablesCompute(_localGame);
     stackingsCompute(_localGame);
     stackablesCompute(_localGame);
     turnablesCompute(_localGame);
-    moveablesRender(_localGame);
+    locatablesRender(_localGame);
+    draggablesRender(_localGame);
     stackingsRender(_localGame);
     stackablesRender(_localGame);
     turnablesRender(_localGame);

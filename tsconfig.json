@@ -7,7 +7,8 @@
   "files": [
     "src/synchronize.ts",
     "src/game.ts",
-    "src/moveable.ts",
+    "src/locatable.ts",
+    "src/draggable.ts",
     "src/stackable.ts",
     "src/stacking.ts",
     "src/turnable.ts",

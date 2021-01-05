@@ -17,15 +17,15 @@ function turnablesRender(local) {
             elem.style.userSelect = "none";
             document.body.appendChild(elem);
         }
-        const m = local.moveables[key];
-        const t = local.turnables[key];
-        elem.style.top = m.y + "px";
-        elem.style.left = m.x + "px";
-        elem.style.width = m.w + "px";
-        elem.style.height = m.h + "px";
-        elem.style.backgroundSize = m.w + "px " + m.h + "px";
-        elem.style.zIndex = m.z.toString();
-        elem.style.backgroundImage = "url(" + t.sides[t.current] + ")";
+        const trn = local.turnables[key];
+        const loc = local.locatables[key];
+        elem.style.top = loc.y + "px";
+        elem.style.left = loc.x + "px";
+        elem.style.width = loc.w + "px";
+        elem.style.height = loc.h + "px";
+        elem.style.backgroundSize = loc.w + "px " + loc.h + "px";
+        elem.style.zIndex = loc.z.toString();
+        elem.style.backgroundImage = "url(" + trn.sides[trn.current] + ")";
     }
 }
 function turnablesTake(local, itemId) {
