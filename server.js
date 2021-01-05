@@ -9,12 +9,33 @@ const fs = require("fs");
 const ws = require("ws");
 
 /*
-  Global State
+  Utilities 
 */
 
-let runningGames = {};
+function parseUrl(url) {
+  let path = null;
+  let parameters = {};
 
-let _countClientsSeen = 0;
+  const pathQuery = url.split("?");
+
+  if (pathQuery.length === 1) {
+    path = pathQuery[0];
+  } else {
+    path = pathQuery[0];
+    const parts = pathQuery[1].split("&");
+
+    for (const p of parts) {
+      const keyValue = p.split("=");
+      if (keyValue.length === 1) {
+        parameters[keyValue[0]] = true;
+      } else {
+        parameters[keyValue[0]] = keyValue[1];
+      }
+    }
+  }
+
+  return [path, parameters];
+}
 
 function generatePlayerId() {
   _countClientsSeen += 1;
@@ -22,11 +43,44 @@ function generatePlayerId() {
 }
 
 function generateGameId() {
-  return "game" + Object.keys(runningGames).length + 1;
+  return "game" + Object.keys(_runningGames).length + 1;
+}
+
+/** Union two LWWMaps returning a copy of the superset.
+ *
+ * The union is biased towards state2 on equal tick counts of both,
+ * by performing the merging of state2 onto result secondary and
+ * avoid an explicit lesser equals check there.
+ *
+ */
+function unionLastWriterWins(state1, state2) {
+  const result = {};
+
+  for (const key of Object.keys(state2)) {
+    if (state1.hasOwnProperty(key) && state1[key].tick > state2[key].tick) {
+      continue;
+    }
+    result[key] = {};
+    for (const [prop, value] of Object.entries(state2[key])) {
+      result[key][prop] = value;
+    }
+  }
+
+  for (const key of Object.keys(state1)) {
+    if (state2.hasOwnProperty(key) && state2[key].tick > state1[key].tick) {
+      continue;
+    }
+    result[key] = {};
+    for (const [prop, value] of Object.entries(state1[key])) {
+      result[key][prop] = value;
+    }
+  }
+
+  return result;
 }
 
 /*
-  Establishing a connection and joining a game
+  Communication
 */
 
 function handleHTTPRequest(req, res) {
@@ -76,160 +130,68 @@ function handleHTTPRequest(req, res) {
   }
 }
 
-function handleSocketConnection(socket, request) {
-  socket.on("message", function (msg) {
-    const obj = JSON.parse(msg);
-    if (obj.request === "joinGame") {
-      handleJoinGame(socket, obj);
-    }
-    if (obj.request === "modifyScene") {
-      handleModifyScene(obj);
-    }
-  });
+function handleClientMessage(socket, msg) {
+  msg = JSON.parse(msg);
 
-  socket.on("close", function () {
-    clientDisconnected(socket);
-  });
-}
-
-function handleJoinGame(socket, msg) {
-  const boardId = msg.boardId;
+  const boardId = msg.boardId || "dog";
   const gameId = msg.gameId || generateGameId();
   const playerId = msg.playerId || generatePlayerId();
 
-  var board = JSON.parse(fs.readFileSync("boards/" + boardId + ".json"));
+  // If there is no such game, create it
 
-  if (!runningGames.hasOwnProperty(gameId)) {
-    runningGames[gameId] = {
-      ticks: 0,
+  if (_runningGames.hasOwnProperty(gameId) === false) {
+    const board = JSON.parse(fs.readFileSync("boards/" + boardId + ".json"));
+
+    _runningGames[gameId] = {
+      tick: 1,
       sockets: {},
+      boardId: boardId,
       scene: board,
     };
+    console.log("Created game", gameId, "on", boardId);
   }
 
-  // Attach player socket
-  runningGames[gameId].sockets[playerId] = socket;
+  // If player not yet part of game, join
 
-  // Grab empty playerAvatar if player never joined game yet
-  let isPlayerKnown = false;
-  for (const [playerAvatarId, playerAvatar] of Object.entries(
-    runningGames[gameId].scene
-  )) {
-    if (playerAvatar.represents === playerId) {
-      isPlayerKnown = true;
-      break;
-    }
-  }
-  if (isPlayerKnown === false) {
-    for (const [playerAvatarId, playerAvatar] of Object.entries(
-      runningGames[gameId].scene
-    )) {
-      if (playerAvatar.represents === null) {
-        playerAvatar.represents = playerId;
-        break;
-      }
-    }
+  if (_runningGames[gameId].sockets.hasOwnProperty(playerId) === false) {
+    _runningGames[gameId].sockets[playerId] = socket;
+    console.log("Client", playerId, "joined", gameId, "on", boardId);
   }
 
-  const resp = {
-    announce: "gameJoined",
-    boardId: boardId,
-    gameId: gameId,
-    playerId: playerId,
-  };
-  runningGames[gameId].sockets[playerId].send(JSON.stringify(resp));
+  // Synchronize with client
 
-  console.log("Client", playerId, "joined", gameId, "on", boardId);
-}
-
-function clientDisconnected(socket) {
-  for (const [gid, game] of Object.entries(runningGames)) {
-    for (const [pid, s] of Object.entries(game.sockets)) {
-      if (s === socket) {
-        delete runningGames[gid].sockets[pid];
-      }
-    }
+  for (const [key, values] of Object.entries(msg.scene)) {
+    _runningGames[gameId].scene[key] = unionLastWriterWins(
+      msg.scene[key],
+      _runningGames[gameId].scene[key]
+    );
   }
 }
 
-function parseUrl(url) {
-  let path = null;
-  let parameters = {};
-
-  const pathQuery = url.split("?");
-
-  if (pathQuery.length === 1) {
-    path = pathQuery[0];
-  } else {
-    path = pathQuery[0];
-    const parts = pathQuery[1].split("&");
-
-    for (const p of parts) {
-      const keyValue = p.split("=");
-      if (keyValue.length === 1) {
-        parameters[keyValue[0]] = true;
-      } else {
-        parameters[keyValue[0]] = keyValue[1];
-      }
-    }
-  }
-
-  return [path, parameters];
-}
-
-/*
-  Synchronization Protocol
-*/
-
-function handleModifyScene(msg) {
-  const gameId = msg.gameId;
-  const game = runningGames[gameId];
-  const playerId = msg.playerId;
-  const changes = msg.changes;
-
-  for (const [thingId, diff] of Object.entries(changes)) {
-    // Create a dummy thing if it does not exist on server yet
-    if (runningGames[gameId].scene.hasOwnProperty(thingId) === false) {
-      runningGames[gameId].scene[thingId] = {
-        ownedBy: null,
-        upToTick: 0,
-      };
-    }
-
-    // Check if client is allowed to modify thing, otherwise bail
-    const thing = runningGames[gameId].scene[thingId];
-    if (
-      thing.ownedBy !== null &&
-      thing.ownedBy !== playerId &&
-      thing.upToTick + 5 > game.ticks
-    ) {
-      continue;
-    }
-
-    for (const [prop, value] of Object.entries(diff)) {
-      game.scene[thingId][prop] = value;
-    }
-
-    // Record that thing has been update while also
-    // overwriting this value set by player
-    thing.upToTick = game.ticks;
-  }
-}
-
-function announceSceneModified() {
-  for (const [gameId, game] of Object.entries(runningGames)) {
+function sendServerMessage() {
+  for (const [gameId, game] of Object.entries(_runningGames)) {
     // Each time a scene is announced to all, increase ticks for this game
-    game.ticks += 1;
+    game.tick += 1;
     // Propagate changes to all players
     for (const [playerId, clientSocket] of Object.entries(game.sockets)) {
       const msg = {
-        announce: "sceneModified",
+        boardId: game.boardId,
         gameId: gameId,
         playerId: playerId,
-        ticks: game.ticks,
+        tick: game.tick,
         scene: game.scene,
       };
       clientSocket.send(JSON.stringify(msg));
+    }
+  }
+}
+
+function handleClientDisconnected(socket) {
+  for (const [gid, game] of Object.entries(_runningGames)) {
+    for (const [pid, s] of Object.entries(game.sockets)) {
+      if (s === socket) {
+        delete _runningGames[gid].sockets[pid];
+      }
     }
   }
 }
@@ -245,13 +207,23 @@ https://www.digitalocean.com/community/tutorials/
 how-to-create-a-web-server-in-node-js-with-the-http-module
 */
 
+let _runningGames = {};
+let _countClientsSeen = 0;
 const httpHost = "";
 const httpPort = 8000;
 const wsPort = 8080;
 
 const wsServer = new ws.Server({ port: wsPort });
 
-wsServer.on("connection", handleSocketConnection);
+wsServer.on("connection", function (socket, request) {
+  socket.on("message", function (msg) {
+    handleClientMessage(socket, msg);
+  });
+
+  socket.on("close", function () {
+    handleClientDisconnected(socket);
+  });
+});
 
 const httpServer = http.createServer(handleHTTPRequest);
 
@@ -265,4 +237,4 @@ httpServer.listen(httpPort, httpHost, () => {
 Clients have no tick and are driven by the server.
 */
 
-setInterval(announceSceneModified, 100);
+setInterval(sendServerMessage, 100);

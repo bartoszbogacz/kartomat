@@ -1,18 +1,23 @@
-interface RemoteGame {
+interface Synchronized {
   tick: number;
-  playerId: string;
+  ownedBy: string | null;
+}
+
+interface RemoteGame {
   locatables: { [key: string]: LocatableItem };
   draggables: { [key: string]: DraggableItem };
   stackables: { [key: string]: StackableItem };
   stackings: { [key: string]: StackingItem };
   turnables: { [key: string]: TurnableItem };
   writeables: { [key: string]: WriteableItem };
-  stratifiers: { [key: string]: StrafierItem };
+  stratifiers: { [key: string]: StratifierItem };
 }
 
 interface LocalGame {
   tick: number;
-  playerId: string;
+  boardId: string | null;
+  gameId: string | null;
+  playerId: string | null;
   topZ: number | null;
   overlaps: { [a: string]: { [b: string]: number } } | null;
   stacks: { [key: string]: [string] } | null;
@@ -22,7 +27,7 @@ interface LocalGame {
   stackings: { [key: string]: StackingItem };
   turnables: { [key: string]: TurnableItem };
   writeables: { [key: string]: WriteableItem };
-  stratifiers: { [key: string]: StrafierItem };
+  stratifiers: { [key: string]: StratifierItem };
 }
 
 interface Drag {
@@ -34,100 +39,61 @@ interface Drag {
   wasOutside: boolean;
 }
 
-const _remoteGame: RemoteGame = {
-  tick: 0,
-  playerId: "player1",
-  locatables: {
-    card1: { tick: 0, ownedBy: null, x: 0, y: 0, z: 0, w: 100, h: 150 },
-    card2: { tick: 0, ownedBy: null, x: 110, y: 0, z: 0, w: 100, h: 150 },
-    card3: { tick: 0, ownedBy: null, x: 220, y: 0, z: 0, w: 100, h: 150 },
-    card4: { tick: 0, ownedBy: null, x: 330, y: 0, z: 0, w: 100, h: 150 },
-    write1: { tick: 0, ownedBy: null, x: 10, y: 500, z: 0, w: 300, h: 300 },
-    strat1: { tick: 0, ownedBy: null, x: 400, y: 500, z: 0, w: 300, h: 300 },
-    strat2: { tick: 0, ownedBy: null, x: 0, y: 1000, z: 1, w: 300, h: 300 },
-  },
-  draggables: {
-    card1: { tick: 0, ownedBy: null },
-    card2: { tick: 0, ownedBy: null },
-    card3: { tick: 0, ownedBy: null },
-    card4: { tick: 0, ownedBy: null },
-  },
-  stackings: {},
-  stackables: {
-    card1: { tick: 0, ownedBy: null, onStacking: null },
-    card2: { tick: 0, ownedBy: null, onStacking: null },
-    card3: { tick: 0, ownedBy: null, onStacking: null },
-    card4: { tick: 0, ownedBy: null, onStacking: null },
-  },
-  turnables: {
-    card1: {
-      tick: 0,
-      ownedBy: null,
-      sides: ["rummy/club_1.png", "rummy/back_blue.png"],
-      current: 0,
-    },
-    card2: {
-      tick: 0,
-      ownedBy: null,
-      sides: ["rummy/club_2.png", "rummy/back_blue.png"],
-      current: 0,
-    },
-    card3: {
-      tick: 0,
-      ownedBy: null,
-      sides: ["rummy/club_3.png", "rummy/back_blue.png"],
-      current: 0,
-    },
-    card4: {
-      tick: 0,
-      ownedBy: null,
-      sides: [
-        "rummy/club_4.png",
-        "rummy/back_blue.png",
-        "dices/dice6_side1.png",
-      ],
-      current: 0,
-    },
-  },
-  writeables: {
-    write1: {
-      tick: 0,
-      ownedBy: null,
-      text: "",
-    },
-  },
-  stratifiers: {
-    strat1: {
-      tick: 0,
-      ownedBy: null,
-      splitByPlayer: true,
-      group: ["card1", "card2"],
-    },
-    strat2: {
-      tick: 0,
-      ownedBy: null,
-      splitByPlayer: true,
-      group: ["card3", "card4"],
-    },
-  },
-};
+/** Union two LWWMaps returning a copy of the superset.
+ *
+ * The union is biased towards state2 on equal tick counts of both,
+ * by performing the merging of state2 onto result secondary and
+ * avoid an explicit lesser equals check there.
+ *
+ */
+function unionLastWriterWins<T extends Synchronized, K extends keyof T>(
+  state1: { [key: string]: T },
+  state2: { [key: string]: T }
+): { [key: string]: T } {
+  const result: { [key: string]: T } = {};
 
-let _localGame = {
-  tick: 0,
-  playerId: "player1",
-  topZ: null,
-  overlaps: null,
-  stacks: null,
-  locatables: _remoteGame.locatables,
-  draggables: _remoteGame.draggables,
-  stackings: _remoteGame.stackings,
-  stackables: _remoteGame.stackables,
-  turnables: _remoteGame.turnables,
-  writeables: _remoteGame.writeables,
-  stratifiers: _remoteGame.stratifiers,
-};
+  for (const key of Object.keys(state2)) {
+    if (state1.hasOwnProperty(key) && state1[key].tick > state2[key].tick) {
+      continue;
+    }
+    result[key] = {} as any;
+    for (const [prop, value] of Object.entries(state2[key])) {
+      result[key][prop as K] = value;
+    }
+  }
 
-let _drag: Drag | null = null;
+  for (const key of Object.keys(state1)) {
+    if (state2.hasOwnProperty(key) && state2[key].tick > state1[key].tick) {
+      continue;
+    }
+    result[key] = {} as any;
+    for (const [prop, value] of Object.entries(state1[key])) {
+      result[key][prop as K] = value;
+    }
+  }
+
+  return result;
+}
+
+function render() {
+  locatablesCompute(_localGame);
+  draggablesCompute(_localGame);
+  stackingsCompute(_localGame);
+  stackablesCompute(_localGame);
+  turnablesCompute(_localGame);
+  writeablesCompute(_localGame);
+  stratifiersCompute(_localGame);
+
+  locatablesRender(_localGame);
+  draggablesRender(_localGame);
+  stackingsRender(_localGame);
+  stackablesRender(_localGame);
+  turnablesRender(_localGame);
+  writeablesRender(_localGame);
+  stratifiersRender(_localGame);
+
+  locatablesDebug.innerHTML = JSON.stringify(_localGame.locatables, null, 2);
+}
 
 function onClick(event: MouseEvent) {
   if (event.target === null) {
@@ -291,33 +257,115 @@ function onMouseUp(event: MouseEvent | TouchEvent) {
   _drag = null;
 }
 
-function render() {
-  locatablesSynchronize(_localGame, _remoteGame);
-  draggablesSynchronize(_localGame, _remoteGame);
-  stackingsSynchronize(_localGame, _remoteGame);
-  stackablesSynchronize(_localGame, _remoteGame);
-  turnablesSynchronize(_localGame, _remoteGame);
-  writeablesSynchronize(_localGame, _remoteGame);
-  stratifiersSynchronize(_localGame, _remoteGame);
+function parseUrl(url: string): [string, { [key: string]: any }] {
+  let path = null;
+  let parameters: { [key: string]: any } = {};
 
-  locatablesCompute(_localGame);
-  draggablesCompute(_localGame);
-  stackingsCompute(_localGame);
-  stackablesCompute(_localGame);
-  turnablesCompute(_localGame);
-  writeablesCompute(_localGame);
-  stratifiersCompute(_localGame);
+  const pathQuery = url.split("?");
 
-  locatablesRender(_localGame);
-  draggablesRender(_localGame);
-  stackingsRender(_localGame);
-  stackablesRender(_localGame);
-  turnablesRender(_localGame);
-  writeablesRender(_localGame);
-  stratifiersRender(_localGame);
+  if (pathQuery.length === 1) {
+    path = pathQuery[0];
+  } else {
+    path = pathQuery[0];
+    const parts = pathQuery[1].split("&");
 
-  locatablesDebug.innerHTML = JSON.stringify(_localGame.locatables, null, 2);
+    for (const p of parts) {
+      const keyValue = p.split("=");
+      if (keyValue.length === 1) {
+        parameters[keyValue[0]] = true;
+      } else {
+        parameters[keyValue[0]] = keyValue[1];
+      }
+    }
+  }
+
+  return [path, parameters];
 }
+
+function sendClientMessage() {
+  const localGame: RemoteGame = {
+    locatables: _localGame.locatables,
+    draggables: _localGame.draggables,
+    stackings: _localGame.stackings,
+    stackables: _localGame.stackables,
+    turnables: _localGame.turnables,
+    writeables: _localGame.writeables,
+    stratifiers: _localGame.stratifiers,
+  };
+
+  const msg = {
+    boardId: _localGame.boardId,
+    gameId: _localGame.gameId,
+    playerId: _localGame.playerId,
+    scene: localGame,
+  };
+
+  _websocket.send(JSON.stringify(msg));
+}
+
+function handleServerMessage(msg: any) {
+  msg = JSON.parse(msg.data);
+
+  const remoteGame = msg.scene as RemoteGame;
+
+  locatablesSynchronize(_localGame, remoteGame);
+  draggablesSynchronize(_localGame, remoteGame);
+  stackingsSynchronize(_localGame, remoteGame);
+  stackablesSynchronize(_localGame, remoteGame);
+  turnablesSynchronize(_localGame, remoteGame);
+  writeablesSynchronize(_localGame, remoteGame);
+  stratifiersSynchronize(_localGame, remoteGame);
+
+  _localGame.tick = msg.tick;
+  _localGame.boardId = msg.boardId;
+  _localGame.gameId = msg.gameId;
+  _localGame.playerId = msg.playerId;
+
+  sendClientMessage();
+}
+
+function keepWebsocketConnected() {
+  _websocket = new WebSocket("ws://" + window.location.hostname + ":8080");
+
+  _websocket.onopen = function () {
+    sendClientMessage();
+  };
+
+  _websocket.onmessage = function (msg: any) {
+    handleServerMessage(msg);
+  };
+
+  _websocket.onerror = function () {
+    window.setTimeout(keepWebsocketConnected, 2000);
+  };
+
+  _websocket.onclose = function () {
+    window.setTimeout(keepWebsocketConnected, 2000);
+  };
+}
+
+let [path, parameters] = parseUrl(window.location.href);
+
+let _drag: Drag | null = null;
+let _websocket: any = null;
+let _localGame: LocalGame = {
+  tick: 0,
+  boardId: parameters.board || null,
+  gameId: parameters.game || null,
+  playerId: parameters.player || null,
+  topZ: null,
+  overlaps: null,
+  stacks: null,
+  locatables: {},
+  draggables: {},
+  stackables: {},
+  stackings: {},
+  turnables: {},
+  writeables: {},
+  stratifiers: {},
+};
+
+keepWebsocketConnected();
 
 document.body.onmousemove = onMouseMove;
 document.body.onmouseup = onMouseUp;

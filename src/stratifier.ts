@@ -1,4 +1,4 @@
-interface StrafierItem extends Synchronized {
+interface StratifierItem extends Synchronized {
   splitByPlayer: boolean;
   group: string[];
 }

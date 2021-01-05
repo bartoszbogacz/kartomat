@@ -5,8 +5,7 @@
     "strict": true
   },
   "files": [
-    "src/synchronize.ts",
-    "src/game.ts",
+    "src/client.ts",
     "src/locatable.ts",
     "src/draggable.ts",
     "src/stackable.ts",
