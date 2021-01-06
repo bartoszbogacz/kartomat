@@ -3,7 +3,7 @@ interface Synchronized {
   ownedBy: string | null;
 }
 
-interface RemoteGame {
+interface GameState {
   locatables: { [key: string]: LocatableItem };
   draggables: { [key: string]: DraggableItem };
   stackables: { [key: string]: StackableItem };
@@ -13,7 +13,7 @@ interface RemoteGame {
   stratifiers: { [key: string]: StratifierItem };
 }
 
-interface LocalGame {
+interface ComputedState {
   tick: number;
   boardId: string | null;
   gameId: string | null;
@@ -21,13 +21,7 @@ interface LocalGame {
   topZ: number | null;
   overlaps: { [a: string]: { [b: string]: number } } | null;
   stacks: { [key: string]: [string] } | null;
-  locatables: { [key: string]: LocatableItem };
-  draggables: { [key: string]: DraggableItem };
-  stackables: { [key: string]: StackableItem };
-  stackings: { [key: string]: StackingItem };
-  turnables: { [key: string]: TurnableItem };
-  writeables: { [key: string]: WriteableItem };
-  stratifiers: { [key: string]: StratifierItem };
+  locations: { [key: string]: LocatableItem } | null;
 }
 
 interface Drag {
@@ -41,27 +35,34 @@ interface Drag {
 
 let _drag: Drag | null = null;
 let _websocket: any = null;
-let _localGame: LocalGame | null = null;
+
+let _localGame: GameState = {
+  locatables: {},
+  draggables: {},
+  stackables: {},
+  stackings: {},
+  turnables: {},
+  writeables: {},
+  stratifiers: {},
+};
+
+let _computed: ComputedState = {
+  tick: 0,
+  boardId: null,
+  gameId: null,
+  playerId: null,
+  topZ: null,
+  overlaps: null,
+  stacks: null,
+  locations: null,
+};
 
 function initWebSocketClient() {
   let [path, parameters] = parseUrl(window.location.href);
 
-  _localGame = {
-    tick: 0,
-    boardId: parameters.board || null,
-    gameId: parameters.game || null,
-    playerId: parameters.player || null,
-    topZ: null,
-    overlaps: null,
-    stacks: null,
-    locatables: {},
-    draggables: {},
-    stackables: {},
-    stackings: {},
-    turnables: {},
-    writeables: {},
-    stratifiers: {},
-  };
+  _computed.boardId = parameters.board || null;
+  _computed.gameId = parameters.game || null;
+  _computed.playerId = parameters.player || null;
 
   _websocket = new WebSocket("ws://" + window.location.hostname + ":8080");
 
@@ -83,51 +84,54 @@ function initWebSocketClient() {
 }
 
 function sendClientMessage() {
-  if (_localGame === null) {
-    return;
-  }
-
-  const localGame: RemoteGame = {
-    locatables: _localGame.locatables,
-    draggables: _localGame.draggables,
-    stackings: _localGame.stackings,
-    stackables: _localGame.stackables,
-    turnables: _localGame.turnables,
-    writeables: _localGame.writeables,
-    stratifiers: _localGame.stratifiers,
-  };
-
   const msg = {
-    boardId: _localGame.boardId,
-    gameId: _localGame.gameId,
-    playerId: _localGame.playerId,
-    scene: localGame,
+    boardId: _computed.boardId,
+    gameId: _computed.gameId,
+    playerId: _computed.playerId,
+    scene: _localGame,
   };
 
   _websocket.send(JSON.stringify(msg));
 }
 
 function handleServerMessage(msg: any) {
-  if (_localGame === null) {
-    return;
-  }
-
   msg = JSON.parse(msg.data);
 
-  const remoteGame = msg.scene as RemoteGame;
+  const remoteGame = msg.scene as GameState;
 
-  locatablesSynchronize(_localGame, remoteGame);
-  draggablesSynchronize(_localGame, remoteGame);
-  stackingsSynchronize(_localGame, remoteGame);
-  stackablesSynchronize(_localGame, remoteGame);
-  turnablesSynchronize(_localGame, remoteGame);
-  writeablesSynchronize(_localGame, remoteGame);
-  stratifiersSynchronize(_localGame, remoteGame);
+  _localGame.locatables = unionLastWriterWins(
+    _localGame.locatables,
+    remoteGame.locatables
+  );
+  _localGame.draggables = unionLastWriterWins(
+    _localGame.draggables,
+    remoteGame.draggables
+  );
+  _localGame.stackings = unionLastWriterWins(
+    _localGame.stackings,
+    remoteGame.stackings
+  );
+  _localGame.stackables = unionLastWriterWins(
+    _localGame.stackables,
+    remoteGame.stackables
+  );
+  _localGame.turnables = unionLastWriterWins(
+    _localGame.turnables,
+    remoteGame.turnables
+  );
+  _localGame.writeables = unionLastWriterWins(
+    _localGame.writeables,
+    remoteGame.writeables
+  );
+  _localGame.stratifiers = unionLastWriterWins(
+    _localGame.stratifiers,
+    remoteGame.stratifiers
+  );
 
-  _localGame.tick = msg.tick;
-  _localGame.boardId = msg.boardId;
-  _localGame.gameId = msg.gameId;
-  _localGame.playerId = msg.playerId;
+  _computed.tick = msg.tick;
+  _computed.boardId = msg.boardId;
+  _computed.gameId = msg.gameId;
+  _computed.playerId = msg.playerId;
 
   sendClientMessage();
 
@@ -139,23 +143,25 @@ function render() {
     return;
   }
 
-  locatablesCompute(_localGame);
-  draggablesCompute(_localGame);
-  stackingsCompute(_localGame);
-  stackablesCompute(_localGame);
-  turnablesCompute(_localGame);
-  writeablesCompute(_localGame);
-  stratifiersCompute(_localGame);
+  locatablesCompute1(_localGame, _computed);
+  stackablesCompute(_localGame, _computed);
+  stratifiersCompute(_localGame, _computed);
+  locatablesCompute2(_localGame, _computed);
 
-  locatablesRender(_localGame);
-  draggablesRender(_localGame);
-  stackingsRender(_localGame);
-  stackablesRender(_localGame);
-  turnablesRender(_localGame);
-  writeablesRender(_localGame);
-  stratifiersRender(_localGame);
+  locatablesRender(_localGame, _computed);
+  stackingsRender(_localGame, _computed);
+  turnablesRender(_localGame, _computed);
+  writeablesRender(_localGame, _computed);
 
-  locatablesDebug.innerHTML = JSON.stringify(_localGame.locatables, null, 2);
+  // Debug
+  const diffToTick: { [key: string]: any } = {};
+  for (const [locId, locatable] of Object.entries(_localGame.locatables)) {
+    if (locatable.tick + 50 > _computed.tick) {
+      diffToTick[locId] = locatable;
+    }
+  }
+
+  debug.innerHTML = JSON.stringify(diffToTick, null, 2);
 }
 
 function onClick(event: MouseEvent) {
@@ -165,13 +171,7 @@ function onClick(event: MouseEvent) {
 
   const thingId = (event.target as HTMLElement).id;
 
-  locatablesClick(_localGame, thingId);
-  draggablesClick(_localGame, thingId);
-  stackingsClick(_localGame, thingId);
-  stackablesClick(_localGame, thingId);
-  turnablesClick(_localGame, thingId);
-  writeablesClick(_localGame, thingId);
-  stratifiersClick(_localGame, thingId);
+  stackingsTouch(_localGame, _computed, thingId);
 
   window.requestAnimationFrame(render);
 }
@@ -183,13 +183,7 @@ function onKeyUp(event: KeyboardEvent) {
 
   const thingId = (event.target as HTMLElement).id;
 
-  locatablesKeyUp(_localGame, thingId);
-  draggablesKeyUp(_localGame, thingId);
-  stackingsKeyUp(_localGame, thingId);
-  stackablesKeyUp(_localGame, thingId);
-  turnablesKeyUp(_localGame, thingId);
-  writeablesKeyUp(_localGame, thingId);
-  stratifiersKeyUp(_localGame, thingId);
+  writeablesKeyUp(_localGame, _computed, thingId);
 
   window.requestAnimationFrame(render);
 }
@@ -218,13 +212,8 @@ function onMouseDown(event: MouseEvent | TouchEvent) {
 
   const thingId = _drag.target.id;
 
-  locatablesTake(_localGame, thingId);
-  draggablesTake(_localGame, thingId);
-  stackingsTake(_localGame, thingId);
-  stackablesTake(_localGame, thingId);
-  turnablesTake(_localGame, thingId);
-  writeablesTake(_localGame, thingId);
-  stratifiersTake(_localGame, thingId);
+  draggablesTake(_localGame, _computed, thingId);
+  stackablesTake(_localGame, _computed, thingId);
 
   window.requestAnimationFrame(render);
 }
@@ -255,13 +244,7 @@ function onMouseMove(event: MouseEvent | TouchEvent) {
 
   const thingId = _drag.target.id;
 
-  locatablesMove(_localGame, thingId, x, y);
-  draggablesMove(_localGame, thingId, x, y);
-  stackingsMove(_localGame, thingId, x, y);
-  stackablesMove(_localGame, thingId, x, y);
-  turnablesMove(_localGame, thingId, x, y);
-  writeablesMove(_localGame, thingId, x, y);
-  stratifiersMove(_localGame, thingId, x, y);
+  draggablesMove(_localGame, _computed, thingId, x, y);
 
   window.requestAnimationFrame(render);
 }
@@ -289,25 +272,15 @@ function onMouseUp(event: MouseEvent | TouchEvent) {
 
   const thingId = _drag.target.id;
 
-  locatablesMove(_localGame, thingId, x, y);
-  draggablesMove(_localGame, thingId, x, y);
-  stackingsMove(_localGame, thingId, x, y);
-  stackablesMove(_localGame, thingId, x, y);
-  turnablesMove(_localGame, thingId, x, y);
-  writeablesMove(_localGame, thingId, x, y);
-  stratifiersMove(_localGame, thingId, x, y);
+  draggablesMove(_localGame, _computed, thingId, x, y);
 
-  locatablesPlace(_localGame, thingId, _drag.wasOutside);
-  draggablesPlace(_localGame, thingId, _drag.wasOutside);
-  stackingsPlace(_localGame, thingId, _drag.wasOutside);
-  stackablesPlace(_localGame, thingId, _drag.wasOutside);
-  turnablesPlace(_localGame, thingId, _drag.wasOutside);
-  writeablesPlace(_localGame, thingId, _drag.wasOutside);
-  stratifiersPlace(_localGame, thingId, _drag.wasOutside);
-
-  window.requestAnimationFrame(render);
+  stackingsPlace(_localGame, _computed, thingId, _drag.wasOutside);
+  stackablesPlace(_localGame, _computed, thingId, _drag.wasOutside);
+  turnablesPlace(_localGame, _computed, thingId, _drag.wasOutside);
 
   _drag = null;
+
+  window.requestAnimationFrame(render);
 }
 
 /** Union two LWWMaps returning a copy of the superset.
@@ -378,8 +351,8 @@ document.body.onmouseup = onMouseUp;
 window.setInterval(render, 1000);
 
 // Debug
-let locatablesDebug = document.createElement("pre");
-locatablesDebug.style.position = "absolute";
-locatablesDebug.style.left = "400px";
-locatablesDebug.style.userSelect = "none";
-document.body.appendChild(locatablesDebug);
+let debug = document.createElement("pre");
+debug.style.position = "absolute";
+debug.style.left = "400px";
+debug.style.userSelect = "none";
+document.body.appendChild(debug);

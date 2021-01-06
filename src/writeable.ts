@@ -2,15 +2,7 @@ interface WriteableItem extends Synchronized {
   text: string;
 }
 
-function writeablesSynchronize(local: LocalGame, remote: RemoteGame) {
-  local.writeables = unionLastWriterWins(local.writeables, remote.writeables);
-}
-
-function writeablesCompute(local: LocalGame) {
-  //
-}
-
-function writeablesRender(local: LocalGame) {
+function writeablesRender(local: GameState, computed: ComputedState) {
   for (const key of Object.keys(local.writeables)) {
     let elem = document.getElementById(key);
     if (elem === null) {
@@ -34,8 +26,8 @@ function writeablesRender(local: LocalGame) {
     elem.style.zIndex = loc.z.toString();
     if (
       local.writeables[key].ownedBy === null ||
-      local.writeables[key].ownedBy === local.playerId ||
-      local.writeables[key].tick + 5 < local.tick
+      local.writeables[key].ownedBy === computed.playerId ||
+      local.writeables[key].tick + 5 < computed.tick
     ) {
       (elem as any).disabled = false;
     } else {
@@ -45,46 +37,17 @@ function writeablesRender(local: LocalGame) {
   }
 }
 
-function writeablesKeyUp(local: LocalGame, itemId: string) {
+function writeablesKeyUp(
+  local: GameState,
+  computed: ComputedState,
+  itemId: string
+) {
   if (local.writeables.hasOwnProperty(itemId)) {
     let elem = document.getElementById(itemId);
     if (elem !== null) {
-      local.writeables[itemId].tick = local.tick + 1;
-      local.writeables[itemId].ownedBy = local.playerId;
+      local.writeables[itemId].tick = computed.tick + 1;
+      local.writeables[itemId].ownedBy = computed.playerId;
       local.writeables[itemId].text = (elem as any).value;
     }
-  }
-}
-
-function writeablesClick(local: LocalGame, itemId: string) {
-  if (local.writeables.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function writeablesTake(local: LocalGame, itemId: string) {
-  if (local.writeables.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function writeablesMove(
-  local: LocalGame,
-  itemId: string,
-  x: number,
-  y: number
-) {
-  if (local.writeables.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function writeablesPlace(
-  local: LocalGame,
-  itemId: string,
-  wasOutside: boolean
-) {
-  if (local.writeables.hasOwnProperty(itemId)) {
-    //
   }
 }

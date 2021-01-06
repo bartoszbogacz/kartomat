@@ -3,98 +3,50 @@ interface StratifierItem extends Synchronized {
   group: string[];
 }
 
-function stratifiersSynchronize(local: LocalGame, remote: RemoteGame) {
-  local.stratifiers = unionLastWriterWins(
-    local.stratifiers,
-    remote.stratifiers
-  );
-}
+function stratifiersCompute(local: GameState, computed: ComputedState) {
+  if (computed.locations === null) {
+    throw new Error("Locations not yet computed.");
+  }
 
-function stratifiersCompute(local: LocalGame) {
   const stratifierIds = Object.keys(local.stratifiers);
-  stratifierIds.sort((a, b) => local.locatables[a].z - local.locatables[b].z);
+  stratifierIds.sort(
+    (a, b) =>
+      (computed.locations as any)[a].z - (computed.locations as any)[b].z
+  );
   let accumZ = 0;
 
   for (const stratifierId of stratifierIds) {
     const stratifier = local.stratifiers[stratifierId];
 
     stratifier.group.sort(
-      (a, b) => local.locatables[a].z - local.locatables[b].z
+      (a, b) =>
+        (computed.locations as any)[a].z - (computed.locations as any)[b].z
     );
 
     if (stratifier.splitByPlayer) {
       for (const itemId of stratifier.group) {
-        if (local.locatables[itemId].ownedBy !== local.playerId) {
-          local.locatables[itemId].z = accumZ;
+        if (computed.locations[itemId].ownedBy !== computed.playerId) {
+          computed.locations[itemId].z = accumZ;
           accumZ = accumZ + 1;
         }
       }
 
-      local.locatables[stratifierId].z = accumZ;
+      computed.locations[stratifierId].z = accumZ;
       accumZ = accumZ + 1;
 
       for (const itemId of stratifier.group) {
-        if (local.locatables[itemId].ownedBy === local.playerId) {
-          local.locatables[itemId].z = accumZ;
+        if (computed.locations[itemId].ownedBy === computed.playerId) {
+          computed.locations[itemId].z = accumZ;
           accumZ = accumZ + 1;
         }
       }
     } else {
-      local.locatables[stratifierId].z = accumZ;
+      computed.locations[stratifierId].z = accumZ;
 
       for (const itemId of stratifier.group) {
-        local.locatables[itemId].z = accumZ;
+        computed.locations[itemId].z = accumZ;
         accumZ = accumZ + 1;
       }
     }
-  }
-}
-
-function stratifiersRender(local: LocalGame) {
-  //
-}
-
-function stratifiersClick(local: LocalGame, itemId: string) {
-  if (local.stratifiers.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function stratifiersKeyUp(local: LocalGame, itemId: string) {
-  if (local.stratifiers.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function stratifiersTake(local: LocalGame, itemId: string) {
-  if (local.stratifiers.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function stratifiersMove(
-  local: LocalGame,
-  itemId: string,
-  x: number,
-  y: number
-) {
-  if (local.stratifiers.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function stratifiersPlace(
-  local: LocalGame,
-  itemId: string,
-  wasOutside: boolean
-) {
-  if (local.stratifiers.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function stratifiersTurn(local: LocalGame, itemId: string) {
-  if (local.stratifiers.hasOwnProperty(itemId)) {
-    //
   }
 }

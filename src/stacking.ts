@@ -3,16 +3,8 @@ interface StackingItem extends Synchronized {
   current: number;
 }
 
-function stackingsSynchronize(local: LocalGame, remote: RemoteGame) {
-  local.stackings = unionLastWriterWins(local.stackings, remote.stackings);
-}
-
-function stackingsCompute(local: LocalGame) {
-  //
-}
-
-function stackingsRender(local: LocalGame) {
-  if (local.stacks === null) {
+function stackingsRender(local: GameState, computed: ComputedState) {
+  if (computed.stacks === null) {
     throw new Error("Stacks not yet computed.");
   }
 
@@ -74,7 +66,8 @@ function stackingsRender(local: LocalGame) {
     }
 
     const s =
-      local.stacks.hasOwnProperty(itemId) && local.stacks[itemId].length > 1;
+      computed.stacks.hasOwnProperty(itemId) &&
+      computed.stacks[itemId].length > 1;
     const loc = local.locatables[itemId];
 
     if (s === true) {
@@ -115,31 +108,35 @@ function stackingsRender(local: LocalGame) {
   }
 }
 
-function stackingsCreateFor(local: LocalGame, stackableId: string): string {
-  if (local.stacks === null) {
-    throw new Error("Stacks not yet computed.");
+function stackingsCreateFor(
+  local: GameState,
+  computed: ComputedState,
+  stackableId: string
+): string {
+  if (computed.stacks === null || computed.locations === null) {
+    throw new Error("Stacks or locations not yet computed.");
   }
 
   for (let i = 0; i < 100; i++) {
-    const stackingId = local.playerId + "stacking" + i;
+    const stackingId = "stacking" + i;
     if (
-      local.stacks.hasOwnProperty(stackingId) &&
-      local.stacks[stackingId].length > 0
+      computed.stacks.hasOwnProperty(stackingId) &&
+      computed.stacks[stackingId].length > 0
     ) {
       continue;
     }
     local.locatables[stackingId] = {
-      tick: local.tick + 1,
-      ownedBy: local.playerId,
-      x: local.locatables[stackableId].x,
-      y: local.locatables[stackableId].y,
-      z: local.locatables[stackableId].z,
-      w: local.locatables[stackableId].w,
-      h: local.locatables[stackableId].h,
+      tick: computed.tick + 1,
+      ownedBy: computed.playerId,
+      x: computed.locations[stackableId].x,
+      y: computed.locations[stackableId].y,
+      z: computed.locations[stackableId].z,
+      w: computed.locations[stackableId].w,
+      h: computed.locations[stackableId].h,
     };
     local.stackings[stackingId] = {
-      tick: local.tick + 1,
-      ownedBy: local.playerId,
+      tick: computed.tick + 1,
+      ownedBy: computed.playerId,
       strides: [30, 10, 1],
       current: 0,
     };
@@ -148,7 +145,11 @@ function stackingsCreateFor(local: LocalGame, stackableId: string): string {
   throw new Error("Exhausted stacking ids.");
 }
 
-function stackingsClick(local: LocalGame, itemId: string) {
+function stackingsTouch(
+  local: GameState,
+  computed: ComputedState,
+  itemId: string
+) {
   if (itemId.endsWith("FoldControl")) {
     const properId = itemId.slice(0, -"FoldControl".length);
     if (local.stackings.hasOwnProperty(properId)) {
@@ -158,56 +159,80 @@ function stackingsClick(local: LocalGame, itemId: string) {
         local.stackings[properId].strides.length;
     }
   }
-  if (local.stacks !== null && itemId.endsWith("TurnControl")) {
+  if (computed.stacks !== null && itemId.endsWith("TurnControl")) {
     const properId = itemId.slice(0, -"TurnControl".length);
     if (local.stackings.hasOwnProperty(properId)) {
       // Turn cards by advancing to next side
-      for (const stackableId of local.stacks[properId]) {
+      for (const stackableId of computed.stacks[properId]) {
         if (local.turnables.hasOwnProperty(stackableId)) {
-          turnablesTurn(local, stackableId);
+          turnablesTurn(local, computed, stackableId);
         }
       }
     }
   }
-  if (local.stacks !== null && itemId.endsWith("ShuffleControl")) {
+  if (computed.stacks !== null && itemId.endsWith("ShuffleControl")) {
     const properId = itemId.slice(0, -"ShuffleControl".length);
     if (local.stackings.hasOwnProperty(properId)) {
       // Shuffle cards by assigning random fractional index
-      for (const stackableId of local.stacks[properId]) {
+      for (const stackableId of computed.stacks[properId]) {
+        local.locatables[stackableId].tick = computed.tick + 1;
+        local.locatables[stackableId].ownedBy = computed.playerId;
         local.locatables[stackableId].x = Math.random();
       }
     }
   }
 }
 
-function stackingsKeyUp(local: LocalGame, itemId: string) {
-  if (local.stackings.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function stackingsTake(local: LocalGame, itemId: string) {
-  if (local.stackings.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function stackingsMove(local: LocalGame, itemId: string, x: number, y: number) {
-  if (local.stackings.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function stackingsPlace(local: LocalGame, itemId: string, wasOutside: boolean) {
-  if (local.stacks !== null && local.stackings.hasOwnProperty(itemId)) {
-    const largest = stackingsFindOverlapping(local, itemId);
+function stackingsPlace(
+  local: GameState,
+  computed: ComputedState,
+  itemId: string,
+  wasOutside: boolean
+) {
+  if (computed.stacks !== null && local.stackings.hasOwnProperty(itemId)) {
+    const largest = stackingsFindOverlapping(local, computed, itemId);
     if (largest !== null) {
       let stackingId = local.stackables[largest].onStacking;
       if (stackingId === null) {
+        // Place stackable without a stacking on our stacking
+        local.stackables[largest].tick = computed.tick + 1;
+        local.stackables[largest].ownedBy = computed.playerId;
         local.stackables[largest].onStacking = itemId;
+
+        const [gapA, gapB] = stackablesFindGap(
+          local,
+          computed,
+          itemId,
+          largest
+        );
+
+        local.locatables[largest].tick = computed.tick + 1;
+        local.locatables[largest].ownedBy = computed.playerId;
+        local.locatables[largest].x = (gapA + gapB) / 2;
       } else {
-        for (const stackableId of local.stacks[itemId]) {
+        // Place our stackables on target stacking
+        // Start with a small offset from left (i + 1)
+        // and end with a small offset to the right (N + 2)
+        const [gapA, gapB] = stackablesFindGap(
+          local,
+          computed,
+          stackingId,
+          computed.stacks[itemId][0]
+        );
+
+        const N = computed.stacks[itemId].length;
+
+        for (let i = 0; i < N; i++) {
+          const stackableId = computed.stacks[itemId][i];
+
+          local.stackables[stackableId].tick = computed.tick + 1;
+          local.stackables[stackableId].ownedBy = computed.playerId;
           local.stackables[stackableId].onStacking = stackingId;
+
+          local.locatables[stackableId].tick = computed.tick + 1;
+          local.locatables[stackableId].ownedBy = computed.playerId;
+          local.locatables[stackableId].x =
+            gapA + ((i + 1) / (N + 2)) * (gapB - gapA);
         }
       }
     }
@@ -215,22 +240,23 @@ function stackingsPlace(local: LocalGame, itemId: string, wasOutside: boolean) {
 }
 
 function stackingsFindOverlapping(
-  local: LocalGame,
+  local: GameState,
+  computed: ComputedState,
   itemId: string
 ): string | null {
   let pixels: number = 500;
   let largest: string | null = null;
 
-  if (local.stacks === null || local.overlaps === null) {
+  if (computed.stacks === null || computed.overlaps === null) {
     throw new Error("Stacks or overlaps not yet computed");
   }
 
   for (const [otherId, stackable] of Object.entries(local.stackables)) {
     if (
       stackable.onStacking !== itemId &&
-      local.overlaps[itemId][otherId] > pixels
+      computed.overlaps[itemId][otherId] > pixels
     ) {
-      pixels = local.overlaps[itemId][otherId];
+      pixels = computed.overlaps[itemId][otherId];
       largest = otherId;
     }
   }

@@ -3,15 +3,11 @@ interface TurnableItem extends Synchronized {
   current: number;
 }
 
-function turnablesSynchronize(local: LocalGame, remote: RemoteGame) {
-  local.turnables = unionLastWriterWins(local.turnables, remote.turnables);
-}
+function turnablesRender(local: GameState, computed: ComputedState) {
+  if (computed.locations === null) {
+    throw new Error("Locations not yet computed");
+  }
 
-function turnablesCompute(local: LocalGame) {
-  //
-}
-
-function turnablesRender(local: LocalGame) {
   for (const key of Object.keys(local.turnables)) {
     let elem = document.getElementById(key);
     if (elem === null) {
@@ -25,7 +21,7 @@ function turnablesRender(local: LocalGame) {
     }
 
     const trn = local.turnables[key];
-    const loc = local.locatables[key];
+    const loc = computed.locations[key];
 
     elem.style.top = loc.y + "px";
     elem.style.left = loc.x + "px";
@@ -37,38 +33,25 @@ function turnablesRender(local: LocalGame) {
   }
 }
 
-function turnablesClick(local: LocalGame, itemId: string) {
-  if (local.turnables.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function turnablesKeyUp(local: LocalGame, itemId: string) {
-  if (local.turnables.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function turnablesTake(local: LocalGame, itemId: string) {
-  if (local.turnables.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function turnablesMove(local: LocalGame, itemId: string, x: number, y: number) {
-  if (local.turnables.hasOwnProperty(itemId)) {
-    //
-  }
-}
-
-function turnablesPlace(local: LocalGame, itemId: string, wasOutside: boolean) {
+function turnablesPlace(
+  local: GameState,
+  computed: ComputedState,
+  itemId: string,
+  wasOutside: boolean
+) {
   if (wasOutside === false) {
-    turnablesTurn(local, itemId);
+    turnablesTurn(local, computed, itemId);
   }
 }
 
-function turnablesTurn(local: LocalGame, itemId: string) {
+function turnablesTurn(
+  local: GameState,
+  computed: ComputedState,
+  itemId: string
+) {
   if (local.turnables.hasOwnProperty(itemId)) {
+    local.turnables[itemId].tick = computed.tick + 1;
+    local.turnables[itemId].ownedBy = computed.playerId;
     local.turnables[itemId].current =
       (local.turnables[itemId].current + 1) %
       local.turnables[itemId].sides.length;
