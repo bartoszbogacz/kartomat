@@ -31,12 +31,16 @@ function avatarsCompute(local: GameState, computed: ComputedState) {
 
 function avatarsRender(local: GameState, computed: ComputedState) {
   for (const key of Object.keys(local.avatars)) {
+    const avt = local.avatars[key];
+    const loc = local.locatables[key];
+
     let elem = document.getElementById(key);
     if (elem === null) {
       elem = document.createElement("textarea");
       elem.onkeyup = onKeyUp;
       elem.id = key;
       elem.className = "Writeable";
+      (elem as any).value = avt.text;
       elem.style.position = "absolute";
       elem.style.resize = "none";
       elem.style.outline = "none";
@@ -44,9 +48,6 @@ function avatarsRender(local: GameState, computed: ComputedState) {
       elem.style.fontSize = "16px";
       document.body.appendChild(elem);
     }
-
-    const avt = local.avatars[key];
-    const loc = local.locatables[key];
 
     elem.style.top = loc.y + "px";
     elem.style.left = loc.x + "px";
