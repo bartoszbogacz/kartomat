@@ -11,8 +11,8 @@ function locatablesCompute1(local: GameState, computed: ComputedState) {
 
   for (const [locId, loc] of Object.entries(local.locatables)) {
     computed.locations[locId] = {
-      tick: 0,
-      ownedBy: null,
+      tick: loc.tick,
+      ownedBy: loc.ownedBy,
       x: loc.x,
       y: loc.y,
       z: loc.z,

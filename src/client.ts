@@ -10,6 +10,7 @@ interface GameState {
   stackings: { [key: string]: StackingItem };
   turnables: { [key: string]: TurnableItem };
   writeables: { [key: string]: WriteableItem };
+  stratified: { [key: string]: StratifiedItem };
   stratifiers: { [key: string]: StratifierItem };
 }
 
@@ -43,6 +44,7 @@ let _localGame: GameState = {
   stackings: {},
   turnables: {},
   writeables: {},
+  stratified: {},
   stratifiers: {},
 };
 
@@ -123,6 +125,10 @@ function handleServerMessage(msg: any) {
     _localGame.writeables,
     remoteGame.writeables
   );
+  _localGame.stratified = unionLastWriterWins(
+    _localGame.stratified,
+    remoteGame.stratified
+  );
   _localGame.stratifiers = unionLastWriterWins(
     _localGame.stratifiers,
     remoteGame.stratifiers
@@ -143,15 +149,19 @@ function render() {
     return;
   }
 
+  // This order is important. It should be
+  // loc1, strat, stack, loc2. Computes
+  // in-between are fine.
   locatablesCompute1(_localGame, _computed);
-  stackablesCompute(_localGame, _computed);
   stratifiersCompute(_localGame, _computed);
+  stackablesCompute(_localGame, _computed);
   locatablesCompute2(_localGame, _computed);
 
   locatablesRender(_localGame, _computed);
   stackingsRender(_localGame, _computed);
   turnablesRender(_localGame, _computed);
   writeablesRender(_localGame, _computed);
+  stratifierRender(_localGame, _computed);
 
   // Debug
   const diffToTick: { [key: string]: any } = {};
