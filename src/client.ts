@@ -189,6 +189,8 @@ function onKeyUp(event: KeyboardEvent) {
 }
 
 function onMouseDown(event: MouseEvent | TouchEvent) {
+  event.preventDefault();
+
   if (_localGame === null || event.target === null) {
     return;
   }
@@ -219,6 +221,8 @@ function onMouseDown(event: MouseEvent | TouchEvent) {
 }
 
 function onMouseMove(event: MouseEvent | TouchEvent) {
+  event.preventDefault();
+
   if (_localGame === null || event.target === null) {
     return;
   }
@@ -250,6 +254,8 @@ function onMouseMove(event: MouseEvent | TouchEvent) {
 }
 
 function onMouseUp(event: MouseEvent | TouchEvent) {
+  event.preventDefault();
+
   if (_drag === null || _localGame === null || event.target === null) {
     return;
   }

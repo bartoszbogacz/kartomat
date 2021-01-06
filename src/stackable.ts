@@ -40,20 +40,20 @@ function stackablesTake(
   computed: ComputedState,
   itemId: string
 ) {
-  if (computed.locations === null) {
-    throw new Error("Locations not yet computed");
+  if (computed.locations === null || computed.topZ === null) {
+    throw new Error("Locations or topZ not yet computed");
   }
 
   if (local.stackables.hasOwnProperty(itemId)) {
-    local.stackables[itemId].tick = computed.tick + 1;
+    local.stackables[itemId].tick = computed.tick;
     local.stackables[itemId].ownedBy = computed.playerId;
     local.stackables[itemId].onStacking = null;
 
-    local.locatables[itemId].tick = computed.tick + 1;
+    local.locatables[itemId].tick = computed.tick;
     local.locatables[itemId].ownedBy = computed.playerId;
     local.locatables[itemId].x = computed.locations[itemId].x;
     local.locatables[itemId].y = computed.locations[itemId].y;
-    local.locatables[itemId].z = computed.locations[itemId].z;
+    local.locatables[itemId].z = computed.topZ + 1;
   }
 }
 
@@ -77,23 +77,23 @@ function stackablesPlace(
         // To put the into relation, just use their visual (computed)
         // x values.
         stackingId = stackingsCreateFor(local, computed, largest);
-        local.stackables[largest].tick = computed.tick + 1;
+        local.stackables[largest].tick = computed.tick;
         local.stackables[largest].ownedBy = computed.playerId;
         local.stackables[largest].onStacking = stackingId;
 
-        local.locatables[largest].tick = computed.tick + 1;
+        local.locatables[largest].tick = computed.tick;
         local.locatables[largest].ownedBy = computed.playerId;
         local.locatables[largest].x = computed.locations[largest].x;
 
-        local.stackables[itemId].tick = computed.tick + 1;
+        local.stackables[itemId].tick = computed.tick;
         local.stackables[itemId].ownedBy = computed.playerId;
         local.stackables[itemId].onStacking = stackingId;
 
-        local.locatables[itemId].tick = computed.tick + 1;
+        local.locatables[itemId].tick = computed.tick;
         local.locatables[itemId].ownedBy = computed.playerId;
         local.locatables[itemId].x = computed.locations[itemId].x;
       } else {
-        local.stackables[itemId].tick = computed.tick + 1;
+        local.stackables[itemId].tick = computed.tick;
         local.stackables[itemId].ownedBy = computed.playerId;
         local.stackables[itemId].onStacking = stackingId;
 
@@ -103,7 +103,7 @@ function stackablesPlace(
           stackingId,
           itemId
         );
-        local.locatables[itemId].tick = computed.tick + 1;
+        local.locatables[itemId].tick = computed.tick;
         local.locatables[itemId].ownedBy = computed.playerId;
         local.locatables[itemId].x = (gapA + gapB) / 2;
       }
@@ -146,7 +146,10 @@ function stackablesFindGap(
   let posX: number = 0;
 
   for (const otherId of computed.stacks[stackingId]) {
-    if (computed.locations[otherId].x > computed.locations[itemId].x) {
+    // We use a small offset to bias stackable insertion to the left.
+    // If you put a stackable very close on top to another one, the new
+    // stackable will be placed on the left.
+    if (computed.locations[otherId].x + 10 > computed.locations[itemId].x) {
       return [posX, local.locatables[otherId].x];
     } else {
       posX = local.locatables[otherId].x;

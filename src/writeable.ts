@@ -45,7 +45,7 @@ function writeablesKeyUp(
   if (local.writeables.hasOwnProperty(itemId)) {
     let elem = document.getElementById(itemId);
     if (elem !== null) {
-      local.writeables[itemId].tick = computed.tick + 1;
+      local.writeables[itemId].tick = computed.tick;
       local.writeables[itemId].ownedBy = computed.playerId;
       local.writeables[itemId].text = (elem as any).value;
     }

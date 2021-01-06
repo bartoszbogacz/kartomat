@@ -126,7 +126,7 @@ function stackingsCreateFor(
       continue;
     }
     local.locatables[stackingId] = {
-      tick: computed.tick + 1,
+      tick: computed.tick,
       ownedBy: computed.playerId,
       x: computed.locations[stackableId].x,
       y: computed.locations[stackableId].y,
@@ -135,7 +135,7 @@ function stackingsCreateFor(
       h: computed.locations[stackableId].h,
     };
     local.stackings[stackingId] = {
-      tick: computed.tick + 1,
+      tick: computed.tick,
       ownedBy: computed.playerId,
       strides: [30, 10, 1],
       current: 0,
@@ -154,6 +154,8 @@ function stackingsTouch(
     const properId = itemId.slice(0, -"FoldControl".length);
     if (local.stackings.hasOwnProperty(properId)) {
       // Fold cards by advancing to next stride
+      local.stackings[properId].tick = computed.tick;
+      local.stackings[properId].ownedBy = computed.playerId;
       local.stackings[properId].current =
         (local.stackings[properId].current + 1) %
         local.stackings[properId].strides.length;
@@ -164,6 +166,10 @@ function stackingsTouch(
     if (local.stackings.hasOwnProperty(properId)) {
       // Turn cards by advancing to next side
       for (const stackableId of computed.stacks[properId]) {
+        local.locatables[stackableId].tick = computed.tick;
+        local.locatables[stackableId].ownedBy = computed.playerId;
+        local.locatables[stackableId].x = -local.locatables[stackableId].x;
+
         if (local.turnables.hasOwnProperty(stackableId)) {
           turnablesTurn(local, computed, stackableId);
         }
@@ -175,7 +181,7 @@ function stackingsTouch(
     if (local.stackings.hasOwnProperty(properId)) {
       // Shuffle cards by assigning random fractional index
       for (const stackableId of computed.stacks[properId]) {
-        local.locatables[stackableId].tick = computed.tick + 1;
+        local.locatables[stackableId].tick = computed.tick;
         local.locatables[stackableId].ownedBy = computed.playerId;
         local.locatables[stackableId].x = Math.random();
       }
@@ -195,7 +201,7 @@ function stackingsPlace(
       let stackingId = local.stackables[largest].onStacking;
       if (stackingId === null) {
         // Place stackable without a stacking on our stacking
-        local.stackables[largest].tick = computed.tick + 1;
+        local.stackables[largest].tick = computed.tick;
         local.stackables[largest].ownedBy = computed.playerId;
         local.stackables[largest].onStacking = itemId;
 
@@ -206,7 +212,7 @@ function stackingsPlace(
           largest
         );
 
-        local.locatables[largest].tick = computed.tick + 1;
+        local.locatables[largest].tick = computed.tick;
         local.locatables[largest].ownedBy = computed.playerId;
         local.locatables[largest].x = (gapA + gapB) / 2;
       } else {
@@ -225,11 +231,11 @@ function stackingsPlace(
         for (let i = 0; i < N; i++) {
           const stackableId = computed.stacks[itemId][i];
 
-          local.stackables[stackableId].tick = computed.tick + 1;
+          local.stackables[stackableId].tick = computed.tick;
           local.stackables[stackableId].ownedBy = computed.playerId;
           local.stackables[stackableId].onStacking = stackingId;
 
-          local.locatables[stackableId].tick = computed.tick + 1;
+          local.locatables[stackableId].tick = computed.tick;
           local.locatables[stackableId].ownedBy = computed.playerId;
           local.locatables[stackableId].x =
             gapA + ((i + 1) / (N + 2)) * (gapB - gapA);

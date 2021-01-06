@@ -50,7 +50,7 @@ function turnablesTurn(
   itemId: string
 ) {
   if (local.turnables.hasOwnProperty(itemId)) {
-    local.turnables[itemId].tick = computed.tick + 1;
+    local.turnables[itemId].tick = computed.tick;
     local.turnables[itemId].ownedBy = computed.playerId;
     local.turnables[itemId].current =
       (local.turnables[itemId].current + 1) %
