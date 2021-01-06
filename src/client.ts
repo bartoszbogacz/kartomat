@@ -12,6 +12,7 @@ interface GameState {
   writeables: { [key: string]: WriteableItem };
   stratified: { [key: string]: StratifiedItem };
   stratifiers: { [key: string]: StratifierItem };
+  avatars: { [key: string]: AvatarItem };
 }
 
 interface ComputedState {
@@ -23,6 +24,7 @@ interface ComputedState {
   overlaps: { [a: string]: { [b: string]: number } } | null;
   stacks: { [key: string]: [string] } | null;
   locations: { [key: string]: LocatableItem } | null;
+  playerAvatars: { [key: string]: string } | null;
 }
 
 interface Drag {
@@ -46,6 +48,7 @@ let _localGame: GameState = {
   writeables: {},
   stratified: {},
   stratifiers: {},
+  avatars: {},
 };
 
 let _computed: ComputedState = {
@@ -57,6 +60,7 @@ let _computed: ComputedState = {
   overlaps: null,
   stacks: null,
   locations: null,
+  playerAvatars: null,
 };
 
 function initWebSocketClient() {
@@ -133,6 +137,10 @@ function handleServerMessage(msg: any) {
     _localGame.stratifiers,
     remoteGame.stratifiers
   );
+  _localGame.avatars = unionLastWriterWins(
+    _localGame.avatars,
+    remoteGame.avatars
+  );
 
   _computed.tick = msg.tick;
   _computed.boardId = msg.boardId;
@@ -156,12 +164,14 @@ function render() {
   stratifiersCompute(_localGame, _computed);
   stackablesCompute(_localGame, _computed);
   locatablesCompute2(_localGame, _computed);
+  avatarsCompute(_localGame, _computed);
 
   locatablesRender(_localGame, _computed);
   stackingsRender(_localGame, _computed);
   turnablesRender(_localGame, _computed);
   writeablesRender(_localGame, _computed);
   stratifierRender(_localGame, _computed);
+  avatarsRender(_localGame, _computed);
 
   // Debug
   const diffToTick: { [key: string]: any } = {};
@@ -194,6 +204,7 @@ function onKeyUp(event: KeyboardEvent) {
   const thingId = (event.target as HTMLElement).id;
 
   writeablesKeyUp(_localGame, _computed, thingId);
+  avatarsKeyUp(_localGame, _computed, thingId);
 
   window.requestAnimationFrame(render);
 }

@@ -7,7 +7,7 @@ function draggablesTake(
   computed: ComputedState,
   itemId: string
 ) {
-  if (computed.topZ !== null && local.locatables.hasOwnProperty(itemId)) {
+  if (computed.topZ !== null && local.draggables.hasOwnProperty(itemId)) {
     local.locatables[itemId].tick = computed.tick;
     local.locatables[itemId].ownedBy = computed.playerId;
     local.locatables[itemId].z = computed.topZ + 1;
@@ -21,7 +21,7 @@ function draggablesMove(
   x: number,
   y: number
 ) {
-  if (local.locatables.hasOwnProperty(itemId)) {
+  if (local.draggables.hasOwnProperty(itemId)) {
     local.locatables[itemId].tick = computed.tick;
     local.locatables[itemId].ownedBy = computed.playerId;
     local.locatables[itemId].x = x;

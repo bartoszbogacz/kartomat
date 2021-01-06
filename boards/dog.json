@@ -1,5 +1,22 @@
 {
+  "avatars": {
+    "player1": {
+      "tick": 0,
+      "ownedBy": null,
+      "represents": null,
+      "text": "player1"
+    }
+  },
   "locatables": {
+    "player1": {
+      "tick": 0,
+      "ownedBy": 0,
+      "x": 800,
+      "y": 100,
+      "z": 0,
+      "w": 200,
+      "h": 30
+    },
     "strat1": {
       "tick": 0,
       "ownedBy": 0,
@@ -488,6 +505,7 @@
     }
   },
   "draggables": {
+    "stacking1": { "tick": 0, "ownedBy": null },
     "card1": { "tick": 0, "ownedBy": null },
     "card2": { "tick": 0, "ownedBy": null },
     "card3": { "tick": 0, "ownedBy": null },

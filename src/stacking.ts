@@ -134,6 +134,17 @@ function stackingsCreateFor(
       w: computed.locations[stackableId].w,
       h: computed.locations[stackableId].h,
     };
+    local.draggables[stackingId] = {
+      tick: computed.tick,
+      ownedBy: computed.playerId,
+    };
+    if (local.stratified.hasOwnProperty(stackableId)) {
+      local.stratified[stackingId] = {
+        tick: computed.tick,
+        ownedBy: computed.playerId,
+        inLayer: local.stratified[stackableId].inLayer,
+      };
+    }
     local.stackings[stackingId] = {
       tick: computed.tick,
       ownedBy: computed.playerId,
