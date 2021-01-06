@@ -1,87 +1,28 @@
 "use strict";
 
-/*
-  Modules
-*/
-
 const http = require("http");
 const fs = require("fs");
 const ws = require("ws");
+const httpHost = "";
+const httpPort = 8000;
+const wsPort = 8080;
 
-/*
-  Utilities 
-*/
+let _wsServer = null;
+let _httpServer = null;
+let _runningGames = {};
+let _countClientsSeen = 0;
 
-function parseUrl(url) {
-  let path = null;
-  let parameters = {};
+function initHTTPServer() {
+  // HTTP Server mostly based on:
+  // https://www.digitalocean.com/community/tutorials/
+  // how-to-create-a-web-server-in-node-js-with-the-http-module
 
-  const pathQuery = url.split("?");
+  _httpServer = http.createServer(handleHTTPRequest);
 
-  if (pathQuery.length === 1) {
-    path = pathQuery[0];
-  } else {
-    path = pathQuery[0];
-    const parts = pathQuery[1].split("&");
-
-    for (const p of parts) {
-      const keyValue = p.split("=");
-      if (keyValue.length === 1) {
-        parameters[keyValue[0]] = true;
-      } else {
-        parameters[keyValue[0]] = keyValue[1];
-      }
-    }
-  }
-
-  return [path, parameters];
+  _httpServer.listen(httpPort, httpHost, () => {
+    console.log(`Server is running on http://${httpHost}:${httpPort}`);
+  });
 }
-
-function generatePlayerId() {
-  _countClientsSeen += 1;
-  return "player" + _countClientsSeen;
-}
-
-function generateGameId() {
-  return "game" + Object.keys(_runningGames).length + 1;
-}
-
-/** Union two LWWMaps returning a copy of the superset.
- *
- * The union is biased towards state2 on equal tick counts of both,
- * by performing the merging of state2 onto result secondary and
- * avoid an explicit lesser equals check there.
- *
- */
-function unionLastWriterWins(state1, state2) {
-  const result = {};
-
-  for (const key of Object.keys(state2)) {
-    if (state1.hasOwnProperty(key) && state1[key].tick > state2[key].tick) {
-      continue;
-    }
-    result[key] = {};
-    for (const [prop, value] of Object.entries(state2[key])) {
-      result[key][prop] = value;
-    }
-  }
-
-  for (const key of Object.keys(state1)) {
-    if (state2.hasOwnProperty(key) && state2[key].tick > state1[key].tick) {
-      continue;
-    }
-    result[key] = {};
-    for (const [prop, value] of Object.entries(state1[key])) {
-      result[key][prop] = value;
-    }
-  }
-
-  return result;
-}
-
-/*
-  Communication
-*/
 
 function handleHTTPRequest(req, res) {
   const [path, params] = parseUrl(req.url);
@@ -130,6 +71,23 @@ function handleHTTPRequest(req, res) {
   }
 }
 
+function initWebSocketServer() {
+  // SocketServer mostly based on:
+  // https://www.npmjs.com/package/ws#sending-and-receiving-text-data
+
+  _wsServer = new ws.Server({ port: wsPort });
+
+  _wsServer.on("connection", function (socket, request) {
+    socket.on("message", function (msg) {
+      handleClientMessage(socket, msg);
+    });
+
+    socket.on("close", function () {
+      handleClientDisconnected(socket);
+    });
+  });
+}
+
 function handleClientMessage(socket, msg) {
   msg = JSON.parse(msg);
 
@@ -138,7 +96,6 @@ function handleClientMessage(socket, msg) {
   const playerId = msg.playerId || generatePlayerId();
 
   // If there is no such game, create it
-
   if (_runningGames.hasOwnProperty(gameId) === false) {
     const board = JSON.parse(fs.readFileSync("boards/" + boardId + ".json"));
 
@@ -152,14 +109,12 @@ function handleClientMessage(socket, msg) {
   }
 
   // If player not yet part of game, join
-
   if (_runningGames[gameId].sockets.hasOwnProperty(playerId) === false) {
     _runningGames[gameId].sockets[playerId] = socket;
     console.log("Client", playerId, "joined", gameId, "on", boardId);
   }
 
   // Synchronize with client
-
   for (const [key, values] of Object.entries(msg.scene)) {
     _runningGames[gameId].scene[key] = unionLastWriterWins(
       msg.scene[key],
@@ -196,45 +151,75 @@ function handleClientDisconnected(socket) {
   }
 }
 
-/*
-  Initialization
+/** Union two LWWMaps returning a copy of the superset.
+ *
+ * The union is biased towards state2 on equal tick counts of both,
+ * by performing the merging of state2 onto result secondary and
+ * avoid an explicit lesser equals check there.
+ *
+ */
+function unionLastWriterWins(state1, state2) {
+  const result = {};
 
-SocketServer mostly based on:
-https://www.npmjs.com/package/ws#sending-and-receiving-text-data
+  for (const key of Object.keys(state2)) {
+    if (state1.hasOwnProperty(key) && state1[key].tick > state2[key].tick) {
+      continue;
+    }
+    result[key] = {};
+    for (const [prop, value] of Object.entries(state2[key])) {
+      result[key][prop] = value;
+    }
+  }
 
-HTTP Server mostly based on:
-https://www.digitalocean.com/community/tutorials/
-how-to-create-a-web-server-in-node-js-with-the-http-module
-*/
+  for (const key of Object.keys(state1)) {
+    if (state2.hasOwnProperty(key) && state2[key].tick > state1[key].tick) {
+      continue;
+    }
+    result[key] = {};
+    for (const [prop, value] of Object.entries(state1[key])) {
+      result[key][prop] = value;
+    }
+  }
 
-let _runningGames = {};
-let _countClientsSeen = 0;
-const httpHost = "";
-const httpPort = 8000;
-const wsPort = 8080;
+  return result;
+}
 
-const wsServer = new ws.Server({ port: wsPort });
+function parseUrl(url) {
+  let path = null;
+  let parameters = {};
 
-wsServer.on("connection", function (socket, request) {
-  socket.on("message", function (msg) {
-    handleClientMessage(socket, msg);
-  });
+  const pathQuery = url.split("?");
 
-  socket.on("close", function () {
-    handleClientDisconnected(socket);
-  });
-});
+  if (pathQuery.length === 1) {
+    path = pathQuery[0];
+  } else {
+    path = pathQuery[0];
+    const parts = pathQuery[1].split("&");
 
-const httpServer = http.createServer(handleHTTPRequest);
+    for (const p of parts) {
+      const keyValue = p.split("=");
+      if (keyValue.length === 1) {
+        parameters[keyValue[0]] = true;
+      } else {
+        parameters[keyValue[0]] = keyValue[1];
+      }
+    }
+  }
 
-httpServer.listen(httpPort, httpHost, () => {
-  console.log(`Server is running on http://${httpHost}:${httpPort}`);
-});
+  return [path, parameters];
+}
 
-/*
-  Server Tick
+function generatePlayerId() {
+  _countClientsSeen += 1;
+  return "player" + _countClientsSeen;
+}
 
-Clients have no tick and are driven by the server.
-*/
+function generateGameId() {
+  return "game" + Object.keys(_runningGames).length + 1;
+}
 
+initHTTPServer();
+initWebSocketServer();
+
+// Clients have no tick and are driven by the server.
 setInterval(sendServerMessage, 100);

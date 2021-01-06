@@ -902,7 +902,5 @@
       "sides": ["rummy/spade_king.png", "rummy/back_blue.png"],
       "current": 0
     }
-  },
-  "writeables": {},
-  "stratifiers": {}
+  }
 }
