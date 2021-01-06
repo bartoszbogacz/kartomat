@@ -3,6 +3,7 @@
 const http = require("http");
 const fs = require("fs");
 const ws = require("ws");
+
 const httpHost = "";
 const httpPort = 8000;
 const wsPort = 8080;
@@ -117,8 +118,8 @@ function handleClientMessage(socket, msg) {
   // Synchronize with client
   for (const [key, values] of Object.entries(msg.scene)) {
     _runningGames[gameId].scene[key] = unionLastWriterWins(
-      msg.scene[key],
-      _runningGames[gameId].scene[key]
+      msg.scene[key] || {},
+      _runningGames[gameId].scene[key] || {}
     );
   }
 }

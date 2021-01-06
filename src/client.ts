@@ -65,19 +65,19 @@ function initWebSocketClient() {
 
   _websocket = new WebSocket("ws://" + window.location.hostname + ":8080");
 
-  _websocket.onopen = function () {
+  _websocket.onopen = function (event: any) {
     sendClientMessage();
   };
 
-  _websocket.onmessage = function (msg: any) {
+  _websocket.onmessage = function (msg: string) {
     handleServerMessage(msg);
   };
 
-  _websocket.onerror = function () {
+  _websocket.onerror = function (event: any) {
     window.setTimeout(initWebSocketClient, 2000);
   };
 
-  _websocket.onclose = function () {
+  _websocket.onclose = function (event: any) {
     window.setTimeout(initWebSocketClient, 2000);
   };
 }
