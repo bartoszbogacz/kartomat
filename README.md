@@ -46,8 +46,12 @@ then restart VSCode
 - Global player UUID that remembers the playerAvatar.text so that
   if a player joins his name is set automatically
 
+- Only send deltas of GameState to reduce traffic.
+
 - Multiple views sharing the same player. Change map of sockets
   from player->socket to socket->player
+
+- Abilityto reset game board
 
 # Nive to have
 
@@ -56,6 +60,8 @@ then restart VSCode
 - Ability to remove elements from the editor
 
 - A Wizard game board
+
+- A Tichu game board
 
 # Bibliography
 
