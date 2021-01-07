@@ -20,6 +20,7 @@ function writeablesRender(local: GameState, computed: ComputedState) {
       elem.style.backgroundColor = "#eeeae2";
       elem.style.color = "#586e75";
       elem.style.fontFamily = "monospace";
+      elem.style.fontSize = "16px";
       elem.style.border = "2px solid #93a1a1";
       document.body.appendChild(elem);
     }

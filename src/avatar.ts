@@ -62,7 +62,7 @@ function avatarsRender(local: GameState, computed: ComputedState) {
     }
 
     if (local.avatars[key].represents === computed.playerId) {
-      elem.style.backgroundColor = "yellow";
+      elem.style.backgroundColor = "#fdfdee";
       elem.style.border = "2px solid #93a1a1";
       elem.style.color = "#586e75";
     } else if (local.avatars[key].represents !== null) {

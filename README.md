@@ -46,6 +46,9 @@ then restart VSCode
 - Global player UUID that remembers the playerAvatar.text so that
   if a player joins his name is set automatically
 
+- Multiple views sharing the same player. Change map of sockets
+  from player->socket to socket->player
+
 # Nive to have
 
 - Player Avatars that can be dragged
