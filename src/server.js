@@ -237,8 +237,12 @@ function parseUrl(url) {
 }
 
 function generatePlayerId() {
-  _countClientsSeen += 1;
-  return "player" + _countClientsSeen;
+  const symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let result = "player-";
+  for (let i = 0; i < 8; i++) {
+    result = result + symbols[Math.floor(Math.random() * symbols.length)];
+  }
+  return result;
 }
 
 function generateGameId() {

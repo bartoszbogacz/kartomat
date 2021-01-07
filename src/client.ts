@@ -68,7 +68,8 @@ function initWebSocketClient() {
 
   _computed.boardId = parameters.board || null;
   _computed.gameId = parameters.game || null;
-  _computed.playerId = parameters.player || null;
+  _computed.playerId =
+    parameters.player || window.localStorage.getItem("playerId");
 
   _websocket = new WebSocket("ws://" + window.location.hostname + ":8080");
 
@@ -146,6 +147,8 @@ function handleServerMessage(msg: any) {
   _computed.boardId = msg.boardId;
   _computed.gameId = msg.gameId;
   _computed.playerId = msg.playerId;
+
+  window.localStorage.setItem("playerId", msg.playerId);
 
   sendClientMessage();
 
