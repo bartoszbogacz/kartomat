@@ -6,7 +6,43 @@
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
 
-.Marble {
+.dodgerblueMarble {
+  background-color: dodgerblue;
+  border: 2px solid black;
+  border-radius: 50%;
+  filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.forestgreenMarble {
+  background-color: forestgreen;
+  border: 2px solid black;
+  border-radius: 50%;
+  filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.dimgrayMarble {
+  background-color: dimgray;
+  border: 2px solid black;
+  border-radius: 50%;
+  filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.goldMarble {
+  background-color: gold;
+  border: 2px solid black;
+  border-radius: 50%;
+  filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.crimsonMarble {
+  background-color: crimson;
+  border: 2px solid black;
+  border-radius: 50%;
+  filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.snowMarble {
+  background-color: snow;
   border: 2px solid black;
   border-radius: 50%;
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));

@@ -8,6 +8,9 @@ function turnablesRender(local: GameState, computed: ComputedState) {
     throw new Error("Locations not yet computed");
   }
 
+  // FIXME: This overlaps with visual which also controls
+  // positions, extents and visuals.
+
   for (const key of Object.keys(local.turnables)) {
     let elem = document.getElementById(key);
     if (elem === null) {

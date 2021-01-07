@@ -11,6 +11,9 @@ function visualsRender(local: GameState, computed: ComputedState) {
     const vis = local.visuals[key];
     const loc = computed.locations[key];
 
+    // FIXME: This overlaps with turnable, i.e. it also
+    // controls the position and and extents of an element.
+
     let elem = document.getElementById(key);
     if (elem === null) {
       elem = document.createElement("div");
