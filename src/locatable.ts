@@ -2,6 +2,7 @@ interface LocatableItem extends Synchronized {
   x: number;
   y: number;
   z: number;
+  l: number;
   w: number;
   h: number;
 }
@@ -16,6 +17,7 @@ function locatablesCompute1(local: GameState, computed: ComputedState) {
       x: loc.x,
       y: loc.y,
       z: loc.z,
+      l: loc.l,
       w: loc.w,
       h: loc.h,
     };

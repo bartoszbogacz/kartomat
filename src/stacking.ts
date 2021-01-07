@@ -131,6 +131,7 @@ function stackingsCreateFor(
       x: computed.locations[stackableId].x,
       y: computed.locations[stackableId].y,
       z: computed.locations[stackableId].z,
+      l: computed.locations[stackableId].l,
       w: computed.locations[stackableId].w,
       h: computed.locations[stackableId].h,
     };
@@ -138,13 +139,6 @@ function stackingsCreateFor(
       tick: computed.tick,
       ownedBy: computed.playerId,
     };
-    if (local.stratified.hasOwnProperty(stackableId)) {
-      local.stratified[stackingId] = {
-        tick: computed.tick,
-        ownedBy: computed.playerId,
-        inLayer: local.stratified[stackableId].inLayer,
-      };
-    }
     local.stackings[stackingId] = {
       tick: computed.tick,
       ownedBy: computed.playerId,
@@ -269,7 +263,7 @@ function stackingsFindOverlapping(
   }
 
   for (const [otherId, stackable] of Object.entries(local.stackables)) {
-    const stratId = overlapsAnyStratifier(local, computed, itemId);
+    const stratId = overlapsAnyDivider(local, computed, itemId);
     const overlaps = computed.overlaps[itemId][otherId] > pixels;
     const ownsTarget = local.locatables[otherId].ownedBy === computed.playerId;
     const yourself = stackable.onStacking === itemId;

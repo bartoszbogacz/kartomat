@@ -6,6 +6,7 @@
       "x": 1100,
       "y": 200,
       "z": 0,
+      "l": 0,
       "w": 230,
       "h": 250
     }
@@ -16,8 +17,5 @@
       "ownedBy": null,
       "text": "You can collaboratively write here."
     }
-  },
-  "stratified": {
-    "textarea": { "tick": 0, "ownedBy": null, "inLayer": "boards" }
   }
 }

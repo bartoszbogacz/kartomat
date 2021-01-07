@@ -10,8 +10,7 @@ interface GameState {
   stackings: { [key: string]: StackingItem };
   turnables: { [key: string]: TurnableItem };
   writeables: { [key: string]: WriteableItem };
-  stratified: { [key: string]: StratifiedItem };
-  stratifiers: { [key: string]: StratifierItem };
+  dividers: { [key: string]: StratifierItem };
   avatars: { [key: string]: AvatarItem };
   visuals: { [key: string]: VisualItem };
 }
@@ -47,8 +46,7 @@ let _localGame: GameState = {
   stackings: {},
   turnables: {},
   writeables: {},
-  stratified: {},
-  stratifiers: {},
+  dividers: {},
   avatars: {},
   visuals: {},
 };
@@ -131,13 +129,9 @@ function handleServerMessage(msg: any) {
     _localGame.writeables,
     remoteGame.writeables
   );
-  _localGame.stratified = unionLastWriterWins(
-    _localGame.stratified,
-    remoteGame.stratified
-  );
-  _localGame.stratifiers = unionLastWriterWins(
-    _localGame.stratifiers,
-    remoteGame.stratifiers
+  _localGame.dividers = unionLastWriterWins(
+    _localGame.dividers,
+    remoteGame.dividers
   );
   _localGame.avatars = unionLastWriterWins(
     _localGame.avatars,
@@ -169,11 +163,11 @@ function render() {
   // FIXME: locatablesCompute2 needs to be called twice,
   // since stackingsCreateNew may add new ones on button
   // presses and these need to be available by stratifersCompute
-  // and than again, based on the stratifiers again for button
+  // and than again, based on the dividers again for button
   // presses
   locatablesCompute1(_localGame, _computed);
   locatablesCompute2(_localGame, _computed);
-  stratifiersCompute(_localGame, _computed);
+  dividersCompute(_localGame, _computed);
   stackablesCompute(_localGame, _computed);
   locatablesCompute2(_localGame, _computed);
   avatarsCompute(_localGame, _computed);

@@ -13,8 +13,7 @@
     "src/stacking.ts",
     "src/turnable.ts",
     "src/writeable.ts",
-    "src/stratified.ts",
-    "src/stratifier.ts",
+    "src/divider.ts",
     "src/avatar.ts",
     "src/visual.ts"
   ]
