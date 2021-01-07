@@ -6,42 +6,42 @@
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
 
-.dodgerblueMarble {
+.DodgerblueMarble {
   background-color: dodgerblue;
   border: 2px solid black;
   border-radius: 50%;
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
 
-.forestgreenMarble {
+.ForestgreenMarble {
   background-color: forestgreen;
   border: 2px solid black;
   border-radius: 50%;
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
 
-.dimgrayMarble {
+.DimgrayMarble {
   background-color: dimgray;
   border: 2px solid black;
   border-radius: 50%;
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
 
-.goldMarble {
+.GoldMarble {
   background-color: gold;
   border: 2px solid black;
   border-radius: 50%;
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
 
-.crimsonMarble {
+.CrimsonMarble {
   background-color: crimson;
   border: 2px solid black;
   border-radius: 50%;
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
 
-.snowMarble {
+.SnowMarble {
   background-color: snow;
   border: 2px solid black;
   border-radius: 50%;

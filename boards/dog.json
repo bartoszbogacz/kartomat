@@ -1378,122 +1378,122 @@
     "marble1": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "dodgerblueMarble"
+      "cssClass": "DodgerblueMarble"
     },
     "marble2": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "dodgerblueMarble"
+      "cssClass": "DodgerblueMarble"
     },
     "marble3": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "dodgerblueMarble"
+      "cssClass": "DodgerblueMarble"
     },
     "marble4": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "dodgerblueMarble"
+      "cssClass": "DodgerblueMarble"
     },
     "marble5": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "forestgreenMarble"
+      "cssClass": "ForestgreenMarble"
     },
     "marble6": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "forestgreenMarble"
+      "cssClass": "ForestgreenMarble"
     },
     "marble7": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "forestgreenMarble"
+      "cssClass": "ForestgreenMarble"
     },
     "marble8": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "forestgreenMarble"
+      "cssClass": "ForestgreenMarble"
     },
     "marble9": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "dimgrayMarble"
+      "cssClass": "DimgrayMarble"
     },
     "marble10": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "dimgrayMarble"
+      "cssClass": "DimgrayMarble"
     },
     "marble11": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "dimgrayMarble"
+      "cssClass": "DimgrayMarble"
     },
     "marble12": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "dimgrayMarble"
+      "cssClass": "DimgrayMarble"
     },
     "marble13": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "goldMarble"
+      "cssClass": "GoldMarble"
     },
     "marble14": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "goldMarble"
+      "cssClass": "GoldMarble"
     },
     "marble15": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "goldMarble"
+      "cssClass": "GoldMarble"
     },
     "marble16": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "goldMarble"
+      "cssClass": "GoldMarble"
     },
     "marble17": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "crimsonMarble"
+      "cssClass": "CrimsonMarble"
     },
     "marble18": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "crimsonMarble"
+      "cssClass": "CrimsonMarble"
     },
     "marble19": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "crimsonMarble"
+      "cssClass": "CrimsonMarble"
     },
     "marble20": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "crimsonMarble"
+      "cssClass": "CrimsonMarble"
     },
     "marble21": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "snowMarble"
+      "cssClass": "SnowMarble"
     },
     "marble22": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "snowMarble"
+      "cssClass": "SnowMarble"
     },
     "marble23": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "snowMarble"
+      "cssClass": "SnowMarble"
     },
     "marble24": {
       "upToTick": 0,
       "ownedBy": null,
-      "cssClass": "snowMarble"
+      "cssClass": "SnowMarble"
     }
   }
 }
