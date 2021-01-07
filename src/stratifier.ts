@@ -57,39 +57,3 @@ function stratifiersCompute(local: GameState, computed: ComputedState) {
     }
   }
 }
-
-function stratifierRender(local: GameState, computed: ComputedState) {
-  if (computed.locations === null) {
-    throw new Error("Locations not yet computed");
-  }
-
-  for (const key of Object.keys(local.stratifiers)) {
-    if (computed.locations.hasOwnProperty(key) === false) {
-      // Stratifier is non-visual
-      continue;
-    }
-
-    let elem = document.getElementById(key);
-    if (elem === null) {
-      elem = document.createElement("div");
-      elem.onmousedown = onMouseDown;
-      elem.id = key;
-      elem.className = "Stratifier";
-      elem.style.position = "absolute";
-      elem.style.userSelect = "none";
-      elem.style.background =
-        "repeating-linear-gradient(" +
-        "-45deg, #eeeae2, #eeeae2 1px, #fdfdee 1px, #fdfdee 10px)";
-      elem.style.border = "3px dashed #d33682";
-      document.body.appendChild(elem);
-    }
-
-    const loc = computed.locations[key];
-
-    elem.style.top = loc.y + "px";
-    elem.style.left = loc.x + "px";
-    elem.style.width = loc.w + "px";
-    elem.style.height = loc.h + "px";
-    elem.style.zIndex = loc.z.toString();
-  }
-}

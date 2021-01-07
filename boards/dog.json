@@ -1374,7 +1374,8 @@
     }
   },
   "visuals": {
-    "board": { "tick": 0, "ownedBy": null, "cssClass": "board" },
+    "privateArea": { "tick": 0, "ownedBy": null, "cssClass": "PrivateArea" },
+    "board": { "tick": 0, "ownedBy": null, "cssClass": "Board" },
     "marble1": {
       "upToTick": 0,
       "ownedBy": null,

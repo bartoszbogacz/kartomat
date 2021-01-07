@@ -1,3 +1,14 @@
+.PrivateArea {
+  background: repeating-linear-gradient(
+    -45deg,
+    #eeeae2,
+    #eeeae2 1px,
+    #fdfdee 1px,
+    #fdfdee 10px
+  );
+  border: 3px dashed #d33682;
+}
+
 .Board {
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }

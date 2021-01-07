@@ -176,7 +176,6 @@ function render() {
   stackingsRender(_localGame, _computed);
   turnablesRender(_localGame, _computed);
   writeablesRender(_localGame, _computed);
-  stratifierRender(_localGame, _computed);
   avatarsRender(_localGame, _computed);
   visualsRender(_localGame, _computed);
 
@@ -387,6 +386,6 @@ window.setInterval(render, 1000);
 // Debug
 let debug = document.createElement("pre");
 debug.style.position = "absolute";
-debug.style.left = "400px";
+debug.style.left = "1400px";
 debug.style.userSelect = "none";
 document.body.appendChild(debug);
