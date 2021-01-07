@@ -1,0 +1,13 @@
+.Board {
+  filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.Dice {
+  filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.Marble {
+  border: 2px solid black;
+  border-radius: 50%;
+  filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}

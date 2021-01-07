@@ -13,6 +13,7 @@ interface GameState {
   stratified: { [key: string]: StratifiedItem };
   stratifiers: { [key: string]: StratifierItem };
   avatars: { [key: string]: AvatarItem };
+  visuals: { [key: string]: VisualItem };
 }
 
 interface ComputedState {
@@ -49,6 +50,7 @@ let _localGame: GameState = {
   stratified: {},
   stratifiers: {},
   avatars: {},
+  visuals: {},
 };
 
 let _computed: ComputedState = {
@@ -141,6 +143,10 @@ function handleServerMessage(msg: any) {
     _localGame.avatars,
     remoteGame.avatars
   );
+  _localGame.visuals = unionLastWriterWins(
+    _localGame.visuals,
+    remoteGame.visuals
+  );
 
   _computed.tick = msg.tick;
   _computed.boardId = msg.boardId;
@@ -172,6 +178,7 @@ function render() {
   writeablesRender(_localGame, _computed);
   stratifierRender(_localGame, _computed);
   avatarsRender(_localGame, _computed);
+  visualsRender(_localGame, _computed);
 
   // Debug
   const diffToTick: { [key: string]: any } = {};

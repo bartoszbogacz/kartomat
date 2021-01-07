@@ -32,6 +32,8 @@ playing area and that cards do hide within decks having wrong zIndices.
 
 See: [NPM Issue 470](https://github.com/npm/cli/issues/470)
 
+Or invoke with ´tsc.cmd´
+
 - VSCode complains about duplicated functions
 
 Make sure a tsconfig.json is present that does not include build outputs,
