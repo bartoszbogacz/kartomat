@@ -72,7 +72,7 @@ function avatarsRender(local: GameState, computed: ComputedState) {
     } else {
       elem.style.backgroundColor = "snow";
       elem.style.border = "gray";
-      elem.style.color = "gray";
+      elem.style.color = "lightgray";
     }
   }
 }

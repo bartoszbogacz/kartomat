@@ -110,11 +110,20 @@
       "w": 770,
       "h": 770
     },
+    "textarea": {
+      "tick": 0,
+      "ownedBy": null,
+      "x": 1130,
+      "y": 200,
+      "z": 0,
+      "w": 200,
+      "h": 250
+    },
     "stacking1": {
       "tick": 0,
       "ownedBy": null,
-      "x": 30,
-      "y": 0,
+      "x": 830,
+      "y": 270,
       "z": 0,
       "w": 100,
       "h": 150
@@ -1082,5 +1091,12 @@
     "card50": { "tick": 0, "ownedBy": null, "inLayer": "privateArea" },
     "card51": { "tick": 0, "ownedBy": null, "inLayer": "privateArea" },
     "card52": { "tick": 0, "ownedBy": null, "inLayer": "privateArea" }
+  },
+  "writeables": {
+    "textarea": {
+      "tick": 0,
+      "ownedBy": null,
+      "text": "You can collaboratively write here."
+    }
   }
 }

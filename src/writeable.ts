@@ -4,20 +4,25 @@ interface WriteableItem extends Synchronized {
 
 function writeablesRender(local: GameState, computed: ComputedState) {
   for (const key of Object.keys(local.writeables)) {
+    const wrt = local.writeables[key];
+    const loc = local.locatables[key];
+
     let elem = document.getElementById(key);
     if (elem === null) {
       elem = document.createElement("textarea");
       elem.onkeyup = onKeyUp;
       elem.id = key;
+      (elem as any).value = wrt.text;
       elem.className = "Writeable";
       elem.style.position = "absolute";
       elem.style.resize = "none";
       elem.style.outline = "none";
+      elem.style.backgroundColor = "#eeeae2";
+      elem.style.color = "#586e75";
+      elem.style.fontFamily = "monospace";
+      elem.style.border = "2px solid #93a1a1";
       document.body.appendChild(elem);
     }
-
-    const wrt = local.writeables[key];
-    const loc = local.locatables[key];
 
     elem.style.top = loc.y + "px";
     elem.style.left = loc.x + "px";
