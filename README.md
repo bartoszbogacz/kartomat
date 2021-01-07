@@ -41,11 +41,6 @@ then restart VSCode
 
 # Immediate TODOs
 
-- Allow simply copying of URL for other players to join the game
-
-- Global player UUID that remembers the playerAvatar.text so that
-  if a player joins his name is set automatically
-
 - Only send deltas of GameState to reduce traffic.
 
 - Re-compute overlaps as neccessary, dont do it once for all
@@ -54,7 +49,12 @@ then restart VSCode
 - Multiple views sharing the same player. Change map of sockets
   from player->socket to socket->player
 
-- Ability to reset game board
+- Ability to reset a game board
+
+- After a server restart a live re-joining client sends a state
+  with very high tick counts. Its tick is then reset to the servers
+  disallowing any modifications. Always step forward server tick
+  to maximum of scene tick?
 
 # Nive to have
 
@@ -70,6 +70,9 @@ then restart VSCode
 
 - Transform DOM elements using transform
 
+- Record player.text in localStorage and set it automatically
+  on joining a game
+
 # Bibliography
 
 Adventures in data oriented design: Part 2
@@ -80,3 +83,5 @@ Building a Data-oriented Entity System: Part 3
 
 Practical Examples in Data Oriented Design
 [Niklas](https://docs.google.com/present/view?id=0AYqySQy4JUK1ZGNzNnZmNWpfMzJkaG5yM3pjZA&hl=en)
+
+Passive Event Listeners [OliverJAsh](https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md)
