@@ -48,6 +48,9 @@ then restart VSCode
 
 - Only send deltas of GameState to reduce traffic.
 
+- Re-compute overlaps as neccessary, dont do it once for all
+  as most computations are wasted most of the time
+
 - Multiple views sharing the same player. Change map of sockets
   from player->socket to socket->player
 
