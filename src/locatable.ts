@@ -29,6 +29,8 @@ function locatablesCompute2(local: GameState, computed: ComputedState) {
 
   computed.overlaps = {};
 
+  // FIXME: This function takes most time yet it only a subset of its data is needed
+
   for (const [cardId, card] of Object.entries(computed.locations)) {
     computed.overlaps[cardId] = {};
     for (const [otherId, other] of Object.entries(computed.locations)) {

@@ -256,7 +256,7 @@ function onMouseDown(event: MouseEvent | TouchEvent) {
 function onMouseMove(event: MouseEvent | TouchEvent) {
   event.preventDefault();
 
-  if (_localGame === null || event.target === null) {
+  if (_localGame === null) {
     return;
   }
 
@@ -289,7 +289,7 @@ function onMouseMove(event: MouseEvent | TouchEvent) {
 function onMouseUp(event: MouseEvent | TouchEvent) {
   event.preventDefault();
 
-  if (_drag === null || _localGame === null || event.target === null) {
+  if (_drag === null || _localGame === null) {
     return;
   }
 
