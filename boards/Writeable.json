@@ -1,0 +1,20 @@
+{
+  "locatables": {
+    "textarea": {
+      "tick": 0,
+      "ownedBy": null,
+      "x": 1130,
+      "y": 200,
+      "z": 0,
+      "w": 200,
+      "h": 250
+    }
+  },
+  "writeables": {
+    "textarea": {
+      "tick": 0,
+      "ownedBy": null,
+      "text": "You can collaboratively write here."
+    }
+  }
+}

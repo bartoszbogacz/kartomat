@@ -98,7 +98,7 @@ function handleClientMessage(socket, msg) {
 
   // If there is no such game, create it
   if (_runningGames.hasOwnProperty(gameId) === false) {
-    const board = JSON.parse(fs.readFileSync("boards/" + boardId + ".json"));
+    const board = assembleBoard(boardId);
 
     _runningGames[gameId] = {
       tick: 1,
@@ -122,6 +122,23 @@ function handleClientMessage(socket, msg) {
       _runningGames[gameId].scene[key] || {}
     );
   }
+}
+
+function assembleBoard(boardId) {
+  const board = {};
+  const assembly = JSON.parse(fs.readFileSync("boards/" + boardId + ".json"));
+  for (const partName of assembly) {
+    const part = JSON.parse(fs.readFileSync("boards/" + partName + ".json"));
+    for (const [trait, props] of Object.entries(part)) {
+      if (board.hasOwnProperty(trait) === false) {
+        board[trait] = {};
+      }
+      for (const [item, prop] of Object.entries(props)) {
+        board[trait][item] = prop;
+      }
+    }
+  }
+  return board;
 }
 
 function sendServerMessage() {

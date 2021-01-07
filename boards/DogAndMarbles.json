@@ -1,0 +1,424 @@
+{
+  "locatables": {
+    "board": {
+      "tick": 0,
+      "ownedBy": null,
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 770,
+      "h": 770
+    },
+    "marbles": {
+      "tick": 0,
+      "ownedBy": null,
+      "z": 0,
+      "y": 0,
+      "x": 0,
+      "h": 0,
+      "w": 0
+    },
+    "marble1": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 62,
+      "x": 418,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble2": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 56,
+      "x": 387,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble3": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 56,
+      "x": 358,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble4": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 56,
+      "x": 326,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble5": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 170,
+      "x": 609,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble6": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 195,
+      "x": 625,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble7": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 219,
+      "x": 642,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble8": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 247,
+      "x": 654,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble9": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 473,
+      "x": 660,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble10": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 503,
+      "x": 645,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble11": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 532,
+      "x": 633,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble12": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 555,
+      "x": 615,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble13": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 676,
+      "x": 425,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble14": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 680,
+      "x": 394,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble15": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 680,
+      "x": 360,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble16": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 681,
+      "x": 332,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble17": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 566,
+      "x": 127,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble18": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 540,
+      "x": 109,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble19": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 512,
+      "x": 93,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble20": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 484,
+      "x": 79,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble21": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 254,
+      "x": 79,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble22": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 221,
+      "x": 95,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble23": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 194,
+      "x": 108,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    },
+    "marble24": {
+      "tick": 0,
+      "ownedBy": null,
+      "y": 172,
+      "x": 126,
+      "h": 20,
+      "w": 20,
+      "z": 0
+    }
+  },
+  "draggables": {
+    "marble1": { "tick": 0, "ownedBy": null },
+    "marble2": { "tick": 0, "ownedBy": null },
+    "marble3": { "tick": 0, "ownedBy": null },
+    "marble4": { "tick": 0, "ownedBy": null },
+    "marble5": { "tick": 0, "ownedBy": null },
+    "marble6": { "tick": 0, "ownedBy": null },
+    "marble7": { "tick": 0, "ownedBy": null },
+    "marble8": { "tick": 0, "ownedBy": null },
+    "marble9": { "tick": 0, "ownedBy": null },
+    "marble10": { "tick": 0, "ownedBy": null },
+    "marble11": { "tick": 0, "ownedBy": null },
+    "marble12": { "tick": 0, "ownedBy": null },
+    "marble13": { "tick": 0, "ownedBy": null },
+    "marble14": { "tick": 0, "ownedBy": null },
+    "marble15": { "tick": 0, "ownedBy": null },
+    "marble16": { "tick": 0, "ownedBy": null },
+    "marble17": { "tick": 0, "ownedBy": null },
+    "marble18": { "tick": 0, "ownedBy": null },
+    "marble19": { "tick": 0, "ownedBy": null },
+    "marble20": { "tick": 0, "ownedBy": null },
+    "marble21": { "tick": 0, "ownedBy": null },
+    "marble22": { "tick": 0, "ownedBy": null },
+    "marble23": { "tick": 0, "ownedBy": null },
+    "marble24": { "tick": 0, "ownedBy": null }
+  },
+  "turnables": {
+    "board": {
+      "tick": 0,
+      "ownedBy": null,
+      "sides": ["boards/dog.jpeg"],
+      "current": 0
+    }
+  },
+  "stratifiers": {
+    "marbles": { "tick": 0, "ownedBy": null }
+  },
+  "stratified": {
+    "marble1": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble2": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble3": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble4": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble5": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble6": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble7": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble8": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble9": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble10": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble11": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble12": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble13": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble14": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble15": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble16": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble17": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble18": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble19": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble20": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble21": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble22": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble23": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
+    "marble24": { "tick": 0, "ownedBy": null, "inLayer": "marbles" }
+  },
+  "visuals": {
+    "board": { "tick": 0, "ownedBy": null, "cssClass": "Board" },
+    "marble1": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "DodgerblueMarble"
+    },
+    "marble2": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "DodgerblueMarble"
+    },
+    "marble3": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "DodgerblueMarble"
+    },
+    "marble4": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "DodgerblueMarble"
+    },
+    "marble5": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "ForestgreenMarble"
+    },
+    "marble6": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "ForestgreenMarble"
+    },
+    "marble7": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "ForestgreenMarble"
+    },
+    "marble8": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "ForestgreenMarble"
+    },
+    "marble9": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "DimgrayMarble"
+    },
+    "marble10": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "DimgrayMarble"
+    },
+    "marble11": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "DimgrayMarble"
+    },
+    "marble12": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "DimgrayMarble"
+    },
+    "marble13": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "GoldMarble"
+    },
+    "marble14": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "GoldMarble"
+    },
+    "marble15": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "GoldMarble"
+    },
+    "marble16": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "GoldMarble"
+    },
+    "marble17": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "CrimsonMarble"
+    },
+    "marble18": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "CrimsonMarble"
+    },
+    "marble19": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "CrimsonMarble"
+    },
+    "marble20": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "CrimsonMarble"
+    },
+    "marble21": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "SnowMarble"
+    },
+    "marble22": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "SnowMarble"
+    },
+    "marble23": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "SnowMarble"
+    },
+    "marble24": {
+      "upToTick": 0,
+      "ownedBy": null,
+      "cssClass": "SnowMarble"
+    }
+  }
+}
