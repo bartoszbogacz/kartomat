@@ -4,7 +4,6 @@ const http = require("http");
 const fs = require("fs");
 const ws = require("ws");
 
-const httpHost = "";
 const httpPort = 8000;
 const wsPort = 8080;
 
@@ -20,8 +19,13 @@ function initHTTPServer() {
 
   _httpServer = http.createServer(handleHTTPRequest);
 
-  _httpServer.listen(httpPort, httpHost, () => {
-    console.log(`Server is running on http://${httpHost}:${httpPort}`);
+  // Bind HTTP server to :: which accetps both IPV4 as well as
+  // IPV6 connections. Otherwise chrome will try the IPV6 localhost
+  // address when developing first and timeout only after a long
+  // time before trying the IPV4 which our server answers to.
+
+  _httpServer.listen(httpPort, "::", () => {
+    console.log(`Server is running on http://:::${httpPort}`);
   });
 }
 
@@ -76,7 +80,12 @@ function initWebSocketServer() {
   // SocketServer mostly based on:
   // https://www.npmjs.com/package/ws#sending-and-receiving-text-data
 
-  _wsServer = new ws.Server({ port: wsPort });
+  // Bind WS server to :: which accetps both IPV4 as well as
+  // IPV6 connections. Otherwise chrome will try the IPV6 localhost
+  // address when developing first and timeout only after a long
+  // time before trying the IPV4 which our server answers to.
+
+  _wsServer = new ws.Server({ host: "::", port: wsPort });
 
   _wsServer.on("connection", function (socket, request) {
     socket.on("message", function (msg) {

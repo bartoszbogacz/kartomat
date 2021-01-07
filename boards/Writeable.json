@@ -16,5 +16,8 @@
       "ownedBy": null,
       "text": "You can collaboratively write here."
     }
+  },
+  "stratified": {
+    "textarea": { "tick": 0, "ownedBy": null, "inLayer": "boards" }
   }
 }

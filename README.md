@@ -51,7 +51,7 @@ then restart VSCode
 - Multiple views sharing the same player. Change map of sockets
   from player->socket to socket->player
 
-- Abilityto reset game board
+- Ability to reset game board
 
 # Nive to have
 
@@ -62,6 +62,10 @@ then restart VSCode
 - A Wizard game board
 
 - A Tichu game board
+
+- Transform only necessary changes
+
+- Transform DOM elements using transform
 
 # Bibliography
 

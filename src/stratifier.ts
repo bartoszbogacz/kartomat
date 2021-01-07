@@ -19,40 +19,36 @@ function stratifiersCompute(local: GameState, computed: ComputedState) {
     }
   }
 
-  const stratifierIds = Object.keys(local.stratifiers);
-  stratifierIds.sort(
-    (a, b) =>
-      (computed.locations as any)[a].z - (computed.locations as any)[b].z
-  );
-
   let accumZ = 0;
 
-  for (const stratifierId of stratifierIds) {
-    const stratifier = local.stratifiers[stratifierId];
-    const stratified = groups[stratifierId];
-
-    stratified.sort(
+  for (const [layer, stratifiedIds] of Object.entries(groups)) {
+    stratifiedIds.sort(
       (a, b) =>
         (computed.locations as any)[a].z - (computed.locations as any)[b].z
     );
 
-    // FIXME: To make room for stackings we add 100 to each item
-    // instead of 1.
+    // Stratifier needs to run before stackings and does not know
+    // about the extents of stackings. We assume that stackings are
+    // never more than 100 elements deep.
 
-    for (const itemId of stratified) {
-      if (computed.locations[itemId].ownedBy !== computed.playerId) {
-        computed.locations[itemId].z = accumZ;
-        accumZ = accumZ + 100;
+    for (const stratifiedId of stratifiedIds) {
+      if (local.locatables[stratifiedId].ownedBy !== computed.playerId) {
+        computed.locations[stratifiedId].z = accumZ;
+        accumZ += 100;
       }
     }
 
-    computed.locations[stratifierId].z = accumZ;
-    accumZ = accumZ + 100;
+    for (const [stratifierId, stratifiers] of Object.entries(
+      local.stratifiers
+    )) {
+      computed.locations[stratifierId].z = accumZ;
+      accumZ += 1;
+    }
 
-    for (const itemId of stratified) {
-      if (computed.locations[itemId].ownedBy === computed.playerId) {
-        computed.locations[itemId].z = accumZ;
-        accumZ = accumZ + 100;
+    for (const stratifiedId of stratifiedIds) {
+      if (local.locatables[stratifiedId].ownedBy === computed.playerId) {
+        computed.locations[stratifiedId].z = accumZ;
+        accumZ += 100;
       }
     }
   }

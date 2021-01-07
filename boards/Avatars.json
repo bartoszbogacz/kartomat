@@ -92,5 +92,13 @@
       "w": 200,
       "h": 30
     }
+  },
+  "stratified": {
+    "player1": { "tick": 0, "ownedBy": null, "inLayer": "boards" },
+    "player2": { "tick": 0, "ownedBy": null, "inLayer": "boards" },
+    "player3": { "tick": 0, "ownedBy": null, "inLayer": "boards" },
+    "player4": { "tick": 0, "ownedBy": null, "inLayer": "boards" },
+    "player5": { "tick": 0, "ownedBy": null, "inLayer": "boards" },
+    "player6": { "tick": 0, "ownedBy": null, "inLayer": "boards" }
   }
 }

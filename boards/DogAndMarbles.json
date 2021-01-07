@@ -273,6 +273,7 @@
     "marbles": { "tick": 0, "ownedBy": null }
   },
   "stratified": {
+    "board": { "tick": 0, "ownedBy": null, "inLayer": "boards" },
     "marble1": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
     "marble2": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
     "marble3": { "tick": 0, "ownedBy": null, "inLayer": "marbles" },
