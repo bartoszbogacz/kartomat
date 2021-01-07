@@ -124,7 +124,11 @@ function stackablesFindOverlapping(
   }
 
   for (const [otherId, stackable] of Object.entries(local.stackables)) {
-    if (computed.overlaps[itemId][otherId] > pixels) {
+    const stratId = overlapsAnyStratifier(local, computed, itemId);
+    const overlaps = computed.overlaps[itemId][otherId] > pixels;
+    const ownsTarget = local.locatables[otherId].ownedBy === computed.playerId;
+
+    if (overlaps && ((stratId && ownsTarget) || !stratId)) {
       pixels = computed.overlaps[itemId][otherId];
       largest = otherId;
     }

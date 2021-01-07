@@ -48,7 +48,7 @@ function locatablesCompute2(local: GameState, computed: ComputedState) {
 
   computed.topZ = 0;
 
-  for (const [_, item] of Object.entries(computed.locations)) {
+  for (const [_, item] of Object.entries(local.locatables)) {
     if (item.z > computed.topZ) {
       computed.topZ = item.z;
     }

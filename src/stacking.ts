@@ -4,8 +4,8 @@ interface StackingItem extends Synchronized {
 }
 
 function stackingsRender(local: GameState, computed: ComputedState) {
-  if (computed.stacks === null) {
-    throw new Error("Stacks not yet computed.");
+  if (computed.stacks === null || computed.locations === null) {
+    throw new Error("Stacks or locations not yet computed.");
   }
 
   for (const [itemId, stacking] of Object.entries(local.stackings)) {
@@ -68,7 +68,7 @@ function stackingsRender(local: GameState, computed: ComputedState) {
     const s =
       computed.stacks.hasOwnProperty(itemId) &&
       computed.stacks[itemId].length > 1;
-    const loc = local.locatables[itemId];
+    const loc = computed.locations[itemId];
 
     if (s === true) {
       move.style.left = loc.x - 30 + "px";
@@ -269,10 +269,12 @@ function stackingsFindOverlapping(
   }
 
   for (const [otherId, stackable] of Object.entries(local.stackables)) {
-    if (
-      stackable.onStacking !== itemId &&
-      computed.overlaps[itemId][otherId] > pixels
-    ) {
+    const stratId = overlapsAnyStratifier(local, computed, itemId);
+    const overlaps = computed.overlaps[itemId][otherId] > pixels;
+    const ownsTarget = local.locatables[otherId].ownedBy === computed.playerId;
+    const yourself = stackable.onStacking === itemId;
+
+    if (overlaps && !yourself && ((stratId && ownsTarget) || !stratId)) {
       pixels = computed.overlaps[itemId][otherId];
       largest = otherId;
     }

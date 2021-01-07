@@ -166,7 +166,13 @@ function render() {
   // This order is important. It should be
   // loc1, strat, stack, loc2. Computes
   // in-between are fine.
+  // FIXME: locatablesCompute2 needs to be called twice,
+  // since stackingsCreateNew may add new ones on button
+  // presses and these need to be available by stratifersCompute
+  // and than again, based on the stratifiers again for button
+  // presses
   locatablesCompute1(_localGame, _computed);
+  locatablesCompute2(_localGame, _computed);
   stratifiersCompute(_localGame, _computed);
   stackablesCompute(_localGame, _computed);
   locatablesCompute2(_localGame, _computed);

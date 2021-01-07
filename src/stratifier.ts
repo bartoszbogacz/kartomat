@@ -32,13 +32,16 @@ function stratifiersCompute(local: GameState, computed: ComputedState) {
     // never more than 100 elements deep.
 
     for (const stratifiedId of stratifiedIds) {
-      if (local.locatables[stratifiedId].ownedBy !== computed.playerId) {
+      if (
+        local.locatables[stratifiedId].ownedBy !== computed.playerId ||
+        overlapsAnyStratifier(local, computed, stratifiedId) === null
+      ) {
         computed.locations[stratifiedId].z = accumZ;
         accumZ += 100;
       }
     }
 
-    for (const [stratifierId, stratifiers] of Object.entries(
+    for (const [stratifierId, stratifier] of Object.entries(
       local.stratifiers
     )) {
       computed.locations[stratifierId].z = accumZ;
@@ -46,10 +49,34 @@ function stratifiersCompute(local: GameState, computed: ComputedState) {
     }
 
     for (const stratifiedId of stratifiedIds) {
-      if (local.locatables[stratifiedId].ownedBy === computed.playerId) {
+      if (
+        local.locatables[stratifiedId].ownedBy === computed.playerId &&
+        overlapsAnyStratifier(local, computed, stratifiedId) !== null
+      ) {
         computed.locations[stratifiedId].z = accumZ;
         accumZ += 100;
       }
     }
   }
+}
+
+function overlapsAnyStratifier(
+  local: GameState,
+  computed: ComputedState,
+  itemId: string
+): string | null {
+  if (computed.overlaps === null) {
+    throw new Error("Overlaps not yet computed");
+  }
+
+  // FIXME: Items go slightly into private area before actually being on top
+  // of it.
+
+  for (const [stratifierId, stratifier] of Object.entries(local.stratifiers)) {
+    if (computed.overlaps[itemId][stratifierId] > 0) {
+      return stratifierId;
+    }
+  }
+
+  return null;
 }
