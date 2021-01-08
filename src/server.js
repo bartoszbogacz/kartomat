@@ -165,6 +165,13 @@ function handleClientMessage(socket, msg) {
     console.log(playerId, "joined", gameId, "playing", boardId);
   }
 
+  // Step tick forward is client is ahead of us. Client may have
+  // a newer state if the server failed and dis-connected during
+  // a game. Never regress tick of clients. Server tick and client
+  // tick behave like a Lamport timestamp.
+
+  _runningGames[gameId].tick = Math.max(_runningGames[gameId].tick, msg.tick);
+
   // Synchronize with client
   for (const [key, values] of Object.entries(msg.scene)) {
     _runningGames[gameId].scene[key] = unionLastWriterWins(

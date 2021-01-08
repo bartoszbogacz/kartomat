@@ -106,3 +106,9 @@ Building a Data-oriented Entity System: Part 3
 
 Practical Examples in Data Oriented Design
 [Niklas](https://docs.google.com/present/view?id=0AYqySQy4JUK1ZGNzNnZmNWpfMzJkaG5yM3pjZA&hl=en)
+
+[Lamport timestamps](https://en.wikipedia.org/wiki/Lamport_timestamp)
+
+Conflict-free replicated data type [CRDT](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type)
+
+Fractional indexes [FIGMA](https://www.figma.com/blog/realtime-editing-of-ordered-sequences/)

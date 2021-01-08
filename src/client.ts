@@ -149,6 +149,7 @@ function sendClientMessage() {
   }
 
   const msg = {
+    tick: _computed.tick,
     boardId: _computed.boardId,
     gameId: _computed.gameId,
     playerId: _computed.playerId,
@@ -200,7 +201,11 @@ function handleServerMessage(msg: any) {
     _remoteGame.visuals
   );
 
-  _computed.tick = msg.tick;
+  // Never regress tick even if server tells us so. Otherwise we may
+  // not be able to change our own objects if their tick is higher than
+  // ours. Client tick and server tick behave like Lamport timestamp.
+
+  _computed.tick = Math.max(msg.tick, _computed.tick);
   _computed.boardId = msg.boardId;
   _computed.gameId = msg.gameId;
   _computed.playerId = msg.playerId;
