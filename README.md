@@ -71,6 +71,10 @@ then restart VSCode
 
 - Player Avatars that can be dragged
 
+- Players having (persistent) colors and elements
+  getting a short highlight of the player color.
+  Instead of the current playerID tag.
+
 - Ability to remove elements from the editor
 
 - A Wizard game board
@@ -96,5 +100,3 @@ Building a Data-oriented Entity System: Part 3
 
 Practical Examples in Data Oriented Design
 [Niklas](https://docs.google.com/present/view?id=0AYqySQy4JUK1ZGNzNnZmNWpfMzJkaG5yM3pjZA&hl=en)
-
-Passive Event Listeners [OliverJAsh](https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md)
