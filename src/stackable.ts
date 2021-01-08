@@ -40,8 +40,8 @@ function stackablesTake(
   computed: ComputedState,
   itemId: string
 ) {
-  if (computed.locations === null || computed.topZ === null) {
-    throw new Error("Locations or topZ not yet computed");
+  if (computed.locations === null) {
+    throw new Error("Locations not yet computed");
   }
 
   if (local.stackables.hasOwnProperty(itemId)) {
@@ -53,7 +53,7 @@ function stackablesTake(
     local.locatables[itemId].ownedBy = computed.playerId;
     local.locatables[itemId].x = computed.locations[itemId].x;
     local.locatables[itemId].y = computed.locations[itemId].y;
-    local.locatables[itemId].z = computed.topZ + 1;
+    local.locatables[itemId].z = locatableOnTopZ(computed.locations) + 1;
   }
 }
 
@@ -119,17 +119,24 @@ function stackablesFindOverlapping(
   let pixels: number = 500;
   let largest: string | null = null;
 
-  if (computed.stacks === null || computed.overlaps === null) {
-    throw new Error("Stacks or overlaps not yet computed");
+  if (computed.locations === null || computed.stacks === null) {
+    throw new Error("Stacks or locations not yet computed");
   }
 
   for (const [otherId, stackable] of Object.entries(local.stackables)) {
+    if (itemId === otherId) {
+      continue;
+    }
+
     const stratId = overlapsAnyDivider(local, computed, itemId);
-    const overlaps = computed.overlaps[itemId][otherId] > pixels;
+    const overlap = overlapMuch(
+      computed.locations[itemId],
+      computed.locations[otherId]
+    );
     const ownsTarget = local.locatables[otherId].ownedBy === computed.playerId;
 
-    if (overlaps && ((stratId && ownsTarget) || !stratId)) {
-      pixels = computed.overlaps[itemId][otherId];
+    if (overlap > pixels && ((stratId && ownsTarget) || !stratId)) {
+      pixels = overlap;
       largest = otherId;
     }
   }

@@ -5,6 +5,22 @@ A collaborative playing table for board games.
 Largely based on Spielunke with original idea by Julia Portl and
 initial implementation by Julia Portl, Ole Johannson, and Bartosz Bogacz.
 
+# Getting started
+
+Unless you already did, enter the directory at top level
+
+> cd kartomat
+
+Compile client Typescript into Javascript. Build output is
+put into ´dist/´.
+
+> tsc.cmd
+
+Run the server which currently is still written
+in Javascript.
+
+> node src/server.js
+
 # Licenses
 
 BSD-3-Clause

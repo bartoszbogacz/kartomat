@@ -24,41 +24,6 @@ function locatablesCompute1(local: GameState, computed: ComputedState) {
   }
 }
 
-function locatablesCompute2(local: GameState, computed: ComputedState) {
-  if (computed.locations === null) {
-    throw new Error("Locations not yet computed");
-  }
-
-  computed.overlaps = {};
-
-  // FIXME: This function takes most time yet it only a subset of its data is needed
-
-  for (const [cardId, card] of Object.entries(computed.locations)) {
-    computed.overlaps[cardId] = {};
-    for (const [otherId, other] of Object.entries(computed.locations)) {
-      if (otherId === cardId) {
-        continue;
-      }
-      const h =
-        Math.min(card.x + card.w, other.x + other.w) -
-        Math.max(card.x, other.x);
-      const v =
-        Math.min(card.y + card.w, other.y + other.h) -
-        Math.max(card.y, other.y);
-
-      computed.overlaps[cardId][otherId] = Math.max(0, h) * Math.max(0, v);
-    }
-  }
-
-  computed.topZ = 0;
-
-  for (const [_, item] of Object.entries(local.locatables)) {
-    if (item.z > computed.topZ) {
-      computed.topZ = item.z;
-    }
-  }
-}
-
 function locatablesRender(local: GameState, computed: ComputedState) {
   if (computed.locations === null) {
     throw new Error("Locations not yet computed.");
@@ -85,4 +50,20 @@ function locatablesRender(local: GameState, computed: ComputedState) {
       elem.innerHTML = loc.ownedBy;
     }
   }
+}
+
+function overlapMuch(a: LocatableItem, b: LocatableItem) {
+  const h = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+  const v = Math.min(a.y + a.w, b.y + b.h) - Math.max(a.y, b.y);
+  return Math.max(0, h) * Math.max(0, v);
+}
+
+function locatableOnTopZ(locs: { [key: string]: LocatableItem }): number {
+  let z: number = 0;
+  for (const [_, item] of Object.entries(locs)) {
+    if (top === null || item.z > z) {
+      z = item.z;
+    }
+  }
+  return z;
 }

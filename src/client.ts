@@ -10,7 +10,7 @@ interface GameState {
   stackings: { [key: string]: StackingItem };
   turnables: { [key: string]: TurnableItem };
   writeables: { [key: string]: WriteableItem };
-  dividers: { [key: string]: StratifierItem };
+  dividers: { [key: string]: DividerItem };
   avatars: { [key: string]: AvatarItem };
   visuals: { [key: string]: VisualItem };
 }
@@ -20,8 +20,6 @@ interface ComputedState {
   boardId: string | null;
   gameId: string | null;
   playerId: string | null;
-  topZ: number | null;
-  overlaps: { [a: string]: { [b: string]: number } } | null;
   stacks: { [key: string]: [string] } | null;
   locations: { [key: string]: LocatableItem } | null;
   playerAvatars: { [key: string]: string } | null;
@@ -56,8 +54,6 @@ let _computed: ComputedState = {
   boardId: null,
   gameId: null,
   playerId: null,
-  topZ: null,
-  overlaps: null,
   stacks: null,
   locations: null,
   playerAvatars: null,
@@ -169,10 +165,8 @@ function render() {
   // and than again, based on the dividers again for button
   // presses
   locatablesCompute1(_localGame, _computed);
-  locatablesCompute2(_localGame, _computed);
   dividersCompute(_localGame, _computed);
   stackablesCompute(_localGame, _computed);
-  locatablesCompute2(_localGame, _computed);
   avatarsCompute(_localGame, _computed);
 
   locatablesRender(_localGame, _computed);

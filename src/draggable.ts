@@ -7,10 +7,10 @@ function draggablesTake(
   computed: ComputedState,
   itemId: string
 ) {
-  if (computed.topZ !== null && local.draggables.hasOwnProperty(itemId)) {
+  if (computed.locations !== null && local.draggables.hasOwnProperty(itemId)) {
     local.locatables[itemId].tick = computed.tick;
     local.locatables[itemId].ownedBy = computed.playerId;
-    local.locatables[itemId].z = computed.topZ + 1;
+    local.locatables[itemId].z = locatableOnTopZ(computed.locations) + 1;
   }
 }
 

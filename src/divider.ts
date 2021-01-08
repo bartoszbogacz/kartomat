@@ -1,4 +1,4 @@
-interface StratifierItem extends Synchronized {
+interface DividerItem extends Synchronized {
   //
 }
 
@@ -64,15 +64,16 @@ function overlapsAnyDivider(
   computed: ComputedState,
   itemId: string
 ): string | null {
-  if (computed.overlaps === null) {
-    throw new Error("Overlaps not yet computed");
+  if (computed.locations === null) {
+    throw new Error("Locations not yet computed.");
   }
-
   // FIXME: Items go slightly into private area before actually being on top
   // of it.
 
   for (const [dividerId, divider] of Object.entries(local.dividers)) {
-    if (computed.overlaps[itemId][dividerId] > 0) {
+    if (
+      overlapMuch(computed.locations[itemId], computed.locations[dividerId]) > 0
+    ) {
       return dividerId;
     }
   }

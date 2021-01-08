@@ -258,18 +258,25 @@ function stackingsFindOverlapping(
   let pixels: number = 500;
   let largest: string | null = null;
 
-  if (computed.stacks === null || computed.overlaps === null) {
-    throw new Error("Stacks or overlaps not yet computed");
+  if (computed.stacks === null || computed.locations === null) {
+    throw new Error("Stacks or locations not yet computed");
   }
 
   for (const [otherId, stackable] of Object.entries(local.stackables)) {
     const stratId = overlapsAnyDivider(local, computed, itemId);
-    const overlaps = computed.overlaps[itemId][otherId] > pixels;
+    const overlap = overlapMuch(
+      computed.locations[itemId],
+      computed.locations[otherId]
+    );
     const ownsTarget = local.locatables[otherId].ownedBy === computed.playerId;
     const yourself = stackable.onStacking === itemId;
 
-    if (overlaps && !yourself && ((stratId && ownsTarget) || !stratId)) {
-      pixels = computed.overlaps[itemId][otherId];
+    if (
+      overlap > pixels &&
+      !yourself &&
+      ((stratId && ownsTarget) || !stratId)
+    ) {
+      pixels = overlap;
       largest = otherId;
     }
   }
