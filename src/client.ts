@@ -203,7 +203,9 @@ function onKeyUp(event: KeyboardEvent) {
 }
 
 function onMouseDown(event: Event) {
-  event.preventDefault();
+  // Using preventDefault here precludes textareas working on
+  // mobile. Since we only want to prevent selection and dragging
+  // of elements, preventDefault on mouseMove is enough.
 
   if (_localGame === null || event.target === null) {
     return;
@@ -268,8 +270,6 @@ function onMouseMove(event: Event) {
 }
 
 function onMouseUp(event: Event) {
-  event.preventDefault();
-
   if (_drag === null || _localGame === null) {
     return;
   }
