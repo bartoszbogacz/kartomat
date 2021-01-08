@@ -253,4 +253,4 @@ initHTTPServer();
 initWebSocketServer();
 
 // Clients have no tick and are driven by the server.
-setInterval(sendServerMessage, 100);
+setInterval(sendServerMessage, 300);
