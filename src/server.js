@@ -136,7 +136,7 @@ function reloadGame(gameId) {
   }
 
   _runningGames[gameId].scene = board;
-  console.log("Reloaded state of game " + gameId);
+  console.log("Reloaded", gameId);
 }
 
 function handleClientMessage(socket, msg) {
