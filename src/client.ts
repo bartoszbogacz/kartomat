@@ -37,6 +37,18 @@ interface Drag {
 let _drag: Drag | null = null;
 let _websocket: any = null;
 
+let _remoteGame: GameState = {
+  locatables: {},
+  draggables: {},
+  stackables: {},
+  stackings: {},
+  turnables: {},
+  writeables: {},
+  dividers: {},
+  avatars: {},
+  visuals: {},
+};
+
 let _localGame: GameState = {
   locatables: {},
   draggables: {},
@@ -87,11 +99,25 @@ function initWebSocketClient() {
 }
 
 function sendClientMessage() {
+  const changes: { [trait: string]: { [iid: string]: Synchronized } } = {};
+
+  for (const [trait, items] of Object.entries(_localGame)) {
+    changes[trait] = {};
+    for (const [iid, item] of Object.entries(items)) {
+      if (
+        (item as Synchronized).tick >
+        _remoteGame[trait as keyof GameState][iid].tick
+      ) {
+        changes[trait][iid] = item as Synchronized;
+      }
+    }
+  }
+
   const msg = {
     boardId: _computed.boardId,
     gameId: _computed.gameId,
     playerId: _computed.playerId,
-    scene: _localGame,
+    scene: changes,
   };
 
   _websocket.send(JSON.stringify(msg));
@@ -100,43 +126,43 @@ function sendClientMessage() {
 function handleServerMessage(msg: any) {
   msg = JSON.parse(msg.data);
 
-  const remoteGame = msg.scene as GameState;
+  _remoteGame = msg.scene as GameState;
 
   _localGame.locatables = unionLastWriterWins(
     _localGame.locatables,
-    remoteGame.locatables
+    _remoteGame.locatables
   );
   _localGame.draggables = unionLastWriterWins(
     _localGame.draggables,
-    remoteGame.draggables
+    _remoteGame.draggables
   );
   _localGame.stackings = unionLastWriterWins(
     _localGame.stackings,
-    remoteGame.stackings
+    _remoteGame.stackings
   );
   _localGame.stackables = unionLastWriterWins(
     _localGame.stackables,
-    remoteGame.stackables
+    _remoteGame.stackables
   );
   _localGame.turnables = unionLastWriterWins(
     _localGame.turnables,
-    remoteGame.turnables
+    _remoteGame.turnables
   );
   _localGame.writeables = unionLastWriterWins(
     _localGame.writeables,
-    remoteGame.writeables
+    _remoteGame.writeables
   );
   _localGame.dividers = unionLastWriterWins(
     _localGame.dividers,
-    remoteGame.dividers
+    _remoteGame.dividers
   );
   _localGame.avatars = unionLastWriterWins(
     _localGame.avatars,
-    remoteGame.avatars
+    _remoteGame.avatars
   );
   _localGame.visuals = unionLastWriterWins(
     _localGame.visuals,
-    remoteGame.visuals
+    _remoteGame.visuals
   );
 
   _computed.tick = msg.tick;
