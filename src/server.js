@@ -31,7 +31,6 @@ function initHTTPServer() {
 
 function handleHTTPRequest(req, res) {
   const [path, params] = parseUrl(req.url);
-  console.log(path, params);
   if (path === "/") {
     fs.readFile("html/index.html", {}, function (err, data) {
       res.setHeader("Content-Type", "text/html");
@@ -143,9 +142,9 @@ function reloadGame(gameId) {
 function handleClientMessage(socket, msg) {
   msg = JSON.parse(msg);
 
-  const boardId = msg.boardId || "dog";
-  const gameId = msg.gameId || generateGameId();
-  const playerId = msg.playerId || generatePlayerId();
+  const boardId = msg.boardId || "Dog";
+  const gameId = msg.gameId || "Game-" + randomId(8);
+  const playerId = msg.playerId || "Player-" + randomId(8);
 
   // If there is no such game, create it
   if (_runningGames.hasOwnProperty(gameId) === false) {
@@ -157,13 +156,13 @@ function handleClientMessage(socket, msg) {
       boardId: boardId,
       scene: board,
     };
-    console.log("Created game", gameId, "on", boardId);
+    console.log(playerId, "created", gameId, "playing", boardId);
   }
 
   // If player not yet part of game, join
   if (_runningGames[gameId].sockets.hasOwnProperty(playerId) === false) {
     _runningGames[gameId].sockets[playerId] = socket;
-    console.log("Client", playerId, "joined", gameId, "on", boardId);
+    console.log(playerId, "joined", gameId, "playing", boardId);
   }
 
   // Synchronize with client
@@ -261,17 +260,13 @@ function parseUrl(url) {
   return [path, parameters];
 }
 
-function generatePlayerId() {
-  const symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  let result = "player-";
-  for (let i = 0; i < 8; i++) {
+function randomId(n) {
+  const symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHUJKLMNOPQRSTUVWXYZ";
+  let result = "";
+  for (let i = 0; i < n; i++) {
     result = result + symbols[Math.floor(Math.random() * symbols.length)];
   }
   return result;
-}
-
-function generateGameId() {
-  return "game" + Object.keys(_runningGames).length + 1;
 }
 
 initHTTPServer();

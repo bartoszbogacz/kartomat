@@ -207,6 +207,19 @@ function handleServerMessage(msg: any) {
 
   window.localStorage.setItem("playerId", msg.playerId);
 
+  let [path, parameters] = parseUrl(window.location.href);
+
+  if (
+    parameters.hasOwnProperty("board") === false ||
+    parameters.board === _computed.boardId
+  ) {
+    history.pushState(
+      {},
+      "",
+      "/client.html?board=" + _computed.boardId + "&game=" + _computed.gameId
+    );
+  }
+
   sendClientMessage();
 
   window.requestAnimationFrame(render);
