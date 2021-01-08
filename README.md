@@ -57,6 +57,12 @@ then restart VSCode
 
 # Immediate TODOs
 
+- Ability to create new game on index.html. Remove edit and debug choices.
+
+- Dog8 board.
+
+- Add typescript as development dependency.
+
 - Multiple views sharing the same player. Change map of sockets
   from player->socket to socket->player
 
