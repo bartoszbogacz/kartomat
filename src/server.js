@@ -39,6 +39,12 @@ function handleHTTPRequest(req, res) {
       res.end(data);
     });
   }
+  if (path === "/reload") {
+    reloadGame(params.game);
+    res.setHeader("Content-Type", "text/plain");
+    res.writeHead(200);
+    res.end();
+  }
   if (path.endsWith(".css")) {
     fs.readFile("css" + path, {}, function (err, data) {
       res.setHeader("Content-Type", "text/css");
@@ -98,6 +104,42 @@ function initWebSocketServer() {
   });
 }
 
+function assembleBoard(boardId) {
+  const board = {};
+  const assembly = JSON.parse(fs.readFileSync("boards/" + boardId + ".json"));
+  for (const partName of assembly) {
+    const part = JSON.parse(fs.readFileSync("boards/" + partName + ".json"));
+    for (const [trait, props] of Object.entries(part)) {
+      if (board.hasOwnProperty(trait) === false) {
+        board[trait] = {};
+      }
+      for (const [item, prop] of Object.entries(props)) {
+        board[trait][item] = prop;
+      }
+    }
+  }
+  return board;
+}
+
+function reloadGame(gameId) {
+  // Get new board and step ticks forward to force clients
+  // to accept changes.
+
+  if (_runningGames.hasOwnProperty(gameId) === false) {
+    return;
+  }
+
+  const board = assembleBoard(_runningGames[gameId].boardId);
+  for (const [trait, items] of Object.entries(board)) {
+    for (const [i, item] of Object.entries(items)) {
+      item.tick = _runningGames[gameId].tick;
+    }
+  }
+
+  _runningGames[gameId].scene = board;
+  console.log("Reloaded state of game " + gameId);
+}
+
 function handleClientMessage(socket, msg) {
   msg = JSON.parse(msg);
 
@@ -131,23 +173,6 @@ function handleClientMessage(socket, msg) {
       _runningGames[gameId].scene[key] || {}
     );
   }
-}
-
-function assembleBoard(boardId) {
-  const board = {};
-  const assembly = JSON.parse(fs.readFileSync("boards/" + boardId + ".json"));
-  for (const partName of assembly) {
-    const part = JSON.parse(fs.readFileSync("boards/" + partName + ".json"));
-    for (const [trait, props] of Object.entries(part)) {
-      if (board.hasOwnProperty(trait) === false) {
-        board[trait] = {};
-      }
-      for (const [item, prop] of Object.entries(props)) {
-        board[trait][item] = prop;
-      }
-    }
-  }
-  return board;
 }
 
 function sendServerMessage() {

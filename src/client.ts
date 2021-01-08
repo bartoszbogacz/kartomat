@@ -71,6 +71,40 @@ let _computed: ComputedState = {
   playerAvatars: null,
 };
 
+function initDocumentControls() {
+  const elem = document.createElement("div");
+  elem.style.position = "absolute";
+  elem.style.left = "800px";
+  elem.style.top = "30px";
+  elem.style.border = "2px solid crimson";
+  elem.style.borderRadius = "0.3em";
+  elem.style.padding = "0.3em";
+  elem.innerHTML = "Reload game";
+  elem.onclick = function () {
+    const httpRequest = new XMLHttpRequest();
+    httpRequest.open("PUT", "/reload?game=" + _computed.gameId, true);
+    httpRequest.send();
+  };
+  document.body.appendChild(elem);
+
+  document.addEventListener("mousemove", onMouseMove, {
+    passive: false,
+    capture: true,
+  });
+  document.addEventListener("mouseup", onMouseUp, {
+    passive: false,
+    capture: true,
+  });
+  document.addEventListener("touchmove", onMouseMove, {
+    passive: false,
+    capture: true,
+  });
+  document.addEventListener("touchend", onMouseUp, {
+    passive: false,
+    capture: true,
+  });
+}
+
 function initWebSocketClient() {
   let [path, parameters] = parseUrl(window.location.href);
 
@@ -373,22 +407,5 @@ function parseUrl(url: string): [string, { [key: string]: any }] {
 }
 
 initWebSocketClient();
-
-document.addEventListener("mousemove", onMouseMove, {
-  passive: false,
-  capture: true,
-});
-document.addEventListener("mouseup", onMouseUp, {
-  passive: false,
-  capture: true,
-});
-document.addEventListener("touchmove", onMouseMove, {
-  passive: false,
-  capture: true,
-});
-document.addEventListener("touchend", onMouseUp, {
-  passive: false,
-  capture: true,
-});
-
+initDocumentControls();
 window.setInterval(render, 1000);

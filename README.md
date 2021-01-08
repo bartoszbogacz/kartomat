@@ -57,12 +57,8 @@ then restart VSCode
 
 # Immediate TODOs
 
-- Only send deltas of GameState to reduce traffic.
-
 - Multiple views sharing the same player. Change map of sockets
   from player->socket to socket->player
-
-- Ability to reset a game board
 
 - After a server restart a live re-joining client sends a state
   with very high tick counts. Its tick is then reset to the servers
@@ -80,6 +76,8 @@ then restart VSCode
 - A Wizard game board
 
 - A Tichu game board
+
+- Send only deltas of game state from server.
 
 - Transform only necessary changes
 
