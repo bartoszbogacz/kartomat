@@ -175,16 +175,6 @@ function render() {
   writeablesRender(_localGame, _computed);
   avatarsRender(_localGame, _computed);
   visualsRender(_localGame, _computed);
-
-  // Debug
-  const diffToTick: { [key: string]: any } = {};
-  for (const [locId, locatable] of Object.entries(_localGame.locatables)) {
-    if (locatable.tick + 50 > _computed.tick) {
-      diffToTick[locId] = locatable;
-    }
-  }
-
-  debug.innerHTML = JSON.stringify(diffToTick, null, 2);
 }
 
 function onClick(event: MouseEvent) {
@@ -212,14 +202,14 @@ function onKeyUp(event: KeyboardEvent) {
   window.requestAnimationFrame(render);
 }
 
-function onMouseDown(event: MouseEvent | TouchEvent) {
+function onMouseDown(event: Event) {
   event.preventDefault();
 
   if (_localGame === null || event.target === null) {
     return;
   }
 
-  const touch = event.type === "touchmove";
+  const touch = event.type === "touchstart";
   const clientY = touch
     ? (event as TouchEvent).touches[0].clientY
     : (event as MouseEvent).clientY;
@@ -244,7 +234,7 @@ function onMouseDown(event: MouseEvent | TouchEvent) {
   window.requestAnimationFrame(render);
 }
 
-function onMouseMove(event: MouseEvent | TouchEvent) {
+function onMouseMove(event: Event) {
   event.preventDefault();
 
   if (_localGame === null) {
@@ -277,32 +267,14 @@ function onMouseMove(event: MouseEvent | TouchEvent) {
   window.requestAnimationFrame(render);
 }
 
-function onMouseUp(event: MouseEvent | TouchEvent) {
+function onMouseUp(event: Event) {
   event.preventDefault();
 
   if (_drag === null || _localGame === null) {
     return;
   }
 
-  const touch = event.type === "touchmove";
-  const clientY = touch
-    ? (event as TouchEvent).touches[0].clientY
-    : (event as MouseEvent).clientY;
-  const clientX = touch
-    ? (event as TouchEvent).touches[0].clientX
-    : (event as MouseEvent).clientX;
-
-  const y = _drag.y - _drag.startY + clientY;
-  const x = _drag.x - _drag.startX + clientX;
-
-  const isOutside =
-    Math.abs(_drag.startY - clientY) + Math.abs(_drag.startX - clientX) > 50;
-
-  _drag.wasOutside = _drag.wasOutside || isOutside;
-
   const thingId = _drag.target.id;
-
-  draggablesMove(_localGame, _computed, thingId, x, y);
 
   stackingsPlace(_localGame, _computed, thingId, _drag.wasOutside);
   stackablesPlace(_localGame, _computed, thingId, _drag.wasOutside);
@@ -376,13 +348,21 @@ function parseUrl(url: string): [string, { [key: string]: any }] {
 
 initWebSocketClient();
 
-document.body.onmousemove = onMouseMove;
-document.body.onmouseup = onMouseUp;
-window.setInterval(render, 1000);
+document.addEventListener("mousemove", onMouseMove, {
+  passive: false,
+  capture: true,
+});
+document.addEventListener("mouseup", onMouseUp, {
+  passive: false,
+  capture: true,
+});
+document.addEventListener("touchmove", onMouseMove, {
+  passive: false,
+  capture: true,
+});
+document.addEventListener("touchend", onMouseUp, {
+  passive: false,
+  capture: true,
+});
 
-// Debug
-let debug = document.createElement("pre");
-debug.style.position = "absolute";
-debug.style.left = "1400px";
-debug.style.userSelect = "none";
-document.body.appendChild(debug);
+window.setInterval(render, 1000);

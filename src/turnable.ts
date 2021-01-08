@@ -15,7 +15,14 @@ function turnablesRender(local: GameState, computed: ComputedState) {
     let elem = document.getElementById(key);
     if (elem === null) {
       elem = document.createElement("div");
-      elem.onmousedown = onMouseDown;
+      elem.addEventListener("mousedown", onMouseDown, {
+        passive: false,
+        capture: true,
+      });
+      elem.addEventListener("touchstart", onMouseDown, {
+        passive: false,
+        capture: true,
+      });
       elem.id = key;
       elem.className = "Turnable";
       elem.style.position = "absolute";

@@ -13,7 +13,14 @@ function stackingsRender(local: GameState, computed: ComputedState) {
     if (move === null) {
       move = document.createElement("div");
       move.id = itemId;
-      move.onmousedown = onMouseDown;
+      move.addEventListener("mousedown", onMouseDown, {
+        passive: false,
+        capture: true,
+      });
+      move.addEventListener("touchstart", onMouseDown, {
+        passive: false,
+        capture: true,
+      });
       move.className = "MoveControl";
       move.style.position = "absolute";
       move.style.width = "30px";
