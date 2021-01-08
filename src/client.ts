@@ -79,6 +79,7 @@ function initDocumentControls() {
   elem.style.border = "2px solid crimson";
   elem.style.borderRadius = "0.3em";
   elem.style.padding = "0.3em";
+  elem.style.userSelect = "none";
   elem.innerHTML = "Reload game";
   elem.onclick = function () {
     const httpRequest = new XMLHttpRequest();
