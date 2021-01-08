@@ -17,6 +17,13 @@
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
 
+.MediumorchidMarble {
+  background-color: mediumorchid;
+  border: 2px solid black;
+  border-radius: 50%;
+  filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
 .DodgerblueMarble {
   background-color: dodgerblue;
   border: 2px solid black;
@@ -47,6 +54,20 @@
 
 .CrimsonMarble {
   background-color: crimson;
+  border: 2px solid black;
+  border-radius: 50%;
+  filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.OrangeMarble {
+  background-color: orange;
+  border: 2px solid black;
+  border-radius: 50%;
+  filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.DarkturquoiseMarble {
+  background-color: darkturquoise;
   border: 2px solid black;
   border-radius: 50%;
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));

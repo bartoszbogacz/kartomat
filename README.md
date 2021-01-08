@@ -57,10 +57,6 @@ then restart VSCode
 
 # Immediate TODOs
 
-- Dog8 board.
-
-- Add typescript as development dependency.
-
 - Multiple views sharing the same player.
 
 # Nive to have

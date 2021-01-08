@@ -539,6 +539,36 @@
       "l": 1,
       "w": 100,
       "h": 150
+    },
+    "card53": {
+      "tick": 0,
+      "ownedBy": null,
+      "x": 53,
+      "y": 0,
+      "z": 0,
+      "l": 1,
+      "w": 100,
+      "h": 150
+    },
+    "card54": {
+      "tick": 0,
+      "ownedBy": null,
+      "x": 54,
+      "y": 0,
+      "z": 0,
+      "l": 1,
+      "w": 100,
+      "h": 150
+    },
+    "card55": {
+      "tick": 0,
+      "ownedBy": null,
+      "x": 55,
+      "y": 0,
+      "z": 0,
+      "l": 1,
+      "w": 100,
+      "h": 150
     }
   },
   "draggables": {
@@ -594,7 +624,10 @@
     "card49": { "tick": 0, "ownedBy": null },
     "card50": { "tick": 0, "ownedBy": null },
     "card51": { "tick": 0, "ownedBy": null },
-    "card52": { "tick": 0, "ownedBy": null }
+    "card52": { "tick": 0, "ownedBy": null },
+    "card53": { "tick": 0, "ownedBy": null },
+    "card54": { "tick": 0, "ownedBy": null },
+    "card55": { "tick": 0, "ownedBy": null }
   },
   "stackables": {
     "card1": { "tick": 0, "ownedBy": null, "onStacking": "stacking1" },
@@ -648,7 +681,10 @@
     "card49": { "tick": 0, "ownedBy": null, "onStacking": "stacking1" },
     "card50": { "tick": 0, "ownedBy": null, "onStacking": "stacking1" },
     "card51": { "tick": 0, "ownedBy": null, "onStacking": "stacking1" },
-    "card52": { "tick": 0, "ownedBy": null, "onStacking": "stacking1" }
+    "card52": { "tick": 0, "ownedBy": null, "onStacking": "stacking1" },
+    "card53": { "tick": 0, "ownedBy": null, "onStacking": "stacking1" },
+    "card54": { "tick": 0, "ownedBy": null, "onStacking": "stacking1" },
+    "card55": { "tick": 0, "ownedBy": null, "onStacking": "stacking1" }
   },
   "stackings": {
     "stacking1": {
@@ -969,6 +1005,24 @@
       "tick": 0,
       "ownedBy": null,
       "sides": ["rummy/spade_king.png", "rummy/back_blue.png"],
+      "current": 0
+    },
+    "card53": {
+      "tick": 0,
+      "ownedBy": null,
+      "sides": ["rummy/joker_red.png", "rummy/back_blue.png"],
+      "current": 0
+    },
+    "card54": {
+      "tick": 0,
+      "ownedBy": null,
+      "sides": ["rummy/joker_red.png", "rummy/back_blue.png"],
+      "current": 0
+    },
+    "card55": {
+      "tick": 0,
+      "ownedBy": null,
+      "sides": ["rummy/joker_red.png", "rummy/back_blue.png"],
       "current": 0
     }
   },
