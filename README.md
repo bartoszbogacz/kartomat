@@ -61,6 +61,11 @@ then restart VSCode
 
 # Nive to have
 
+- A board editor
+
+- Create and configure boards as HTML files with client.js
+  supplying the functionality.
+
 - Show player.text instead of playerID when dragging
 
 - Player Avatars that can be dragged
