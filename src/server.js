@@ -169,8 +169,11 @@ function handleClientMessage(socket, msg) {
 
   // If player not yet part of game, join
   if (_runningGames[gameId].sockets.hasOwnProperty(playerId) === false) {
-    _runningGames[gameId].sockets[playerId] = socket;
+    _runningGames[gameId].sockets[playerId] = [socket];
     console.log(playerId, "joined", gameId, "playing", boardId);
+  } else if (_runningGames[gameId].sockets[playerId].indexOf(socket) === -1) {
+    _runningGames[gameId].sockets[playerId].push(socket);
+    console.log("views", playerId, "in", gameId, "playing", boardId);
   }
 
   // Step tick forward is client is ahead of us. Client may have
@@ -194,7 +197,7 @@ function sendServerMessage() {
     // Each time a scene is announced to all, increase ticks for this game
     game.tick += 1;
     // Propagate changes to all players
-    for (const [playerId, clientSocket] of Object.entries(game.sockets)) {
+    for (const [playerId, clientSockets] of Object.entries(game.sockets)) {
       const msg = {
         boardId: game.boardId,
         gameId: gameId,
@@ -202,16 +205,19 @@ function sendServerMessage() {
         tick: game.tick,
         scene: game.scene,
       };
-      clientSocket.send(JSON.stringify(msg));
+      for (const cs of clientSockets) {
+        cs.send(JSON.stringify(msg));
+      }
     }
   }
 }
 
 function handleClientDisconnected(socket) {
   for (const [gid, game] of Object.entries(_runningGames)) {
-    for (const [pid, s] of Object.entries(game.sockets)) {
-      if (s === socket) {
-        delete _runningGames[gid].sockets[pid];
+    for (const [pid, sockets] of Object.entries(game.sockets)) {
+      const i = sockets.indexOf(socket);
+      if (i !== -1) {
+        _runningGames[gid].sockets[pid].splice(i, 1);
       }
     }
   }

@@ -32,15 +32,10 @@ licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1)
 
 # Issues
 
-- There can only be one view per player, since sockets has an index on player.
-
-- Touch movement does not work across all devices and browsers
-
-- Concurrent addition and removal from cards of a deck, especially of
-  the card leading of a deck, is still buggy.
-
-Allieviate the issue by ensuring that cards are restted to the
-playing area and that cards do hide within decks having wrong zIndices.
+- Clients are identified by playerId which two clients may share.
+  In that case the provisions for the lock-out do not work and
+  textarea are not updated. Basic aynchronization should not be
+  affected though.
 
 # External
 
@@ -48,18 +43,14 @@ playing area and that cards do hide within decks having wrong zIndices.
 
 See: [NPM Issue 470](https://github.com/npm/cli/issues/470)
 
-Or invoke with ´tsc.cmd´
+Or invoke with ´tsc.cmd´ or with ´npx tsc´
 
 - VSCode complains about duplicated functions
 
 Make sure a tsconfig.json is present that does not include build outputs,
 then restart VSCode
 
-# Immediate TODOs
-
-- Multiple views sharing the same player.
-
-# Nive to have
+# TODO
 
 - A board editor
 
