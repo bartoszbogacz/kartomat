@@ -14,7 +14,7 @@ Unless you already did, enter the directory at top level
 Compile client Typescript into Javascript. Build output is
 put into ´dist/´.
 
-> tsc.cmd
+> npx tsc
 
 Run the server which currently is still written
 in Javascript.

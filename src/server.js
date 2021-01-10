@@ -3,6 +3,7 @@
 const http = require("http");
 const fs = require("fs");
 const ws = require("ws");
+const path = require("path");
 
 const httpPort = 8000;
 const wsPort = 8080;
@@ -30,54 +31,57 @@ function initHTTPServer() {
 }
 
 function handleHTTPRequest(req, res) {
-  const [path, params] = parseUrl(req.url);
-  if (path === "/") {
-    fs.readFile("html/index.html", {}, function (err, data) {
+  const [filename, params] = parseUrl(req.url);
+  if (filename === "/") {
+    // It is not necessary to normalize the path here. However, to make
+    // sure that all paths are properly escaped before opening one might grep
+    // the source code for readFile and make sure each call contains a
+    // path.normalize. In that case its easier to have no exceptions and escape
+    // the literal string anyhow.
+    fs.readFile(path.normalize("html/index.html"), {}, function (err, data) {
       res.setHeader("Content-Type", "text/html");
       res.writeHead(200);
       res.end(data);
     });
-  }
-  if (path === "/reload") {
+  } else if (filename === "/reload") {
     reloadGame(params.game);
     res.setHeader("Content-Type", "text/plain");
     res.writeHead(200);
     res.end();
-  }
-  if (path.endsWith(".css")) {
-    fs.readFile("css" + path, {}, function (err, data) {
+  } else if (filename.endsWith(".css")) {
+    fs.readFile("css" + path.normalize(filename), {}, function (err, data) {
       res.setHeader("Content-Type", "text/css");
       res.writeHead(200);
       res.end(data);
     });
-  }
-  if (path.endsWith(".html")) {
-    fs.readFile("html" + path, {}, function (err, data) {
+  } else if (filename.endsWith(".html")) {
+    fs.readFile("html" + path.normalize(filename), {}, function (err, data) {
       res.setHeader("Content-Type", "text/html");
       res.writeHead(200);
       res.end(data);
     });
-  }
-  if (path.endsWith(".js")) {
-    fs.readFile("dist" + path, {}, function (err, data) {
+  } else if (filename.endsWith(".js")) {
+    fs.readFile("dist" + path.normalize(filename), {}, function (err, data) {
       res.setHeader("Content-Type", "text/javascript");
       res.writeHead(200);
       res.end(data);
     });
-  }
-  if (path.endsWith(".png")) {
-    fs.readFile("img" + path, {}, function (err, data) {
+  } else if (filename.endsWith(".png")) {
+    fs.readFile("img" + path.normalize(filename), {}, function (err, data) {
       res.setHeader("Content-Type", "image/png");
       res.writeHead(200);
       res.end(data);
     });
-  }
-  if (path.endsWith(".jpeg")) {
-    fs.readFile("img" + path, {}, function (err, data) {
+  } else if (filename.endsWith(".jpeg")) {
+    fs.readFile("img" + path.normalize(filename), {}, function (err, data) {
       res.setHeader("Content-Type", "image/jpeg");
       res.writeHead(200);
       res.end(data);
     });
+  } else {
+    res.setHeader("Content-Type", "text/plain");
+    res.writeHead(404);
+    res.end();
   }
 }
 
@@ -105,9 +109,13 @@ function initWebSocketServer() {
 
 function assembleBoard(boardId) {
   const board = {};
-  const assembly = JSON.parse(fs.readFileSync("boards/" + boardId + ".json"));
+  const assembly = JSON.parse(
+    fs.readFileSync("boards/" + path.normalize(boardId) + ".json")
+  );
   for (const partName of assembly) {
-    const part = JSON.parse(fs.readFileSync("boards/" + partName + ".json"));
+    const part = JSON.parse(
+      fs.readFileSync("boards/" + path.normalize(partName) + ".json")
+    );
     for (const [trait, props] of Object.entries(part)) {
       if (board.hasOwnProperty(trait) === false) {
         board[trait] = {};
@@ -243,15 +251,15 @@ function unionLastWriterWins(state1, state2) {
 }
 
 function parseUrl(url) {
-  let path = null;
+  let filename = null;
   let parameters = {};
 
   const pathQuery = url.split("?");
 
   if (pathQuery.length === 1) {
-    path = pathQuery[0];
+    filename = pathQuery[0];
   } else {
-    path = pathQuery[0];
+    filename = pathQuery[0];
     const parts = pathQuery[1].split("&");
 
     for (const p of parts) {
@@ -264,7 +272,7 @@ function parseUrl(url) {
     }
   }
 
-  return [path, parameters];
+  return [filename, parameters];
 }
 
 function randomId(n) {
