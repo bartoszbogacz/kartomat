@@ -32,6 +32,9 @@ licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1)
 
 # Issues
 
+- History is being spammed with current url parameters. No
+  need for push state on every tick.
+
 - Clients are identified by playerId which two clients may share.
   In that case the provisions for the lock-out do not work and
   textarea are not updated. Basic aynchronization should not be
@@ -58,7 +61,17 @@ Or invoke with ´tsc.cmd´ or with ´npx tsc´
 Make sure a tsconfig.json is present that does not include build outputs,
 then restart VSCode
 
-# TODO
+# Getting-acquainted Tasks
+
+- Show number of cards on a deck as a number below the control elements
+
+- Show actual running games in the index.html instead of the hard-coded ones
+
+- Admin dashboard with log of boards being loaded, games being opened,
+  players joining, and performance metrics such as time to broadcast
+  all changes for each game
+
+# Tasks
 
 - A board editor
 
