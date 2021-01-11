@@ -216,7 +216,7 @@ function handleServerMessage(msg: any) {
 
   if (
     parameters.hasOwnProperty("board") === false ||
-    parameters.board === _computed.boardId
+    parameters.board !== _computed.boardId
   ) {
     history.pushState(
       {},
