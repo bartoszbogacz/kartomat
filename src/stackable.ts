@@ -53,7 +53,7 @@ function stackablesTake(
     local.locatables[itemId].ownedBy = computed.playerId;
     local.locatables[itemId].x = computed.locations[itemId].x;
     local.locatables[itemId].y = computed.locations[itemId].y;
-    local.locatables[itemId].z = locatableOnTopZ(computed.locations) + 1;
+    local.locatables[itemId].z = locatablesTopZ(computed.locations) + 1;
   }
 }
 

@@ -32,9 +32,6 @@ licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1)
 
 # Issues
 
-- History is being spammed with current url parameters. No
-  need for push state on every tick.
-
 - Clients are identified by playerId which two clients may share.
   In that case the provisions for the lock-out do not work and
   textarea are not updated. Basic aynchronization should not be
@@ -71,9 +68,11 @@ then restart VSCode
   players joining, and performance metrics such as time to broadcast
   all changes for each game
 
-# Tasks
+# Work in progress
 
 - A board editor
+
+# Tasks
 
 - Create and configure boards as HTML files with client.js
   supplying the functionality.

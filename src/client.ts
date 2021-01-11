@@ -34,6 +34,7 @@ interface Drag {
   wasOutside: boolean;
 }
 
+let _currentlyEditing: boolean = false;
 let _drag: Drag | null = null;
 let _websocket: any = null;
 
@@ -72,21 +73,48 @@ let _computed: ComputedState = {
 };
 
 function initDocumentControls() {
-  const elem = document.createElement("div");
-  elem.style.position = "absolute";
-  elem.style.left = "800px";
-  elem.style.top = "30px";
-  elem.style.border = "2px solid crimson";
-  elem.style.borderRadius = "0.3em";
-  elem.style.padding = "0.3em";
-  elem.style.userSelect = "none";
-  elem.innerHTML = "Reload game";
-  elem.onclick = function () {
+  const reloadButton = document.createElement("div");
+  reloadButton.style.position = "absolute";
+  reloadButton.style.left = "800px";
+  reloadButton.style.top = "30px";
+  reloadButton.style.border = "2px solid crimson";
+  reloadButton.style.borderRadius = "0.3em";
+  reloadButton.style.padding = "0.3em";
+  reloadButton.style.userSelect = "none";
+  reloadButton.innerHTML = "Reload Board";
+  reloadButton.onclick = function () {
     const httpRequest = new XMLHttpRequest();
     httpRequest.open("PUT", "/reload?game=" + _computed.gameId, true);
     httpRequest.send();
   };
-  document.body.appendChild(elem);
+  document.body.appendChild(reloadButton);
+
+  const editButton = document.createElement("div");
+  editButton.style.position = "absolute";
+  editButton.style.left = "800px";
+  editButton.style.top = "70px";
+  editButton.style.border = "2px solid crimson";
+  editButton.style.borderRadius = "0.3em";
+  editButton.style.padding = "0.3em";
+  editButton.style.userSelect = "none";
+  editButton.innerHTML = "Edit Board";
+  editButton.onclick = function () {
+    _currentlyEditing = !_currentlyEditing;
+  };
+  document.body.appendChild(editButton);
+
+  /*
+  There is only one place where we use .preventDefault()
+  and it is not strictly necessary. If we can do without
+  we may use passive event listeners that do not block
+  the browser and may be executed concurrently with
+  DOM rendering. 
+  
+  https://developers.google.com/web/updates/2016/06/
+  passive-event-listeners
+
+  Remove the code below. Move the above note to
+  one of the new handlers.
 
   document.addEventListener("mousemove", onMouseMove, {
     passive: false,
@@ -103,7 +131,7 @@ function initDocumentControls() {
   document.addEventListener("touchend", onMouseUp, {
     passive: false,
     capture: true,
-  });
+  }); */
 }
 
 function initWebSocketClient() {
@@ -254,9 +282,13 @@ function render() {
   writeablesRender(_localGame, _computed);
   avatarsRender(_localGame, _computed);
   visualsRender(_localGame, _computed);
+
+  locatablesRenderEditControls(_localGame, _computed, _currentlyEditing);
 }
 
 function onClick(event: MouseEvent) {
+  // Deprected interface using ids.
+  // TODO: Replace Id based interface with lambda based below
   if (_localGame === null || event.target === null) {
     return;
   }
@@ -269,6 +301,8 @@ function onClick(event: MouseEvent) {
 }
 
 function onKeyUp(event: KeyboardEvent) {
+  // Deprected interface using ids.
+  // TODO: Replace Id based interface with lambda based below
   if (_localGame === null || event.target === null) {
     return;
   }
@@ -282,9 +316,13 @@ function onKeyUp(event: KeyboardEvent) {
 }
 
 function onMouseDown(event: Event) {
+  // Deprected interface using ids.
+  // TODO: Replace Id based interface with lambda based below
+
   // Using preventDefault here precludes textareas working on
   // mobile. Since we only want to prevent selection and dragging
   // of elements, preventDefault on mouseMove is enough.
+  // TODO: Alo add note on passive event listeners.
 
   if (_localGame === null || event.target === null) {
     return;
@@ -312,10 +350,15 @@ function onMouseDown(event: Event) {
   draggablesTake(_localGame, _computed, thingId);
   stackablesTake(_localGame, _computed, thingId);
 
+  document.onmousemove = onMouseMove;
+  document.onmouseup = onMouseUp;
   window.requestAnimationFrame(render);
 }
 
 function onMouseMove(event: Event) {
+  // Deprected interface using ids.
+  // TODO: Replace Id based interface with lambda based below
+
   event.preventDefault();
 
   if (_localGame === null) {
@@ -349,6 +392,9 @@ function onMouseMove(event: Event) {
 }
 
 function onMouseUp(event: Event) {
+  // Deprected interface using ids.
+  // TODO: Replace Id based interface with lambda based below
+
   if (_drag === null || _localGame === null) {
     return;
   }
@@ -360,8 +406,114 @@ function onMouseUp(event: Event) {
   turnablesPlace(_localGame, _computed, thingId, _drag.wasOutside);
 
   _drag = null;
-
+  document.onmousemove = null;
+  document.onmouseup = null;
   window.requestAnimationFrame(render);
+}
+
+/** New interface for dragging and dropping not relying on element ids.
+ *
+ * With multiple elements per game object and additionally multiple
+ * edit controls per trait the amount of Id mangling to be performed
+ * is not sustainable.
+ */
+function dragAndDrop(
+  fnTake: (a: GameState, b: ComputedState, itemId: string) => void,
+  fnMove: (
+    a: GameState,
+    b: ComputedState,
+    itemId: string,
+    x: number,
+    y: number
+  ) => void,
+  fnPlace: (
+    a: GameState,
+    b: ComputedState,
+    itemId: string,
+    wasOutside: boolean
+  ) => void,
+  itemId: string
+) {
+  let _drag: Drag | null = null;
+
+  function onMouseDown(event: Event) {
+    // Using preventDefault here precludes textareas working on
+    // mobile. Since we only want to prevent selection and dragging
+    // of elements, preventDefault on mouseMove is enough.
+
+    if (_localGame === null || event.target === null) {
+      return;
+    }
+
+    const touch = event.type === "touchstart";
+    const clientY = touch
+      ? (event as TouchEvent).touches[0].clientY
+      : (event as MouseEvent).clientY;
+    const clientX = touch
+      ? (event as TouchEvent).touches[0].clientX
+      : (event as MouseEvent).clientX;
+
+    _drag = {
+      target: event.target as HTMLElement,
+      y: (event.target as HTMLElement).offsetTop,
+      x: (event.target as HTMLElement).offsetLeft,
+      startY: clientY,
+      startX: clientX,
+      wasOutside: false,
+    };
+
+    fnTake(_localGame, _computed, itemId);
+
+    document.onmousemove = onMouseMove;
+    document.onmouseup = onMouseUp;
+    window.requestAnimationFrame(render);
+  }
+
+  function onMouseMove(event: Event) {
+    event.preventDefault();
+
+    if (_localGame === null) {
+      return;
+    }
+
+    const touch = event.type === "touchmove";
+    const clientY = touch
+      ? (event as TouchEvent).touches[0].clientY
+      : (event as MouseEvent).clientY;
+    const clientX = touch
+      ? (event as TouchEvent).touches[0].clientX
+      : (event as MouseEvent).clientX;
+
+    if (_drag === null) {
+      return;
+    }
+
+    const y = _drag.y - _drag.startY + clientY;
+    const x = _drag.x - _drag.startX + clientX;
+    const isOutside =
+      Math.abs(_drag.startY - clientY) + Math.abs(_drag.startX - clientX) > 50;
+
+    _drag.wasOutside = _drag.wasOutside || isOutside;
+
+    fnMove(_localGame, _computed, itemId, x, y);
+
+    window.requestAnimationFrame(render);
+  }
+
+  function onMouseUp(event: Event) {
+    if (_drag === null || _localGame === null) {
+      return;
+    }
+
+    fnPlace(_localGame, _computed, itemId, _drag.wasOutside);
+
+    _drag = null;
+    document.onmousemove = null;
+    document.onmouseup = null;
+    window.requestAnimationFrame(render);
+  }
+
+  return onMouseDown;
 }
 
 /** Union two LWWMaps returning a copy of the superset.

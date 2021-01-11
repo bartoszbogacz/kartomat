@@ -11,7 +11,6 @@ const wsPort = 8080;
 let _wsServer = null;
 let _httpServer = null;
 let _runningGames = {};
-let _countClientsSeen = 0;
 
 function initHTTPServer() {
   // HTTP Server mostly based on:
