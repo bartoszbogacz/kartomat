@@ -117,11 +117,13 @@ function initDocumentControls() {
 
   // Register handler for adding items in edit mode
   document.body.oncontextmenu = function (event: MouseEvent) {
-    event.preventDefault();
-    addControlMenu.style.left = event.clientX + "px";
-    addControlMenu.style.top = event.clientY + "px";
-    addControlMenu.style.zIndex = "1000";
-    addControlMenu.style.visibility = "visible";
+    if (_currentlyEditing === true) {
+      event.preventDefault();
+      addControlMenu.style.left = event.clientX + "px";
+      addControlMenu.style.top = event.clientY + "px";
+      addControlMenu.style.zIndex = "1000";
+      addControlMenu.style.visibility = "visible";
+    }
   };
 
   document.addEventListener("mousedown", function (event: MouseEvent) {
