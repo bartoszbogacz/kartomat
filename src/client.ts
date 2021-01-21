@@ -82,6 +82,8 @@ function initDocumentControls() {
   reloadButton.style.padding = "0.3em";
   reloadButton.style.userSelect = "none";
   reloadButton.innerHTML = "Reload Board";
+
+  // Register handler for RELOAD GAME button
   reloadButton.onclick = function () {
     const httpRequest = new XMLHttpRequest();
     httpRequest.open("PUT", "/reload?game=" + _computed.gameId, true);
@@ -98,23 +100,48 @@ function initDocumentControls() {
   editButton.style.padding = "0.3em";
   editButton.style.userSelect = "none";
   editButton.innerHTML = "Edit Board";
+
+  // Register handler for EDIT GAME button
   editButton.onclick = function () {
     _currentlyEditing = !_currentlyEditing;
   };
   document.body.appendChild(editButton);
 
+  const addControlMenu = document.createElement("div");
+  addControlMenu.style.position = "absolute";
+  addControlMenu.style.visibility = "hidden";
+  addControlMenu.style.border = "1px solid black";
+  addControlMenu.style.userSelect = "none";
+  addControlMenu.innerHTML = "Card<br>Marble<br>Board<br>PlayerTag";
+  document.body.appendChild(addControlMenu);
+
+  // Register handler for adding items in edit mode
+  document.body.oncontextmenu = function (event: MouseEvent) {
+    event.preventDefault();
+    addControlMenu.style.left = event.clientX + "px";
+    addControlMenu.style.top = event.clientY + "px";
+    addControlMenu.style.zIndex = "1000";
+    addControlMenu.style.visibility = "visible";
+  };
+
+  document.addEventListener("mousedown", function (event: MouseEvent) {
+    if (event.button !== 2) {
+      addControlMenu.style.visibility = "hidden";
+    }
+  });
+
   /*
-  There is only one place where we use .preventDefault()
-  and it is not strictly necessary. If we can do without
-  we may use passive event listeners that do not block
-  the browser and may be executed concurrently with
+  There is only one place where we use .preventDefault() on
+  mouse up/down/move and it is not strictly necessary. If we
+  can do without we may use passive event listeners that do 
+  not block the browser and may be executed concurrently with
   DOM rendering. 
   
   https://developers.google.com/web/updates/2016/06/
   passive-event-listeners
 
-  Remove the code below. Move the above note to
-  one of the new handlers.
+  Remove the code below. Move the above note to one of the new 
+  handlers.
 
   document.addEventListener("mousemove", onMouseMove, {
     passive: false,
