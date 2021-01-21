@@ -79,6 +79,12 @@ then restart VSCode
 
 - An game editor
 
+- Implement all interactions (reload, edit, add) as context menu.
+  It does not need to taken into account when designing boards.
+
+- All items on the same layer should not overlap each other but each
+  other around. Physics geometry need to match actual geometry.
+
 - Move remaining TODOs from Spielunke over here
 
 - Show player.text instead of playerID when dragging
