@@ -55,6 +55,10 @@ Or invoke with ´tsc.cmd´ or with ´npx tsc´
 Make sure a tsconfig.json is present that does not include build outputs,
 then restart VSCode
 
+# Do as next item
+
+- Create a card when choosing the card item in context menu
+
 # Getting-acquainted Tasks
 
 - Show number of cards on a deck as a number below the control elements
@@ -65,14 +69,11 @@ then restart VSCode
   players joining, and performance metrics such as time to broadcast
   all changes for each game
 
-# Work in progress
-
-- A board editor
-
 # Tasks
 
-- Create and configure boards as HTML files with client.js
-  supplying the functionality.
+- An game editor
+
+- Move remaining TODOs from Spielunke over here
 
 - Show player.text instead of playerID when dragging
 
@@ -82,20 +83,22 @@ then restart VSCode
   getting a short highlight of the player color.
   Instead of the current playerID tag.
 
-- Ability to remove elements from the editor
-
 - A Wizard game board
 
 - A Tichu game board
 
-- Send only deltas of game state from server.
+- Send only deltas of game state from server
 
-- Transform only necessary changes
+- Re-compute game state only for changed CRDT items
 
-- Transform DOM elements using transform
+- Transform DOM elements using transform3D in CSS
+  This significantly faster as no DOM re-layout is triggered
 
 - Record player.text in localStorage and set it automatically
   on joining a game
+
+- Ability to remove elements from the editor
+  Requires tombstones in CRDT.
 
 # Bibliography
 
