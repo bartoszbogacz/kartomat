@@ -85,6 +85,10 @@ then restart VSCode
 - All items on the same layer should not overlap each other but each
   other around. Physics geometry need to match actual geometry.
 
+- Save game with randomly generated id. Modify synchronized
+  playerTag like boardTag that contains randomID and game name.
+  Offer these game names on the join screen.
+
 - Move remaining TODOs from Spielunke over here
 
 - Show player.text instead of playerID when dragging
