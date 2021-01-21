@@ -42,7 +42,7 @@ licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1)
   or two slots in either direction turns it since it was never
   outside its turning radius. Only turn cards not on stacks?
 
-# External
+# FAQ
 
 - tsc will not start without modifying PowerShell execution policy
 
@@ -55,11 +55,13 @@ Or invoke with ´tsc.cmd´ or with ´npx tsc´
 Make sure a tsconfig.json is present that does not include build outputs,
 then restart VSCode
 
-# Do as next item
+# Do Next
 
 - Create a card when choosing the card item in context menu
 
-# Getting-acquainted Tasks
+- Create turnable edit control elements
+
+# Getting acquainted
 
 - Show number of cards on a deck as a number below the control elements
 

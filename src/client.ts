@@ -117,17 +117,11 @@ function initDocumentControls() {
   addCards.style.padding = "1em";
   addCards.style.userSelect = "none";
   addCards.innerHTML = "Cards";
-  addCards.addEventListener("click", function (event: MouseEvent) {
-    //
-  });
 
   const addMarble = document.createElement("div");
   addMarble.style.padding = "1em";
   addMarble.style.userSelect = "none";
   addMarble.innerHTML = "Marble";
-  addMarble.addEventListener("click", function (event: MouseEvent) {
-    //
-  });
 
   addControlMenu.appendChild(addCards);
   addControlMenu.appendChild(addMarble);
@@ -144,9 +138,36 @@ function initDocumentControls() {
     }
   };
 
-  document.addEventListener("mousedown", function (event: MouseEvent) {
-    if (event.button !== 2) {
-      addControlMenu.style.visibility = "hidden";
+  document.addEventListener("click", function (event: MouseEvent) {
+    addControlMenu.style.visibility = "hidden";
+
+    if (event.target === addMarble) {
+      for (let i = 0; i < 100; i++) {
+        const itemId = "Marble" + i;
+        if (_localGame.locatables.hasOwnProperty(itemId) === false) {
+          _localGame.locatables[itemId] = {
+            tick: _computed.tick,
+            ownedBy: _computed.playerId,
+            x: event.clientX,
+            y: event.clientY,
+            w: 20,
+            h: 20,
+            z: 0,
+            l: 2,
+          };
+          _localGame.draggables[itemId] = {
+            tick: _computed.tick,
+            ownedBy: _computed.playerId,
+          };
+          _localGame.visuals[itemId] = {
+            tick: _computed.tick,
+            ownedBy: _computed.playerId,
+            cssClass: "DodgerblueMarble",
+          };
+          return;
+        }
+      }
+      // Cannot add marble. All tested ids are in use.
     }
   });
 

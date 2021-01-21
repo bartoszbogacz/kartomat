@@ -298,122 +298,122 @@
   "visuals": {
     "board": { "tick": 0, "ownedBy": null, "cssClass": "Board" },
     "marble1": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "DodgerblueMarble"
     },
     "marble2": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "DodgerblueMarble"
     },
     "marble3": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "DodgerblueMarble"
     },
     "marble4": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "DodgerblueMarble"
     },
     "marble5": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "ForestgreenMarble"
     },
     "marble6": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "ForestgreenMarble"
     },
     "marble7": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "ForestgreenMarble"
     },
     "marble8": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "ForestgreenMarble"
     },
     "marble9": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "DimgrayMarble"
     },
     "marble10": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "DimgrayMarble"
     },
     "marble11": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "DimgrayMarble"
     },
     "marble12": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "DimgrayMarble"
     },
     "marble13": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "GoldMarble"
     },
     "marble14": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "GoldMarble"
     },
     "marble15": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "GoldMarble"
     },
     "marble16": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "GoldMarble"
     },
     "marble17": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "CrimsonMarble"
     },
     "marble18": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "CrimsonMarble"
     },
     "marble19": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "CrimsonMarble"
     },
     "marble20": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "CrimsonMarble"
     },
     "marble21": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "SnowMarble"
     },
     "marble22": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "SnowMarble"
     },
     "marble23": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "SnowMarble"
     },
     "marble24": {
-      "upToTick": 0,
+      "tick": 0,
       "ownedBy": null,
       "cssClass": "SnowMarble"
     }
