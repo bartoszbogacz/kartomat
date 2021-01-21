@@ -37,9 +37,6 @@ licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1)
   textarea are not updated. Basic aynchronization should not be
   affected though.
 
-- Cards move some pixels below private area before being switched
-  above it. These transitions should not be noticable.
-
 - Grabbing a card to turn it also moves it left on stack since
   there is left bias implemented. Also moving a card only one
   or two slots in either direction turns it since it was never

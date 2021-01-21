@@ -71,9 +71,6 @@ function overlapsAnyDivider(
   if (computed.locations === null) {
     throw new Error("Locations not yet computed.");
   }
-  // FIXME: Items go slightly into private area before actually being on top
-  // of it.
-
   for (const [dividerId, divider] of Object.entries(local.dividers)) {
     if (
       overlapMuch(computed.locations[itemId], computed.locations[dividerId]) > 0

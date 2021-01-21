@@ -54,7 +54,7 @@ function locatablesRender(local: GameState, computed: ComputedState) {
 
 function overlapMuch(a: LocatableItem, b: LocatableItem) {
   const h = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
-  const v = Math.min(a.y + a.w, b.y + b.h) - Math.max(a.y, b.y);
+  const v = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
   return Math.max(0, h) * Math.max(0, v);
 }
 
