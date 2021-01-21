@@ -112,7 +112,25 @@ function initDocumentControls() {
   addControlMenu.style.visibility = "hidden";
   addControlMenu.style.border = "1px solid black";
   addControlMenu.style.userSelect = "none";
-  addControlMenu.innerHTML = "Card<br>Marble<br>Board<br>PlayerTag";
+
+  const addCards = document.createElement("div");
+  addCards.style.padding = "1em";
+  addCards.style.userSelect = "none";
+  addCards.innerHTML = "Cards";
+  addCards.addEventListener("click", function (event: MouseEvent) {
+    //
+  });
+
+  const addMarble = document.createElement("div");
+  addMarble.style.padding = "1em";
+  addMarble.style.userSelect = "none";
+  addMarble.innerHTML = "Marble";
+  addMarble.addEventListener("click", function (event: MouseEvent) {
+    //
+  });
+
+  addControlMenu.appendChild(addCards);
+  addControlMenu.appendChild(addMarble);
   document.body.appendChild(addControlMenu);
 
   // Register handler for adding items in edit mode
