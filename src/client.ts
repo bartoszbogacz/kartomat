@@ -168,8 +168,9 @@ function sendClientMessage() {
     changes[trait] = {};
     for (const [iid, item] of Object.entries(items)) {
       if (
+        _remoteGame[trait as keyof GameState].hasOwnProperty(iid) === false ||
         (item as Synchronized).tick >
-        _remoteGame[trait as keyof GameState][iid].tick
+          _remoteGame[trait as keyof GameState][iid].tick
       ) {
         changes[trait][iid] = item as Synchronized;
       }

@@ -123,7 +123,7 @@ function locatablesRenderEditControls(
       document.body.appendChild(editSize);
     }
 
-    if (doEdit === true) {
+    if (doEdit === true && local.stackables.hasOwnProperty(itemId) === false) {
       editMove.style.left = loc.x - 10 + "px";
       editMove.style.top = loc.y - 10 + "px";
       editMove.style.zIndex = (loc.z + 1).toString();
@@ -132,7 +132,7 @@ function locatablesRenderEditControls(
       editMove.style.visibility = "hidden";
     }
 
-    if (doEdit === true) {
+    if (doEdit === true && local.stackables.hasOwnProperty(itemId) === false) {
       editSize.style.left = loc.x + loc.w + "px";
       editSize.style.top = loc.y + loc.h + "px";
       editSize.style.zIndex = (loc.z + 1).toString();

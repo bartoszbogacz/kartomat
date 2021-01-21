@@ -10,6 +10,10 @@ function dividersCompute(local: GameState, computed: ComputedState) {
   const groups: { [key: number]: string[] } = {};
 
   for (const [key, loc] of Object.entries(local.locatables)) {
+    if (local.dividers.hasOwnProperty(key)) {
+      // Do not manage dividers in groups themselves
+      continue;
+    }
     if (groups.hasOwnProperty(loc.l)) {
       groups[loc.l].push(key);
     } else {
