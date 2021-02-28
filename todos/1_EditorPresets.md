@@ -1,3 +1,3 @@
 # Editor Presets
 
-A deck of Rummy Cards.
+- [ ] A deck of Rummy Cards.
