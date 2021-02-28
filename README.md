@@ -5,6 +5,15 @@ A collaborative playing table for board games.
 Largely based on Spielunke with original idea by Julia Portl and
 initial implementation by Julia Portl, Ole Johannson, and Bartosz Bogacz.
 
+# License
+
+[BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) for source code
+and [CC0](https://creativecommons.org/publicdomain/zero/1.0/) for assets.
+
+Modified [svg-cards](http://svg-cards.sourceforge.net/)
+originally by [David Bellot](http://david.bellot.free.fr/)
+licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1).
+
 # Getting started
 
 Unless you already did, enter the directory at top level
@@ -14,6 +23,12 @@ Unless you already did, enter the directory at top level
 Compile client Typescript into Javascript. Build output is
 put into ´dist/´.
 
+Typescript compiler `tsc` will refurse to start without modifying PowerShell execution policy
+
+See: [NPM Issue 470](https://github.com/npm/cli/issues/470)
+
+Invoke with ´tsc.cmd´ or with ´npx tsc´
+
 > npx tsc
 
 Run the server which currently is still written
@@ -21,100 +36,8 @@ in Javascript.
 
 > node src/server.js
 
-# Licenses
-
-BSD-3-Clause
-
-Modified [svg-cards](http://svg-cards.sourceforge.net/)
-licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1),
-originally by [David Bellot](http://david.bellot.free.fr/)
-licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1)
-
-# Issues
-
-- Clients are identified by playerId which two clients may share.
-  In that case the provisions for the lock-out do not work and
-  textarea are not updated. Basic aynchronization should not be
-  affected though.
-
-- Grabbing a card to turn it also moves it left on stack since
-  there is left bias implemented. Also moving a card only one
-  or two slots in either direction turns it since it was never
-  outside its turning radius. Only turn cards not on stacks?
-
-# FAQ
-
-- tsc will not start without modifying PowerShell execution policy
-
-See: [NPM Issue 470](https://github.com/npm/cli/issues/470)
-
-Or invoke with ´tsc.cmd´ or with ´npx tsc´
-
-- VSCode complains about duplicated functions
-
-Make sure a tsconfig.json is present that does not include build outputs,
-then restart VSCode
-
-# Do Next
-
-- Create a card when choosing the card item in context menu
-
-- Create turnable edit control elements
-
-# Getting acquainted
-
-- Show number of cards on a deck as a number below the control elements
-
-- Show actual running games in the index.html instead of the hard-coded ones
-
-- Admin dashboard with log of boards being loaded, games being opened,
-  players joining, and performance metrics such as time to broadcast
-  all changes for each game
-
-- Move all hardcoded CSS into client.css. Implement state switching as
-  CSS classes instead of hard-coded style setting. Will reduce code size
-  quite a bit.
-
-# Tasks
-
-- An game editor
-
-- Implement all interactions (reload, edit, add) as context menu.
-  It does not need to taken into account when designing boards.
-
-- All items on the same layer should not overlap each other but each
-  other around. Physics geometry need to match actual geometry.
-
-- Save game with randomly generated id. Modify synchronized
-  playerTag like boardTag that contains randomID and game name.
-  Offer these game names on the join screen.
-
-- Move remaining TODOs from Spielunke over here
-
-- Show player.text instead of playerID when dragging
-
-- Player Avatars that can be dragged
-
-- Players having (persistent) colors and elements
-  getting a short highlight of the player color.
-  Instead of the current playerID tag.
-
-- A Wizard game board
-
-- A Tichu game board
-
-- Send only deltas of game state from server
-
-- Re-compute game state only for changed CRDT items
-
-- Transform DOM elements using transform3D in CSS
-  This significantly faster as no DOM re-layout is triggered
-
-- Record player.text in localStorage and set it automatically
-  on joining a game
-
-- Ability to remove elements from the editor
-  Requires tombstones in CRDT.
+If VSCode complains about duplicated functions make sure a tsconfig.json
+is present that does not include build outputs, then restart VSCode
 
 # Bibliography
 
