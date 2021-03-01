@@ -3,6 +3,11 @@ interface Synchronized {
   ownedBy: string | null;
 }
 
+// Defintion of shared GameState between clients.
+// The server is agnostic wrt. properties in GameState.
+// That is adding and removing properties here does
+// not require adjusting the server.
+
 interface GameState {
   locatables: { [key: string]: LocatableItem };
   draggables: { [key: string]: DraggableItem };
