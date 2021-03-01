@@ -1,4 +1,4 @@
-# Refactor Turnable and Visual
+# Refactor Locatable, Turnable and Visual
 
 Currently `Locatable` provides properties `x, y, w, h, z, l` with functions
 `overlapMuch`, `locatablesTopZ`, and also a `render` which places and resizes
@@ -59,9 +59,9 @@ In `locatable.ts` in `function locatablesRender` implement
 - move setting `cssClass` from during DOM element creation
   to during rendering, as the cssClass might change during
   turning. Also remember too keep base class `LocatableItem`.
-- setting correct side during rendering, c.f.
 
-  elem.style.backgroundImage = "url(" + trn.sides[trn.current] + ")";
+- setting correct side during rendering, c.f.
+  `elem.style.backgroundImage = "url(" + trn.sides[trn.current] + ")";`
 
 - turning by responding to placement, c.f.
   `function turnablesPlace` and `function turnablesTurn`. Note that
