@@ -91,7 +91,7 @@ The colors for the marbles are as ordered above are:
 
 The dog board is `"boards/dog.png"`.
 
-# Dog for 8 people
+## Dog for 8 people
 
 The positions of marbles are:
 
