@@ -51,13 +51,13 @@ In `locatable.ts` change `interface Locatable` by adding
 
     images: string[];
     colors: string[];
-    cssClass: string[];
+    cssClasses: string[];
     current: number[];
 
 In `locatable.ts` in `function locatablesRender` implement
 
-- move setting `cssClass` from during DOM element creation
-  to during rendering, as the cssClass might change during
+- move setting `cssClasses` from during DOM element creation
+  to during rendering, as the cssClasses might change during
   turning. Also remember too keep base class `LocatableItem`.
 
 - setting correct side during rendering, c.f.
@@ -72,3 +72,67 @@ Modify `function stackingsTouch` in `stacking.ts` to use new functions
 you implemented in `locatable.ts`.
 
 Remove files `visual.ts` and `turnable.ts`.
+
+At this point, the board definition files will no longer load.
+Modify `DogAndMarbles.json`, `RummyAndPrivateArea.json`, and
+`Avatars6.json` to new specifiction of components. The component
+`Locatable` should contain exactly:
+
+    "locatables": {
+        "board": {
+            "tick": 0,
+            "ownedBy": null,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "l": 0,
+            "w": 770,
+            "h": 770
+            "images": ["boards/dog.jpeg"],
+            "colors": ["white"],
+            "cssClass": ["Board"],
+            "current": 0
+        },
+        "marble1": {
+            "tick": 0,
+            "ownedBy": null,
+            "y": 62,
+            "x": 418,
+            "h": 20,
+            "w": 20,
+            "z": 0,
+            "l": 2
+            "images": [""],
+            "colors": ["Crimson"],
+            "cssClasses": ["Marble"],
+            "current": 0
+        },
+
+Marbles will only be part of `Locatable` and `Draggable`.
+
+    "draggables": {
+        "marble1": { "tick": 0, "ownedBy": null },
+        ...
+
+Cards will be part of `Locatable`, `Draggable`, and `Stackable`.
+
+    "locatables": {
+        "card1": {
+            "tick": 0,
+            "ownedBy": null,
+            "x": 1,
+            "y": 0,
+            "z": 0,
+            "l": 1,
+            "w": 100,
+            "h": 150,
+            "images": ["rummy/club_1.png", "rummy/back_blue.png"],
+            "colors": ["white"],
+            "cssClasses": ["Card"],
+            "current": 0
+
+    "draggables": {
+        "card1": { "tick": 0, "ownedBy": null },
+
+    "stackables": {
+        "card1": { "tick": 0, "ownedBy": null, "onStacking": "stacking1" },

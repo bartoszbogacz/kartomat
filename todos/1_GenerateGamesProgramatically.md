@@ -18,11 +18,77 @@ these properties to a game when it is loaded.
 As this task only creates games, instead of saving them, hydration is
 used here only for automatically generated games.
 
+## Stackables and Stackings
+
+A fixed amount of ready to use and invisible stackings need to
+provided automatically. Unstacked cards that are being stacked
+take an empty stackings as their new stacking object which must
+already exist.
+
+The face images of cards are:
+
+    ["rummy/club_1.png", "rummy/back_blue.png"]
+    ["rummy/club_2.png", "rummy/back_blue.png"]
+    ["rummy/club_3.png", "rummy/back_blue.png"]
+    ["rummy/club_4.png", "rummy/back_blue.png"]
+    ["rummy/club_5.png", "rummy/back_blue.png"]
+    ["rummy/club_6.png", "rummy/back_blue.png"]
+    ["rummy/club_7.png", "rummy/back_blue.png"]
+    ["rummy/club_8.png", "rummy/back_blue.png"]
+    ["rummy/club_9.png", "rummy/back_blue.png"]
+    ["rummy/club_10.png", "rummy/back_blue.png"]
+    ["rummy/club_jack.png", "rummy/back_blue.png"]
+    ["rummy/club_queen.png", "rummy/back_blue.png"]
+    ["rummy/club_king.png", "rummy/back_blue.png"]
+    ["rummy/diamond_1.png", "rummy/back_blue.png"]
+    ["rummy/diamond_2.png", "rummy/back_blue.png"]
+    ["rummy/diamond_3.png", "rummy/back_blue.png"]
+    ["rummy/diamond_4.png", "rummy/back_blue.png"]
+    ["rummy/diamond_5.png", "rummy/back_blue.png"]
+    ["rummy/diamond_6.png", "rummy/back_blue.png"]
+    ["rummy/diamond_7.png", "rummy/back_blue.png"]
+    ["rummy/diamond_8.png", "rummy/back_blue.png"]
+    ["rummy/diamond_9.png", "rummy/back_blue.png"]
+    ["rummy/diamond_10.png", "rummy/back_blue.png"]
+    ["rummy/diamond_jack.png", "rummy/back_blue.png"]
+    ["rummy/diamond_queen.png", "rummy/back_blue.png"]
+    ["rummy/diamond_king.png", "rummy/back_blue.png"]
+    ["rummy/heart_1.png", "rummy/back_blue.png"]
+    ["rummy/heart_2.png", "rummy/back_blue.png"]
+    ["rummy/heart_3.png", "rummy/back_blue.png"]
+    ["rummy/heart_4.png", "rummy/back_blue.png"]
+    ["rummy/heart_5.png", "rummy/back_blue.png"]
+    ["rummy/heart_6.png", "rummy/back_blue.png"]
+    ["rummy/heart_7.png", "rummy/back_blue.png"]
+    ["rummy/heart_8.png", "rummy/back_blue.png"]
+    ["rummy/heart_9.png", "rummy/back_blue.png"]
+    ["rummy/heart_10.png", "rummy/back_blue.png"]
+    ["rummy/heart_jack.png", "rummy/back_blue.png"]
+    ["rummy/heart_queen.png", "rummy/back_blue.png"]
+    ["rummy/heart_king.png", "rummy/back_blue.png"]
+    ["rummy/spade_1.png", "rummy/back_blue.png"]
+    ["rummy/spade_2.png", "rummy/back_blue.png"]
+    ["rummy/spade_3.png", "rummy/back_blue.png"]
+    ["rummy/spade_4.png", "rummy/back_blue.png"]
+    ["rummy/spade_5.png", "rummy/back_blue.png"]
+    ["rummy/spade_6.png", "rummy/back_blue.png"]
+    ["rummy/spade_7.png", "rummy/back_blue.png"]
+    ["rummy/spade_8.png", "rummy/back_blue.png"]
+    ["rummy/spade_9.png", "rummy/back_blue.png"]
+    ["rummy/spade_10.png", "rummy/back_blue.png"]
+    ["rummy/spade_jack.png", "rummy/back_blue.png"]
+    ["rummy/spade_queen.png", "rummy/back_blue.png"]
+    ["rummy/spade_king.png", "rummy/back_blue.png"]
+    ["rummy/joker_red.png", "rummy/back_blue.png"]
+    ["rummy/joker_red.png", "rummy/back_blue.png"]
+    ["rummy/joker_red.png", "rummy/back_blue.png"]
+
 ## Dog for 6 people
 
 For now, all the following will be in `server.js`.
 
-Implement `deckOfRummy(x, y, fold, side)` that creates a deck of Rummy
+Implement `deckOfRummy(x, y, fold, side)` that creates a deck of Rummy,
+which is 1 stacking and 52 cards being in said stacking,
 located at `x, y` being in the folding state `fold` and all showing the
 side `side`.
 
@@ -148,67 +214,3 @@ The colors of marbles are:
     "OrangeMarble"
 
 The dog board is `"boards/dog8.png"`.
-
-## Wizard
-
-The face images of cards are:
-
-    ["rummy/club_1.png", "rummy/back_blue.png"]
-    ["rummy/club_2.png", "rummy/back_blue.png"]
-    ["rummy/club_3.png", "rummy/back_blue.png"]
-    ["rummy/club_4.png", "rummy/back_blue.png"]
-    ["rummy/club_5.png", "rummy/back_blue.png"]
-    ["rummy/club_6.png", "rummy/back_blue.png"]
-    ["rummy/club_7.png", "rummy/back_blue.png"]
-    ["rummy/club_8.png", "rummy/back_blue.png"]
-    ["rummy/club_9.png", "rummy/back_blue.png"]
-    ["rummy/club_10.png", "rummy/back_blue.png"]
-    ["rummy/club_jack.png", "rummy/back_blue.png"]
-    ["rummy/club_queen.png", "rummy/back_blue.png"]
-    ["rummy/club_king.png", "rummy/back_blue.png"]
-    ["rummy/diamond_1.png", "rummy/back_blue.png"]
-    ["rummy/diamond_2.png", "rummy/back_blue.png"]
-    ["rummy/diamond_3.png", "rummy/back_blue.png"]
-    ["rummy/diamond_4.png", "rummy/back_blue.png"]
-    ["rummy/diamond_5.png", "rummy/back_blue.png"]
-    ["rummy/diamond_6.png", "rummy/back_blue.png"]
-    ["rummy/diamond_7.png", "rummy/back_blue.png"]
-    ["rummy/diamond_8.png", "rummy/back_blue.png"]
-    ["rummy/diamond_9.png", "rummy/back_blue.png"]
-    ["rummy/diamond_10.png", "rummy/back_blue.png"]
-    ["rummy/diamond_jack.png", "rummy/back_blue.png"]
-    ["rummy/diamond_queen.png", "rummy/back_blue.png"]
-    ["rummy/diamond_king.png", "rummy/back_blue.png"]
-    ["rummy/heart_1.png", "rummy/back_blue.png"]
-    ["rummy/heart_2.png", "rummy/back_blue.png"]
-    ["rummy/heart_3.png", "rummy/back_blue.png"]
-    ["rummy/heart_4.png", "rummy/back_blue.png"]
-    ["rummy/heart_5.png", "rummy/back_blue.png"]
-    ["rummy/heart_6.png", "rummy/back_blue.png"]
-    ["rummy/heart_7.png", "rummy/back_blue.png"]
-    ["rummy/heart_8.png", "rummy/back_blue.png"]
-    ["rummy/heart_9.png", "rummy/back_blue.png"]
-    ["rummy/heart_10.png", "rummy/back_blue.png"]
-    ["rummy/heart_jack.png", "rummy/back_blue.png"]
-    ["rummy/heart_queen.png", "rummy/back_blue.png"]
-    ["rummy/heart_king.png", "rummy/back_blue.png"]
-    ["rummy/spade_1.png", "rummy/back_blue.png"]
-    ["rummy/spade_2.png", "rummy/back_blue.png"]
-    ["rummy/spade_3.png", "rummy/back_blue.png"]
-    ["rummy/spade_4.png", "rummy/back_blue.png"]
-    ["rummy/spade_5.png", "rummy/back_blue.png"]
-    ["rummy/spade_6.png", "rummy/back_blue.png"]
-    ["rummy/spade_7.png", "rummy/back_blue.png"]
-    ["rummy/spade_8.png", "rummy/back_blue.png"]
-    ["rummy/spade_9.png", "rummy/back_blue.png"]
-    ["rummy/spade_10.png", "rummy/back_blue.png"]
-    ["rummy/spade_jack.png", "rummy/back_blue.png"]
-    ["rummy/spade_queen.png", "rummy/back_blue.png"]
-    ["rummy/spade_king.png", "rummy/back_blue.png"]
-    ["rummy/joker_red.png", "rummy/back_blue.png"]
-    ["rummy/joker_red.png", "rummy/back_blue.png"]
-    ["rummy/joker_red.png", "rummy/back_blue.png"]
-
-## Tichu
-
-## Ligretto
