@@ -54,7 +54,9 @@ function stackingsRender(local: GameState, computed: ComputedState) {
     const s =
       computed.stacks.hasOwnProperty(itemId) &&
       computed.stacks[itemId].length > 1;
+
     const loc = computed.locations[itemId];
+    const sta = local.stackings[itemId];
 
     // The move element is created by locatable and styled by locatable.
     // Take a look how a stacking is defined as locatable. It contains
@@ -86,11 +88,16 @@ function stackingsRender(local: GameState, computed: ComputedState) {
       shuffle.style.visibility = "hidden";
     }
 
-    if (s === true) {
+    if (sta !== undefined && s === true) {
       fold.style.left = loc.x + "px";
       fold.style.top = loc.y + 60 + "px";
       fold.style.zIndex = loc.z.toString();
       fold.style.visibility = "visible";
+      if (sta.current === 0) {
+        fold.style.backgroundImage = 'url("controls/unfold.png")';
+      } else {
+        fold.style.backgroundImage = 'url("controls/fold.png")';
+      }
     } else {
       fold.style.visibility = "hidden";
     }
