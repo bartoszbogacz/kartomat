@@ -36,35 +36,85 @@ Also:
 Remove any `throw new Error("Locations not yet computed.");`.
 Enfore inter-component dependencies using the type system.
 
-## Approach
+## Structrue
 
-To enable dependencies _between_ components we use a multi-phase invokation.
+Classes that only contain state that is replicated among all peers.
 
-    function componentCompute(game: SynchronizedGame): DiffToComputedState
+`tickLocal` denote the last update to the element. If `tickLocal > tick`
+changes to this element need to send to peers.
 
-    function componentRender(computed: ComputedState)
+    class GameSceneReplicated { pieces }
 
-So that the data flow can be illustrated as follows:
+    class GamingPieceReplicated { tick, ownedBy, tickLocal, x, y, w, h, l, z }
 
-    computed_t <- mergeLWW(computed_t-1, receive())
+    class PlayingBoardReplicated extends GamingPieceReplicated { image }
 
-    deltaA <- computeComponent(readonly game)
-    deltaB <- computeComponent(readonly game)
-    deltaC <- computeComponent(readonly game)
+    class PlayerAvatarReplicated extends GameingPieceReplicted { text, represents }
 
-    computed_t+1 <- join(computed_t, deltaA, deltaB, deltaC)
+    class PrivateAreaReplicated extends GameingPieceReplicated { }
 
-    renderComponent(readonly computed_t+1)
-    renderComponent(readonly computed_t+1)
-    renderComponent(readonly computed_t+1)
+    class WritingSurface extends GameingPieceReplicated { text }
 
-    send(computed_t+1)
+    class MovablePieceReplicated extends GamingPieceReplicated { }
 
-Unsolved questions / cases. There is a difference in changed state
-and necessary modification between
+    class PlayingMarbleReplicated extends MovablePieceReplicated { color }
 
-    - Re-rendering of a frame where no computed state has changed
+    class PlayingCardReplicated extends MovablePieceReplicated { images, current, onStack }
 
-    - Movement of a single element that does not interact with any other
+    class PlayingDeckReplicated extends MoveablePieceReplicated { }
 
-    - Remote change of the game state
+Classes that derive properties local for each client related to visualization.
+Only leaf classes of the hierarchy of replicated classes are extended.
+Then, only properties that need deriving are shadowed. For example, all
+z values need to be re-computed since for visualization we are intersted
+in their rank and not the actual position. The same is true for the
+cards in a stack. While only their fractional index x and their stacking
+is shared, for visualization their rank on their current stacking determines
+the position of a card.
+
+`tickVisible` denotes the last rendered tick. If `tickLocal > tickVisible` the element
+needs to be re-rendered.
+
+    class GameScene extends GameSceneReplicated { pieces }
+
+    class PlayingBoard extends PlayingBoardReplicated { tickVisible, z, elem }
+
+    class PlayerAvatar extends PlayerAvatarReplicated { tickVisible, z, elem }
+
+    class PrivateArea extends PrivateAreaReplicated { tickVisible, elem, visibleToAll, visibleToSelfOnly, visisbleToOthersOnly }
+
+    class WritingSurface extends WritingSurfaceReplicated { tickVisible, z, elem }
+
+    class PlayingMarble extends PlayingMarbleReplicated { tickVisible, z, color, elem }
+
+    class PlayingCard extends PlayingCardReplicated { tickVisible, x, y, z, images, current, onStack, elem }
+
+    class PlayingDeck extends PlayingDeckReplicated { tickVisible, z, elem, cards }
+
+Additionally there is scene tree.
+
+    GameScene
+        PlayingMarble
+        WritingSurface
+        [...]
+        PrivateArea
+            visibleToAll
+                GamingPieceReplicated
+                [...]
+                PlayingCard
+                [...]
+                PlayingDeck
+                    PlayingCard
+                    [...]
+            visisbleToSelfOnly
+                [...]
+            visibleToOthersOnly
+                [...]
+
+## Information propagation
+
+    GameScene.synchronize()
+
+    GameScene.compute()
+
+    GameScene.render()
