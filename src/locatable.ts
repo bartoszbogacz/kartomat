@@ -5,6 +5,10 @@ interface LocatableItem extends Synchronized {
   l: number;
   w: number;
   h: number;
+  cssClass: string;
+  images: string[];
+  colors: string[];
+  current: number;
 }
 
 function locatablesCompute1(local: GameState, computed: ComputedState) {
@@ -20,6 +24,10 @@ function locatablesCompute1(local: GameState, computed: ComputedState) {
       l: loc.l,
       w: loc.w,
       h: loc.h,
+      images: loc.images,
+      colors: loc.colors,
+      cssClass: loc.cssClass,
+      current: loc.current,
     };
   }
 }
@@ -30,24 +38,63 @@ function locatablesRender(local: GameState, computed: ComputedState) {
   }
 
   for (const [itemId, loc] of Object.entries(computed.locations)) {
-    let elem = document.getElementById(itemId + "Locatable");
-    if (elem === null) {
-      elem = document.createElement("div");
-      elem.id = itemId + "Locatable";
-      elem.className = "Locatable";
-      elem.style.position = "absolute";
-      elem.style.userSelect = "none";
-      document.body.appendChild(elem);
+    const loc = computed.locations[itemId];
+
+    // HTML element of the Locatable object
+
+    let visualElem = document.getElementById(itemId);
+    if (visualElem === null) {
+      visualElem = document.createElement("div");
+      visualElem.className = loc.cssClass;
+      visualElem.id = itemId;
+      visualElem.style.position = "absolute";
+      visualElem.style.userSelect = "none";
+      visualElem.addEventListener("mousedown", onMouseDown, {
+        passive: false,
+        capture: true,
+      });
+      visualElem.addEventListener("touchstart", onMouseDown, {
+        passive: false,
+        capture: true,
+      });
+      document.body.appendChild(visualElem);
     }
 
-    elem.style.top = loc.y + loc.h + "px";
-    elem.style.left = loc.x + loc.w + "px";
-    elem.style.zIndex = (loc.z + 1).toString();
+    visualElem.style.top = loc.y + "px";
+    visualElem.style.left = loc.x + "px";
+    visualElem.style.width = loc.w + "px";
+    visualElem.style.height = loc.h + "px";
+    visualElem.style.zIndex = loc.z.toString();
+    visualElem.style.backgroundSize = loc.w + "px " + loc.h + "px";
+
+    if (loc.colors[loc.current] !== "") {
+      visualElem.style.backgroundColor = loc.colors[loc.current];
+    }
+
+    if (loc.images[loc.current] !== "") {
+      visualElem.style.backgroundImage = "url(" + loc.images[loc.current] + ")";
+    }
+
+    // Visualization of which player just changed a object
+
+    let ownerElem = document.getElementById(itemId + "Owner");
+    if (ownerElem === null) {
+      ownerElem = document.createElement("div");
+      ownerElem.id = itemId + "Owner";
+      ownerElem.className = "Owner";
+      ownerElem.style.position = "absolute";
+      ownerElem.style.userSelect = "none";
+      document.body.appendChild(ownerElem);
+    }
+
+    ownerElem.style.top = loc.y + loc.h + "px";
+    ownerElem.style.left = loc.x + loc.w + "px";
+    ownerElem.style.zIndex = (loc.z + 1).toString();
     if (loc.tick + 5 < computed.tick || loc.ownedBy === null) {
-      elem.style.visibility = "hidden";
+      ownerElem.style.visibility = "hidden";
     } else {
-      elem.style.visibility = "visible";
-      elem.innerHTML = loc.ownedBy;
+      ownerElem.style.visibility = "visible";
+      ownerElem.innerHTML = loc.ownedBy;
     }
   }
 }
@@ -66,6 +113,31 @@ function locatablesTopZ(locs: { [key: string]: LocatableItem }): number {
     }
   }
   return z;
+}
+
+function locatablesPlace(
+  local: GameState,
+  computed: ComputedState,
+  itemId: string,
+  wasOutside: boolean
+) {
+  if (wasOutside === false) {
+    locatablesTurn(local, computed, itemId);
+  }
+}
+
+function locatablesTurn(
+  local: GameState,
+  computed: ComputedState,
+  itemId: string
+) {
+  if (local.locatables.hasOwnProperty(itemId)) {
+    local.locatables[itemId].tick = computed.tick;
+    local.locatables[itemId].ownedBy = computed.playerId;
+    local.locatables[itemId].current =
+      (local.locatables[itemId].current + 1) %
+      local.locatables[itemId].images.length;
+  }
 }
 
 function locatablesRenderEditControls(

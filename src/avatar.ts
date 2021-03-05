@@ -49,11 +49,6 @@ function avatarsRender(local: GameState, computed: ComputedState) {
       document.body.appendChild(elem);
     }
 
-    elem.style.top = loc.y + "px";
-    elem.style.left = loc.x + "px";
-    elem.style.width = loc.w + "px";
-    elem.style.height = loc.h + "px";
-    elem.style.zIndex = loc.z.toString();
     if (local.avatars[key].represents === computed.playerId) {
       (elem as any).disabled = false;
     } else {
@@ -74,6 +69,9 @@ function avatarsRender(local: GameState, computed: ComputedState) {
       elem.style.border = "gray";
       elem.style.color = "lightgray";
     }
+
+    // Element position and zIndex will be taken care of by Locatable
+    // in a later call to locatablesRender in the client.ts/render function.
   }
 }
 

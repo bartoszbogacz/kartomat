@@ -8,7 +8,11 @@
       "z": 0,
       "l": 0,
       "w": 770,
-      "h": 770
+      "h": 770,
+      "cssClass": "Board",
+      "images": ["boards/dog.jpeg"],
+      "colors": ["Dodgerblue"],
+      "current": 0
     },
     "marbles": {
       "tick": 0,
@@ -18,7 +22,11 @@
       "h": 0,
       "w": 0,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Dodgerblue"],
+      "current": 0
     },
     "marble1": {
       "tick": 0,
@@ -28,7 +36,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Dodgerblue"],
+      "current": 0
     },
     "marble2": {
       "tick": 0,
@@ -38,7 +50,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Dodgerblue"],
+      "current": 0
     },
     "marble3": {
       "tick": 0,
@@ -48,7 +64,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Dodgerblue"],
+      "current": 0
     },
     "marble4": {
       "tick": 0,
@@ -58,7 +78,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Dodgerblue"],
+      "current": 0
     },
     "marble5": {
       "tick": 0,
@@ -68,7 +92,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Forestgreen"],
+      "current": 0
     },
     "marble6": {
       "tick": 0,
@@ -78,7 +106,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Forestgreen"],
+      "current": 0
     },
     "marble7": {
       "tick": 0,
@@ -88,7 +120,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Forestgreen"],
+      "current": 0
     },
     "marble8": {
       "tick": 0,
@@ -98,7 +134,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Forestgreen"],
+      "current": 0
     },
     "marble9": {
       "tick": 0,
@@ -108,7 +148,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Dimgray"],
+      "current": 0
     },
     "marble10": {
       "tick": 0,
@@ -118,7 +162,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Dimgray"],
+      "current": 0
     },
     "marble11": {
       "tick": 0,
@@ -128,7 +176,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Dimgray"],
+      "current": 0
     },
     "marble12": {
       "tick": 0,
@@ -138,7 +190,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Dimgray"],
+      "current": 0
     },
     "marble13": {
       "tick": 0,
@@ -148,7 +204,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Gold"],
+      "current": 0
     },
     "marble14": {
       "tick": 0,
@@ -158,7 +218,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Gold"],
+      "current": 0
     },
     "marble15": {
       "tick": 0,
@@ -168,7 +232,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Gold"],
+      "current": 0
     },
     "marble16": {
       "tick": 0,
@@ -178,7 +246,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Gold"],
+      "current": 0
     },
     "marble17": {
       "tick": 0,
@@ -188,7 +260,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Crimson"],
+      "current": 0
     },
     "marble18": {
       "tick": 0,
@@ -198,7 +274,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Crimson"],
+      "current": 0
     },
     "marble19": {
       "tick": 0,
@@ -208,7 +288,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Crimson"],
+      "current": 0
     },
     "marble20": {
       "tick": 0,
@@ -218,7 +302,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Crimson"],
+      "current": 0
     },
     "marble21": {
       "tick": 0,
@@ -228,7 +316,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Snow"],
+      "current": 0
     },
     "marble22": {
       "tick": 0,
@@ -238,7 +330,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Snow"],
+      "current": 0
     },
     "marble23": {
       "tick": 0,
@@ -248,7 +344,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Snow"],
+      "current": 0
     },
     "marble24": {
       "tick": 0,
@@ -258,7 +358,11 @@
       "h": 20,
       "w": 20,
       "z": 0,
-      "l": 2
+      "l": 2,
+      "cssClass": "Marble",
+      "images": [""],
+      "colors": ["Snow"],
+      "current": 0
     }
   },
   "draggables": {
@@ -286,136 +390,5 @@
     "marble22": { "tick": 0, "ownedBy": null },
     "marble23": { "tick": 0, "ownedBy": null },
     "marble24": { "tick": 0, "ownedBy": null }
-  },
-  "turnables": {
-    "board": {
-      "tick": 0,
-      "ownedBy": null,
-      "sides": ["boards/dog.jpeg"],
-      "current": 0
-    }
-  },
-  "visuals": {
-    "board": { "tick": 0, "ownedBy": null, "cssClass": "Board" },
-    "marble1": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "DodgerblueMarble"
-    },
-    "marble2": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "DodgerblueMarble"
-    },
-    "marble3": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "DodgerblueMarble"
-    },
-    "marble4": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "DodgerblueMarble"
-    },
-    "marble5": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "ForestgreenMarble"
-    },
-    "marble6": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "ForestgreenMarble"
-    },
-    "marble7": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "ForestgreenMarble"
-    },
-    "marble8": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "ForestgreenMarble"
-    },
-    "marble9": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "DimgrayMarble"
-    },
-    "marble10": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "DimgrayMarble"
-    },
-    "marble11": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "DimgrayMarble"
-    },
-    "marble12": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "DimgrayMarble"
-    },
-    "marble13": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "GoldMarble"
-    },
-    "marble14": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "GoldMarble"
-    },
-    "marble15": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "GoldMarble"
-    },
-    "marble16": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "GoldMarble"
-    },
-    "marble17": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "CrimsonMarble"
-    },
-    "marble18": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "CrimsonMarble"
-    },
-    "marble19": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "CrimsonMarble"
-    },
-    "marble20": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "CrimsonMarble"
-    },
-    "marble21": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "SnowMarble"
-    },
-    "marble22": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "SnowMarble"
-    },
-    "marble23": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "SnowMarble"
-    },
-    "marble24": {
-      "tick": 0,
-      "ownedBy": null,
-      "cssClass": "SnowMarble"
-    }
   }
 }

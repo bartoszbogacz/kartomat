@@ -5,15 +5,6 @@ A collaborative playing table for board games.
 Largely based on Spielunke with original idea by Julia Portl and
 initial implementation by Julia Portl, Ole Johannson, and Bartosz Bogacz.
 
-# License
-
-[BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) for source code
-and [CC0](https://creativecommons.org/publicdomain/zero/1.0/) for assets.
-
-Modified [svg-cards](http://svg-cards.sourceforge.net/)
-originally by [David Bellot](http://david.bellot.free.fr/)
-licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1).
-
 # Getting started
 
 Unless you already did, enter the directory at top level
@@ -55,3 +46,13 @@ Practical Examples in Data Oriented Design
 Conflict-free replicated data type [CRDT](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type)
 
 Fractional indexes [FIGMA](https://www.figma.com/blog/realtime-editing-of-ordered-sequences/)
+
+# License
+
+Source Code, Copyright (c) 2020-2021, Bartosz Bogacz, [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause).
+
+Art assets, Copyright (c) 2020-2021, Julia Portl [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
+
+Modified [svg-cards](http://svg-cards.sourceforge.net/)
+originally by [David Bellot](http://david.bellot.free.fr/)
+licensed as [LGPL 2.1](https://opensource.org/licenses/LGPL-2.1).

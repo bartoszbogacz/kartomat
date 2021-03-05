@@ -13,11 +13,9 @@ interface GameState {
   draggables: { [key: string]: DraggableItem };
   stackables: { [key: string]: StackableItem };
   stackings: { [key: string]: StackingItem };
-  turnables: { [key: string]: TurnableItem };
   writeables: { [key: string]: WriteableItem };
   dividers: { [key: string]: DividerItem };
   avatars: { [key: string]: AvatarItem };
-  visuals: { [key: string]: VisualItem };
 }
 
 interface ComputedState {
@@ -48,11 +46,9 @@ let _remoteGame: GameState = {
   draggables: {},
   stackables: {},
   stackings: {},
-  turnables: {},
   writeables: {},
   dividers: {},
   avatars: {},
-  visuals: {},
 };
 
 let _localGame: GameState = {
@@ -60,11 +56,9 @@ let _localGame: GameState = {
   draggables: {},
   stackables: {},
   stackings: {},
-  turnables: {},
   writeables: {},
   dividers: {},
   avatars: {},
-  visuals: {},
 };
 
 let _computed: ComputedState = {
@@ -159,15 +153,14 @@ function initDocumentControls() {
             h: 20,
             z: 0,
             l: 2,
+            cssClass: "",
+            images: [""],
+            colors: ["Black"],
+            current: 0,
           };
           _localGame.draggables[itemId] = {
             tick: _computed.tick,
             ownedBy: _computed.playerId,
-          };
-          _localGame.visuals[itemId] = {
-            tick: _computed.tick,
-            ownedBy: _computed.playerId,
-            cssClass: "DodgerblueMarble",
           };
           return;
         }
@@ -187,7 +180,7 @@ function initDocumentControls() {
   passive-event-listeners
 
   Remove the code below. Move the above note to one of the new 
-  handlers.
+  handlers.*/
 
   document.addEventListener("mousemove", onMouseMove, {
     passive: false,
@@ -204,7 +197,7 @@ function initDocumentControls() {
   document.addEventListener("touchend", onMouseUp, {
     passive: false,
     capture: true,
-  }); */
+  });
 }
 
 function initWebSocketClient() {
@@ -282,10 +275,6 @@ function handleServerMessage(msg: any) {
     _localGame.stackables,
     _remoteGame.stackables
   );
-  _localGame.turnables = unionLastWriterWins(
-    _localGame.turnables,
-    _remoteGame.turnables
-  );
   _localGame.writeables = unionLastWriterWins(
     _localGame.writeables,
     _remoteGame.writeables
@@ -297,10 +286,6 @@ function handleServerMessage(msg: any) {
   _localGame.avatars = unionLastWriterWins(
     _localGame.avatars,
     _remoteGame.avatars
-  );
-  _localGame.visuals = unionLastWriterWins(
-    _localGame.visuals,
-    _remoteGame.visuals
   );
 
   // Never regress tick even if server tells us so. Otherwise we may
@@ -345,17 +330,26 @@ function render() {
   // presses and these need to be available by stratifersCompute
   // and than again, based on the dividers again for button
   // presses
+
   locatablesCompute1(_localGame, _computed);
   dividersCompute(_localGame, _computed);
   stackablesCompute(_localGame, _computed);
   avatarsCompute(_localGame, _computed);
 
+  // Both Locatable and Avatar want to create an element for their
+  // entitiy. We schedule avatarsRender to be called earlier than
+  // locatablesRender so that Avatar gets priority to create a
+  // textarea instead of a div element in locatablesRender. After
+  // an element was create the explicit check prevents it from being
+  // re-created. The same is the case for Writeables and Stackings.
+  // This is admittably less than elegant and implements an unspecified
+  // ad-hoc inheritance structure. For now, it does afford a way of
+  // specialization, however.
+
+  avatarsRender(_localGame, _computed);
+  writeablesRender(_localGame, _computed);
   locatablesRender(_localGame, _computed);
   stackingsRender(_localGame, _computed);
-  turnablesRender(_localGame, _computed);
-  writeablesRender(_localGame, _computed);
-  avatarsRender(_localGame, _computed);
-  visualsRender(_localGame, _computed);
 
   locatablesRenderEditControls(_localGame, _computed, _currentlyEditing);
 }
@@ -477,7 +471,7 @@ function onMouseUp(event: Event) {
 
   stackingsPlace(_localGame, _computed, thingId, _drag.wasOutside);
   stackablesPlace(_localGame, _computed, thingId, _drag.wasOutside);
-  turnablesPlace(_localGame, _computed, thingId, _drag.wasOutside);
+  locatablesPlace(_localGame, _computed, thingId, _drag.wasOutside);
 
   _drag = null;
   document.onmousemove = null;

@@ -8,7 +8,11 @@
       "z": 0,
       "l": 0,
       "w": 230,
-      "h": 250
+      "h": 250,
+      "cssClass": "",
+      "images": [""],
+      "colors": [""],
+      "current": 0
     }
   },
   "writeables": {

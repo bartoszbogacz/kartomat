@@ -11,10 +11,8 @@
     "src/draggable.ts",
     "src/stackable.ts",
     "src/stacking.ts",
-    "src/turnable.ts",
     "src/writeable.ts",
     "src/divider.ts",
-    "src/avatar.ts",
-    "src/visual.ts"
+    "src/avatar.ts"
   ]
 }

@@ -25,11 +25,6 @@ function writeablesRender(local: GameState, computed: ComputedState) {
       document.body.appendChild(elem);
     }
 
-    elem.style.top = loc.y + "px";
-    elem.style.left = loc.x + "px";
-    elem.style.width = loc.w + "px";
-    elem.style.height = loc.h + "px";
-    elem.style.zIndex = loc.z.toString();
     if (
       local.writeables[key].ownedBy === null ||
       local.writeables[key].ownedBy === computed.playerId ||
@@ -40,6 +35,9 @@ function writeablesRender(local: GameState, computed: ComputedState) {
       (elem as any).disabled = true;
       (elem as any).value = wrt.text;
     }
+
+    // Element position and zIndex will be taken care of by Locatable
+    // in a later call to locatablesRender in the client.ts/render function.
   }
 }
 

@@ -28,7 +28,7 @@ function stackablesCompute(local: GameState, computed: ComputedState) {
     const stacking_m = computed.locations[stackingId];
     const stride = stacking_s.strides[stacking_s.current];
     for (let i = 0; i < stack.length; i++) {
-      computed.locations[stack[i]].x = stacking_m.x + i * stride;
+      computed.locations[stack[i]].x = 30 + stacking_m.x + i * stride;
       computed.locations[stack[i]].y = stacking_m.y;
       computed.locations[stack[i]].z = stacking_m.z + i;
     }

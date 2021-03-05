@@ -9,27 +9,6 @@ function stackingsRender(local: GameState, computed: ComputedState) {
   }
 
   for (const [itemId, stacking] of Object.entries(local.stackings)) {
-    let move = document.getElementById(itemId);
-    if (move === null) {
-      move = document.createElement("div");
-      move.id = itemId;
-      move.addEventListener("mousedown", onMouseDown, {
-        passive: false,
-        capture: true,
-      });
-      move.addEventListener("touchstart", onMouseDown, {
-        passive: false,
-        capture: true,
-      });
-      move.className = "MoveControl";
-      move.style.position = "absolute";
-      move.style.width = "30px";
-      move.style.height = "30px";
-      move.style.backgroundImage = 'url("controls/move.png")';
-      move.style.backgroundSize = "30px 30px";
-      document.body.appendChild(move);
-    }
-
     let shuffle = document.getElementById(itemId + "ShuffleControl");
     if (shuffle === null) {
       shuffle = document.createElement("div");
@@ -77,17 +56,29 @@ function stackingsRender(local: GameState, computed: ComputedState) {
       computed.stacks[itemId].length > 1;
     const loc = computed.locations[itemId];
 
-    if (s === true) {
-      move.style.left = loc.x - 30 + "px";
-      move.style.top = loc.y + "px";
-      move.style.zIndex = loc.z.toString();
-      move.style.visibility = "visible";
-    } else {
-      move.style.visibility = "hidden";
+    // The move element is created by locatable and styled by locatable.
+    // Take a look how a stacking is defined as locatable. It contains
+    // the respective PNG of the move control as its background. We
+    // chose this approach to be able to re-use the dragging code of
+    // draggable. In this case, the move element represents the object
+    // of the stacking, that is, its geometry and visuals. Locatable
+    // automatically attached event handlers to the DOM element
+    // representing an object.
+    const move = document.getElementById(itemId);
+
+    if (move !== null) {
+      if (s === true) {
+        move.style.left = loc.x + "px";
+        move.style.top = loc.y + "px";
+        move.style.zIndex = loc.z.toString();
+        move.style.visibility = "visible";
+      } else {
+        move.style.visibility = "hidden";
+      }
     }
 
     if (s === true) {
-      shuffle.style.left = loc.x - 30 + "px";
+      shuffle.style.left = loc.x + "px";
       shuffle.style.top = loc.y + 30 + "px";
       shuffle.style.zIndex = loc.z.toString();
       shuffle.style.visibility = "visible";
@@ -96,7 +87,7 @@ function stackingsRender(local: GameState, computed: ComputedState) {
     }
 
     if (s === true) {
-      fold.style.left = loc.x - 30 + "px";
+      fold.style.left = loc.x + "px";
       fold.style.top = loc.y + 60 + "px";
       fold.style.zIndex = loc.z.toString();
       fold.style.visibility = "visible";
@@ -105,7 +96,7 @@ function stackingsRender(local: GameState, computed: ComputedState) {
     }
 
     if (s === true) {
-      turn.style.left = loc.x - 30 + "px";
+      turn.style.left = loc.x + "px";
       turn.style.top = loc.y + 90 + "px";
       turn.style.zIndex = loc.z.toString();
       turn.style.visibility = "visible";
@@ -141,6 +132,10 @@ function stackingsCreateFor(
       l: computed.locations[stackableId].l,
       w: computed.locations[stackableId].w,
       h: computed.locations[stackableId].h,
+      cssClass: computed.locations[stackableId].cssClass,
+      images: computed.locations[stackableId].images,
+      colors: computed.locations[stackableId].colors,
+      current: computed.locations[stackableId].current,
     };
     local.draggables[stackingId] = {
       tick: computed.tick,
@@ -181,10 +176,7 @@ function stackingsTouch(
         local.locatables[stackableId].tick = computed.tick;
         local.locatables[stackableId].ownedBy = computed.playerId;
         local.locatables[stackableId].x = -local.locatables[stackableId].x;
-
-        if (local.turnables.hasOwnProperty(stackableId)) {
-          turnablesTurn(local, computed, stackableId);
-        }
+        locatablesTurn(local, computed, stackableId);
       }
     }
   }

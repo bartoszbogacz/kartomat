@@ -214,3 +214,68 @@ The colors of marbles are:
     "OrangeMarble"
 
 The dog board is `"boards/dog8.png"`.
+
+# Old code
+
+.MediumorchidMarble {
+background-color: mediumorchid;
+border: 2px solid black;
+border-radius: 50%;
+filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.DodgerblueMarble {
+background-color: dodgerblue;
+border: 2px solid black;
+border-radius: 50%;
+filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.ForestgreenMarble {
+background-color: forestgreen;
+border: 2px solid black;
+border-radius: 50%;
+filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.DimgrayMarble {
+background-color: dimgray;
+border: 2px solid black;
+border-radius: 50%;
+filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.GoldMarble {
+background-color: gold;
+border: 2px solid black;
+border-radius: 50%;
+filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.CrimsonMarble {
+background-color: crimson;
+border: 2px solid black;
+border-radius: 50%;
+filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.OrangeMarble {
+background-color: orange;
+border: 2px solid black;
+border-radius: 50%;
+filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.DarkturquoiseMarble {
+background-color: darkturquoise;
+border: 2px solid black;
+border-radius: 50%;
+filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
+
+.SnowMarble {
+background-color: snow;
+border: 2px solid black;
+border-radius: 50%;
+filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}
