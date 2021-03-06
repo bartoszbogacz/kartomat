@@ -12,6 +12,365 @@ let _wsServer = null;
 let _httpServer = null;
 let _runningGames = {};
 
+function generateAvatars(scene, count) {
+  const xys = [
+    [920, 30],
+    [1130, 30],
+    [920, 70],
+    [1130, 70],
+    [920, 110],
+    [1130, 110],
+    [920, 150],
+    [1130, 150],
+  ];
+
+  if (!scene.hasOwnProperty("avatars")) {
+    scene["avatars"] = {};
+  }
+  if (!scene.hasOwnProperty("locatables")) {
+    scene["locatables"] = {};
+  }
+  for (let i = 0; i < count; i++) {
+    const itemId = "avatar" + (i + 1);
+    if (
+      scene["avatars"].hasOwnProperty(itemId) ||
+      scene["locatables"].hasOwnProperty(itemId)
+    ) {
+      throw new Error("ItemId already in use.");
+    }
+    scene["avatars"][itemId] = {
+      represents: null,
+      text: "Player" + (i + 1),
+    };
+    scene["locatables"][itemId] = {
+      x: xys[i][0],
+      y: xys[i][1],
+      w: 200,
+      h: 30,
+      z: 0,
+      l: 0,
+      cssClass: "",
+      images: [""],
+      colors: [""],
+      current: 0,
+    };
+  }
+}
+
+function generateMarbles(scene, xycs) {
+  if (!scene.hasOwnProperty("draggables")) {
+    scene["draggables"] = {};
+  }
+  if (!scene.hasOwnProperty("locatables")) {
+    scene["locatables"] = {};
+  }
+
+  for (let i = 0; i < xycs.length; i++) {
+    const itemId = "marble" + (i + 1);
+    if (
+      scene["draggables"].hasOwnProperty(itemId) ||
+      scene["locatables"].hasOwnProperty(itemId)
+    ) {
+      throw new Error("ItemId already in use.");
+    }
+
+    scene["draggables"][itemId] = {};
+    scene["locatables"][itemId] = {
+      x: xycs[i][0],
+      y: xycs[i][1],
+      w: 20,
+      h: 20,
+      z: 0,
+      l: 2,
+      cssClass: "Marble",
+      images: [""],
+      colors: [xycs[i][2]],
+      current: 0,
+    };
+  }
+}
+
+function generateRummy(scene) {
+  if (!scene.hasOwnProperty("stackings")) {
+    scene["stackings"] = {};
+  }
+  if (!scene.hasOwnProperty("stackables")) {
+    scene["stackables"] = {};
+  }
+  if (!scene.hasOwnProperty("draggables")) {
+    scene["draggables"] = {};
+  }
+  if (!scene.hasOwnProperty("locatables")) {
+    scene["locatables"] = {};
+  }
+
+  scene["draggables"]["stacking0"] = {};
+
+  scene["stackings"]["stacking0"] = {
+    strides: [2, 30],
+    current: 0,
+  };
+
+  scene["locatables"]["stacking0"] = {
+    x: 830,
+    y: 270,
+    z: 0,
+    l: 1,
+    w: 30,
+    h: 30,
+    cssClass: "MoveControl",
+    colors: [""],
+    images: ["controls/move.png"],
+    current: 0,
+  };
+
+  const images = [
+    ["rummy/club_1.png", "rummy/back_blue.png"],
+    ["rummy/club_2.png", "rummy/back_blue.png"],
+    ["rummy/club_3.png", "rummy/back_blue.png"],
+    ["rummy/club_4.png", "rummy/back_blue.png"],
+    ["rummy/club_5.png", "rummy/back_blue.png"],
+    ["rummy/club_6.png", "rummy/back_blue.png"],
+    ["rummy/club_7.png", "rummy/back_blue.png"],
+    ["rummy/club_8.png", "rummy/back_blue.png"],
+    ["rummy/club_9.png", "rummy/back_blue.png"],
+    ["rummy/club_10.png", "rummy/back_blue.png"],
+    ["rummy/club_jack.png", "rummy/back_blue.png"],
+    ["rummy/club_queen.png", "rummy/back_blue.png"],
+    ["rummy/club_king.png", "rummy/back_blue.png"],
+    ["rummy/diamond_1.png", "rummy/back_blue.png"],
+    ["rummy/diamond_2.png", "rummy/back_blue.png"],
+    ["rummy/diamond_3.png", "rummy/back_blue.png"],
+    ["rummy/diamond_4.png", "rummy/back_blue.png"],
+    ["rummy/diamond_5.png", "rummy/back_blue.png"],
+    ["rummy/diamond_6.png", "rummy/back_blue.png"],
+    ["rummy/diamond_7.png", "rummy/back_blue.png"],
+    ["rummy/diamond_8.png", "rummy/back_blue.png"],
+    ["rummy/diamond_9.png", "rummy/back_blue.png"],
+    ["rummy/diamond_10.png", "rummy/back_blue.png"],
+    ["rummy/diamond_jack.png", "rummy/back_blue.png"],
+    ["rummy/diamond_queen.png", "rummy/back_blue.png"],
+    ["rummy/diamond_king.png", "rummy/back_blue.png"],
+    ["rummy/heart_1.png", "rummy/back_blue.png"],
+    ["rummy/heart_2.png", "rummy/back_blue.png"],
+    ["rummy/heart_3.png", "rummy/back_blue.png"],
+    ["rummy/heart_4.png", "rummy/back_blue.png"],
+    ["rummy/heart_5.png", "rummy/back_blue.png"],
+    ["rummy/heart_6.png", "rummy/back_blue.png"],
+    ["rummy/heart_7.png", "rummy/back_blue.png"],
+    ["rummy/heart_8.png", "rummy/back_blue.png"],
+    ["rummy/heart_9.png", "rummy/back_blue.png"],
+    ["rummy/heart_10.png", "rummy/back_blue.png"],
+    ["rummy/heart_jack.png", "rummy/back_blue.png"],
+    ["rummy/heart_queen.png", "rummy/back_blue.png"],
+    ["rummy/heart_king.png", "rummy/back_blue.png"],
+    ["rummy/spade_1.png", "rummy/back_blue.png"],
+    ["rummy/spade_2.png", "rummy/back_blue.png"],
+    ["rummy/spade_3.png", "rummy/back_blue.png"],
+    ["rummy/spade_4.png", "rummy/back_blue.png"],
+    ["rummy/spade_5.png", "rummy/back_blue.png"],
+    ["rummy/spade_6.png", "rummy/back_blue.png"],
+    ["rummy/spade_7.png", "rummy/back_blue.png"],
+    ["rummy/spade_8.png", "rummy/back_blue.png"],
+    ["rummy/spade_9.png", "rummy/back_blue.png"],
+    ["rummy/spade_10.png", "rummy/back_blue.png"],
+    ["rummy/spade_jack.png", "rummy/back_blue.png"],
+    ["rummy/spade_queen.png", "rummy/back_blue.png"],
+    ["rummy/spade_king.png", "rummy/back_blue.png"],
+    ["rummy/joker_red.png", "rummy/back_blue.png"],
+    ["rummy/joker_red.png", "rummy/back_blue.png"],
+    ["rummy/joker_red.png", "rummy/back_blue.png"],
+  ];
+
+  for (let i = 0; i < images.length; i++) {
+    const itemId = "card" + (i + 1);
+    if (
+      scene["stackables"].hasOwnProperty(itemId) ||
+      scene["draggables"].hasOwnProperty(itemId) ||
+      scene["locatables"].hasOwnProperty(itemId)
+    ) {
+      throw new Error("ItemId already in use.");
+    }
+
+    scene["stackables"][itemId] = { onStacking: "stacking0" };
+    scene["draggables"][itemId] = {};
+    scene["locatables"][itemId] = {
+      x: i,
+      y: 0,
+      w: 100,
+      h: 150,
+      z: 0,
+      l: 2,
+      cssClass: "Card",
+      images: images[i],
+      colors: ["", ""],
+      current: 0,
+    };
+  }
+}
+
+function generateWriteable(scene) {
+  if (!scene.hasOwnProperty("locatables")) {
+    scene["locatables"] = {};
+  }
+  if (!scene.hasOwnProperty("writeables")) {
+    scene["writeables"] = {};
+  }
+
+  scene["locatables"]["textarea1"] = {
+    x: 1100,
+    y: 200,
+    z: 0,
+    l: 0,
+    w: 230,
+    h: 250,
+    cssClass: "",
+    images: [""],
+    colors: [""],
+    current: 0,
+  };
+
+  scene["writeables"]["textarea1"] = {
+    text: "You can collaboratively write here.",
+  };
+}
+
+function generateDog6() {
+  let scene = {
+    locatables: {
+      board: {
+        x: 0,
+        y: 0,
+        z: 0,
+        l: 0,
+        w: 770,
+        h: 770,
+        cssClass: "Board",
+        images: ["boards/dog.jpeg"],
+        colors: [""],
+        current: 0,
+      },
+      privateArea: {
+        x: 830,
+        y: 470,
+        z: 0,
+        l: 1,
+        w: 500,
+        h: 300,
+        cssClass: "PrivateArea",
+        colors: [""],
+        images: [""],
+        current: 0,
+      },
+    },
+    dividers: {
+      privateArea: {},
+    },
+  };
+
+  const marbles = [
+    [418, 62, "Dodgerblue"],
+    [387, 56, "Dodgerblue"],
+    [358, 56, "Dodgerblue"],
+    [326, 56, "Dodgerblue"],
+    [609, 170, "Forestgreen"],
+    [625, 195, "Forestgreen"],
+    [642, 219, "Forestgreen"],
+    [654, 247, "Forestgreen"],
+    [660, 473, "Dimgray"],
+    [645, 503, "Dimgray"],
+    [633, 532, "Dimgray"],
+    [615, 555, "Dimgray"],
+    [425, 676, "Gold"],
+    [394, 680, "Gold"],
+    [360, 680, "Gold"],
+    [332, 681, "Gold"],
+    [127, 566, "Crimson"],
+    [109, 540, "Crimson"],
+    [93, 512, "Crimson"],
+    [79, 484, "Crimson"],
+    [79, 254, "Snow"],
+    [95, 221, "Snow"],
+    [108, 194, "Snow"],
+    [126, 172, "Snow"],
+  ];
+
+  generateAvatars(scene, 6);
+  generateMarbles(scene, marbles);
+  generateRummy(scene);
+  generateWriteable(scene);
+
+  return scene;
+}
+
+function generateDog8() {
+  let scene = {
+    locatables: {
+      board: {
+        x: 0,
+        y: 0,
+        z: 0,
+        l: 0,
+        w: 770,
+        h: 770,
+        cssClass: "Board",
+        images: ["boards/dog8.png"],
+        colors: [""],
+        current: 0,
+      },
+      privateArea: {
+        x: 830,
+        y: 470,
+        z: 0,
+        l: 1,
+        w: 500,
+        h: 300,
+        cssClass: "PrivateArea",
+        colors: [""],
+        images: [""],
+        current: 0,
+      },
+    },
+    dividers: {
+      privateArea: {},
+    },
+  };
+
+  const marbles = [
+    [701, 200, "Mediumorchid"],
+    [726, 482, "Dodgerblue"],
+    [715, 515, "Dodgerblue"],
+    [700, 548, "Dodgerblue"],
+    [715, 234, "Mediumorchid"],
+    [545, 700, "Forestgreen"],
+    [512, 714, "Forestgreen"],
+    [480, 729, "Forestgreen"],
+    [484, 20, "Dimgray"],
+    [551, 46, "Dimgray"],
+    [730, 265, "Mediumorchid"],
+    [517, 33, "Dimgray"],
+    [262, 725, "Orange"],
+    [47, 196, "Gold"],
+    [33, 228, "Gold"],
+    [19, 262, "Gold"],
+    [231, 713, "Orange"],
+    [266, 19, "Crimson"],
+    [200, 45, "Crimson"],
+    [234, 32, "Crimson"],
+    [17, 480, "Darkturquoise"],
+    [32, 513, "Darkturquoise"],
+    [46, 544, "Darkturquoise"],
+    [198, 699, "Orange"],
+  ];
+
+  generateAvatars(scene, 8);
+  generateMarbles(scene, marbles);
+  generateRummy(scene);
+  generateWriteable(scene);
+
+  return scene;
+}
+
 function initHTTPServer() {
   // HTTP Server mostly based on:
   // https://www.digitalocean.com/community/tutorials/
@@ -106,25 +465,27 @@ function initWebSocketServer() {
   });
 }
 
-function assembleBoard(boardId) {
-  const board = {};
-  const assembly = JSON.parse(
-    fs.readFileSync("boards/" + path.normalize(boardId) + ".json")
-  );
-  for (const partName of assembly) {
-    const part = JSON.parse(
-      fs.readFileSync("boards/" + path.normalize(partName) + ".json")
-    );
-    for (const [trait, props] of Object.entries(part)) {
-      if (board.hasOwnProperty(trait) === false) {
-        board[trait] = {};
-      }
-      for (const [item, prop] of Object.entries(props)) {
-        board[trait][item] = prop;
-      }
+function hydrateScene(scene) {
+  for (const component of Object.keys(scene)) {
+    for (const [key, value] of Object.entries(scene[component])) {
+      value["tick"] = 0;
+      value["ownedBy"] = null;
     }
   }
-  return board;
+  return scene;
+}
+
+// The method assembleBoard will be called by handleHTTPRequest with boardId
+// set by the ?board=Dog query parameter.
+
+function assembleBoard(boardId) {
+  if (boardId === "Dog6") {
+    return hydrateScene(generateDog6());
+  } else if (boardId === "Dog8") {
+    return hydrateScene(generateDog8());
+  } else {
+    throw new Error("Board not implemented");
+  }
 }
 
 function reloadGame(gameId) {
