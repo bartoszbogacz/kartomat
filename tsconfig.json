@@ -13,6 +13,16 @@
     "src/stacking.ts",
     "src/writeable.ts",
     "src/divider.ts",
-    "src/avatar.ts"
+    "src/avatar.ts",
+    "src/_Client.ts",
+    "src/_Scene.ts",
+    "src/_DragAndDrop.ts",
+    "src/_Card.ts",
+    "src/_Deck.ts",
+    "src/_Marble.ts",
+    "src/_Board.ts",
+    "src/_Avatar.ts",
+    "src/_Notepad.ts",
+    "src/_PrivateArea.ts"
   ]
 }

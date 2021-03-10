@@ -34,87 +34,112 @@ Also:
 ## Goals
 
 Remove any `throw new Error("Locations not yet computed.");`.
-Enfore inter-component dependencies using the type system.
+Enforce inter-component dependencies using the type system.
 
-## Structrue
+## Examples
 
-Classes that only contain state that is replicated among all peers.
+    class SceneReplicated {
+        tick: number;
+        gameId: string;
+        gameName: string;
+        boardId: string;
+        boardName: string;
+    }
 
-`tickLocal` denote the last update to the element. If `tickLocal > tick`
-changes to this element need to send to peers.
+    class Scene {
+        replica: SceneReplicated;
 
-    class GameSceneReplicated { pieces }
+        playerId: string;
+        clientId: string;
 
-    class GamingPieceReplicated { tick, ownedBy, tickLocal, x, y, w, h, l, z }
+        playerName: string;
+    }
 
-    class PlayingBoardReplicated extends GamingPieceReplicated { image }
+    class Scene {
+        render() {
+            let decks = {};
+            for (const piece of this.pieces) {
+                if (piece.name.startswith("card")) {
+                    decks[piece.deck].push(piece);
+                }
+            }
 
-    class PlayerAvatarReplicated extends GameingPieceReplicted { text, represents }
+            for (const [deckName, cards] of Object.entries(decks)) {
+                this.pieces[deckName].render(cards)
+            }
+        }
+    }
 
-    class PrivateAreaReplicated extends GameingPieceReplicated { }
+    class Deck {
+        render(cards: Card[]) {
+            this.cards = cards;
 
-    class WritingSurface extends GameingPieceReplicated { text }
+            for (let i = 0; i < this.cards.length; i++) {
+                this.cards[i].render(
+                    this.x + this.w + this.replica.stride * i,
+                    this.y
+                );
+            }
+        }
+    }
 
-    class MovablePieceReplicated extends GamingPieceReplicated { }
+    class CardReplicated {
+        tick: number;
+        owner: (string | null);
+        x: number;
+        y: number;
+        w: number;
+        h: number;
+        l: number;
+        z: number;
+        deck: string;
+        sides: string[];
+        current: number;
 
-    class PlayingMarbleReplicated extends MovablePieceReplicated { color }
+        update (x: number, y: number, z: number, deck: (string | null)) {
+            //
+        }
+    }
 
-    class PlayingCardReplicated extends MovablePieceReplicated { images, current, onStack }
+    class Card {
+        replica: CardReplicated;
+        scene: Scene;
+        deck: Deck;
+        elem: DOMElement;
 
-    class PlayingDeckReplicated extends MoveablePieceReplicated { }
+        x: number;
+        y: number;
 
-Classes that derive properties local for each client related to visualization.
-Only leaf classes of the hierarchy of replicated classes are extended.
-Then, only properties that need deriving are shadowed. For example, all
-z values need to be re-computed since for visualization we are intersted
-in their rank and not the actual position. The same is true for the
-cards in a stack. While only their fractional index x and their stacking
-is shared, for visualization their rank on their current stacking determines
-the position of a card.
+        render(x: number, y: number) {
+            this.x = x;
+            this.y = y;
 
-`tickVisible` denotes the last rendered tick. If `tickLocal > tickVisible` the element
-needs to be re-rendered.
+            this.elem.style.left = this.x + "px";
+            this.elem.style.top = this.y + "px";
+        }
 
-    class GameScene extends GameSceneReplicated { pieces }
+        take() {
+            this.replica.update(
+                this.deck.x + this.x,
+                this.deck.y + this.y,
+                this.scene.topZ() + 1,
+                null
+            )
+        }
 
-    class PlayingBoard extends PlayingBoardReplicated { tickVisible, z, elem }
+        place() {
+            deck = this.scene.largestOverlapsDecks(this);
+            if (deck !== null) {
+                this.replica.update(deck.fractionalIndexAt(this.x), this.y, this.z, deck);
+                return;
+            }
 
-    class PlayerAvatar extends PlayerAvatarReplicated { tickVisible, z, elem }
-
-    class PrivateArea extends PrivateAreaReplicated { tickVisible, elem, visibleToAll, visibleToSelfOnly, visisbleToOthersOnly }
-
-    class WritingSurface extends WritingSurfaceReplicated { tickVisible, z, elem }
-
-    class PlayingMarble extends PlayingMarbleReplicated { tickVisible, z, color, elem }
-
-    class PlayingCard extends PlayingCardReplicated { tickVisible, x, y, z, images, current, onStack, elem }
-
-    class PlayingDeck extends PlayingDeckReplicated { tickVisible, z, elem, cards }
-
-Additionally there is scene tree.
-
-    GameScene
-        PlayingMarble
-        WritingSurface
-        [...]
-        PrivateArea
-            visibleToAll
-                GamingPieceReplicated
-                [...]
-                PlayingCard
-                [...]
-                PlayingDeck
-                    PlayingCard
-                    [...]
-            visisbleToSelfOnly
-                [...]
-            visibleToOthersOnly
-                [...]
-
-## Information propagation
-
-    GameScene.synchronize()
-
-    GameScene.compute()
-
-    GameScene.render()
+            piece = this.scene.largestOverlapsCards(this);
+            if (piece !== null) {
+                const deckName: string = scene.newDeck(this.x, this.y, this.z);
+                this.replica.update(this.x, this.y, this.z, deck);
+                piece.replica.update(piece.x, piece.y, piece.z, deck);
+                return;
+            }
+        }
+    }
