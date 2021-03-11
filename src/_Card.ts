@@ -147,12 +147,14 @@ class Card {
 
   place(wasOutside: boolean) {
     const other = this.scene.overlapsCard(this);
+    if (other === null) {
+      if (!wasOutside) {
+        this.turn();
+      }
+      return;
+    }
 
-    if (other === null && wasOutside) {
-      // Nothing to do
-    } else if (other === null) {
-      this.turn();
-    } else if (other.onDeck === null) {
+    if (other.onDeck === null) {
       const deck = this.scene.createDeck(this);
       this.replica.tick = this.scene.tick;
       this.replica.owner = this.scene.playerId;
@@ -160,12 +162,11 @@ class Card {
       other.replica.tick = this.scene.tick;
       other.replica.owner = this.scene.playerId;
       other.replica.onDeck = deck.name;
-    } else {
-      this.replica.tick = this.scene.tick;
-      this.replica.owner = this.scene.playerId;
-      this.replica.onDeck = other.onDeck.name;
-      this.replica.x = other.onDeck.indexFor(this.x);
+      return;
     }
+
+    const [w, v] = other.onDeck.gapFor(this.x);
+    this.putOn(other.onDeck, (w + v) * 0.5);
   }
 
   turn() {
@@ -173,5 +174,13 @@ class Card {
     this.replica.owner = this.scene.playerId;
     this.replica.current =
       (this.replica.current + 1) % this.replica.images.length;
+  }
+
+  /** Put card onDeck at fractional index */
+  putOn(onDeck: Deck, f: number) {
+    this.replica.tick = this.scene.tick;
+    this.replica.owner = this.scene.playerId;
+    this.replica.onDeck = onDeck.name;
+    this.replica.x = f;
   }
 }

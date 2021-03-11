@@ -140,19 +140,60 @@ class Deck {
     this.replica.y = y;
   }
 
-  indexFor(x: number): number {
-    let f: number = 0;
+  place(wasOutside: boolean) {
+    const other = this.scene.overlapsCard(this);
+    if (other === null) {
+      return;
+    }
+
+    if (other.onDeck === null) {
+      const [w, v] = this.gapFor(other.x);
+      other.putOn(this, (w + v) * 0.5);
+      return;
+    }
+
+    const [w, v] = this.gapFor(this.x);
+    const n = this.cards.length;
+    for (let i = 0; i < n; i++) {
+      this.cards[i].putOn(other.onDeck, w + ((i + 1) / (n + 2)) * (v - w));
+    }
+  }
+
+  fold() {
+    this.replica.tick = this.scene.tick;
+    this.replica.owner = this.scene.playerId;
+    this.replica.current =
+      (this.replica.current + 1) % this.replica.strides.length;
+  }
+
+  /** This modification is not atomic and may lead to inconsistencies */
+  turn() {
+    for (const card of this.cards) {
+      card.turn();
+      card.move(-card.x, card.y);
+    }
+  }
+
+  /** This modification is not atomic and may lead to inconsistencies */
+  shuffle() {
+    for (const card of this.cards) {
+      card.move(Math.random(), card.y);
+    }
+  }
+
+  gapFor(x: number): [number, number] {
+    let v: number = 0;
     // We use a small offset to bias card insertion to the left.
     // If you put a card very close on top to another one, the new
     // stackable will be placed on the left.
     for (const card of this.cards) {
       if (card.x + 10 > x) {
-        return (card.x + x) * 0.5;
+        return [v, card.x];
       } else {
-        f = card.x;
+        v = card.x;
       }
     }
     // Reached last card. Put the new card behind that one.
-    return x + 1;
+    return [v, v + 1];
   }
 }
