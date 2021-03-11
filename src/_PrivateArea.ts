@@ -81,5 +81,7 @@ class PrivateArea {
     this._z = z;
 
     this.elem.style.zIndex = this.z.toString();
+
+    return z + 1;
   }
 }

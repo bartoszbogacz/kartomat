@@ -129,6 +129,8 @@ class Card {
     this.ownerElem.style.left = this.x + "px";
     this.ownerElem.style.top = this.y + "px";
     this.ownerElem.style.zIndex = (this.z + 1).toString();
+
+    return z + 2;
   }
 
   take() {

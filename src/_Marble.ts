@@ -107,6 +107,8 @@ class Marble {
 
     this.visElem.style.zIndex = this.z.toString();
     this.ownerElem.style.zIndex = (this.z + 1).toString();
+
+    return z + 2;
   }
 
   take() {

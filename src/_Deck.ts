@@ -113,7 +113,7 @@ class Deck {
     }
   }
 
-  render(z: number, cards: Card[]) {
+  render(z: number, cards: Card[]): number {
     this._z = z;
     this.cards = cards;
 
@@ -125,6 +125,8 @@ class Deck {
     for (let i = 0; i < this.cards.length; i++) {
       this.cards[i].render(x + w + s * i, y, z + 1 + i, this);
     }
+
+    return z + 1 + this.cards.length;
   }
 
   take() {

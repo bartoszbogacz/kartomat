@@ -15,9 +15,15 @@ interface ReplicatedScene {
 
 class Scene {
   private replica: ReplicatedScene;
+
+  private avatars: { [key: string]: Avatar } = {};
+  private boards: { [key: string]: Board } = {};
+  private marbles: { [key: string]: Marble } = {};
+  private notepads: { [key: string]: Notepad } = {};
   private privateAreas: { [key: string]: PrivateArea } = {};
-  private cards: { [key: string]: Card } = {};
   private decks: { [key: string]: Deck } = {};
+  private cards: { [key: string]: Card } = {};
+
   private cardsOnDeck: { [key: string]: Card[] } = {};
 
   constructor() {
@@ -47,40 +53,90 @@ class Scene {
   synchronizeWith(remote: ReplicatedScene) {
     this.cardsOnDeck = {};
 
-    for (const [key, item] of Object.entries(remote.privateAreas)) {
+    for (const [key, avatar] of Object.entries(remote.avatars)) {
+      if (!this.avatars.hasOwnProperty(key)) {
+        this.avatars[key] = new Avatar(this, key);
+      }
+      this.avatars[key].synchronizeWith(avatar);
+    }
+
+    for (const [key, marble] of Object.entries(remote.marbles)) {
+      if (!this.marbles.hasOwnProperty(key)) {
+        this.marbles[key] = new Marble(this, key);
+      }
+      this.marbles[key].synchronizeWith(marble);
+    }
+
+    for (const [key, board] of Object.entries(remote.boards)) {
+      if (!this.boards.hasOwnProperty(key)) {
+        this.boards[key] = new Board(this, key);
+      }
+      this.boards[key].synchronizeWith(board);
+    }
+
+    for (const [key, notepad] of Object.entries(remote.notepads)) {
+      if (!this.notepads.hasOwnProperty(key)) {
+        this.notepads[key] = new Notepad(this, key);
+      }
+      this.notepads[key].synchronizeWith(notepad);
+    }
+
+    for (const [key, privateArea] of Object.entries(remote.privateAreas)) {
       if (!this.privateAreas.hasOwnProperty(key)) {
         this.privateAreas[key] = new PrivateArea(this, key);
       }
-      this.privateAreas[key].synchronizeWith(item);
+      this.privateAreas[key].synchronizeWith(privateArea);
     }
 
-    for (const [key, item] of Object.entries(remote.cards)) {
+    for (const [key, deck] of Object.entries(remote.decks)) {
+      if (!this.decks.hasOwnProperty(key)) {
+        this.decks[key] = new Deck(this, key, null);
+      }
+      this.decks[key].synchronizeWith(deck);
+    }
+
+    for (const [key, card] of Object.entries(remote.cards)) {
       if (!this.cards.hasOwnProperty(key)) {
         this.cards[key] = new Card(this, key);
       }
 
-      this.cards[key].synchronizeWith(item);
+      this.cards[key].synchronizeWith(card);
 
-      if (item.onDeck !== null) {
-        if (this.cardsOnDeck.hasOwnProperty(item.onDeck)) {
-          this.cardsOnDeck[item.onDeck].push(this.cards[key]);
+      if (card.onDeck !== null) {
+        if (this.cardsOnDeck.hasOwnProperty(card.onDeck)) {
+          this.cardsOnDeck[card.onDeck].push(this.cards[key]);
         } else {
-          this.cardsOnDeck[item.onDeck] = [this.cards[key]];
+          this.cardsOnDeck[card.onDeck] = [this.cards[key]];
         }
       }
-    }
-
-    for (const [key, item] of Object.entries(remote.decks)) {
-      if (!this.decks.hasOwnProperty(key)) {
-        this.decks[key] = new Deck(this, key, null);
-      }
-      this.decks[key].synchronizeWith(item);
     }
   }
 
   render() {
-    for (const [deckId, deck] of Object.entries(this.decks)) {
-      deck.render(0, this.cardsOnDeck[deckId]);
+    let z: number = 0;
+
+    for (const [key, avatar] of Object.entries(this.avatars)) {
+      z = avatar.render(z);
+    }
+
+    for (const [key, marble] of Object.entries(this.marbles)) {
+      z = marble.render(z);
+    }
+
+    for (const [key, board] of Object.entries(this.boards)) {
+      z = board.render(z);
+    }
+
+    for (const [key, notepad] of Object.entries(this.notepads)) {
+      z = notepad.render(z);
+    }
+
+    for (const [key, privateArea] of Object.entries(this.privateAreas)) {
+      z = privateArea.render(z);
+    }
+
+    for (const [key, deck] of Object.entries(this.decks)) {
+      z = deck.render(z, this.cardsOnDeck[key]);
     }
   }
 
