@@ -1,11 +1,3 @@
-interface Rectangle {
-  x: number;
-  y: number;
-  z: number;
-  w: number;
-  h: number;
-}
-
 interface ReplicatedScene {
   tick: number;
   gameId: string;
@@ -18,11 +10,12 @@ interface ReplicatedScene {
   notepads: { [key: string]: ReplicatedNotepad };
   cards: { [key: string]: ReplicatedCard };
   decks: { [key: string]: ReplicatedDeck };
-  privateareas: { [key: string]: ReplicatedPrivateArea };
+  privateAreas: { [key: string]: ReplicatedPrivateArea };
 }
 
 class Scene {
   private replica: ReplicatedScene;
+  private privateAreas: { [key: string]: PrivateArea } = {};
   private cards: { [key: string]: Card } = {};
   private decks: { [key: string]: Deck } = {};
   private cardsOnDeck: { [key: string]: Card[] } = {};
@@ -39,7 +32,7 @@ class Scene {
       notepads: {},
       cards: {},
       decks: {},
-      privateareas: {},
+      privateAreas: {},
     };
   }
 
@@ -51,31 +44,37 @@ class Scene {
     return this.replica.playerId;
   }
 
-  update() {
+  synchronizeWith(remote: ReplicatedScene) {
     this.cardsOnDeck = {};
 
-    for (const [cardId, card] of Object.entries(this.replica.cards)) {
-      if (this.cards.hasOwnProperty(cardId)) {
-        this.cards[cardId].update();
-      } else {
-        this.cards[cardId] = new Card(this, cardId, card);
+    for (const [key, item] of Object.entries(remote.privateAreas)) {
+      if (!this.privateAreas.hasOwnProperty(key)) {
+        this.privateAreas[key] = new PrivateArea(this, key);
+      }
+      this.privateAreas[key].synchronizeWith(item);
+    }
+
+    for (const [key, item] of Object.entries(remote.cards)) {
+      if (!this.cards.hasOwnProperty(key)) {
+        this.cards[key] = new Card(this, key);
       }
 
-      if (card.onDeck !== null) {
-        if (this.cardsOnDeck.hasOwnProperty(card.onDeck)) {
-          this.cardsOnDeck[card.onDeck].push(this.cards[cardId]);
+      this.cards[key].synchronizeWith(item);
+
+      if (item.onDeck !== null) {
+        if (this.cardsOnDeck.hasOwnProperty(item.onDeck)) {
+          this.cardsOnDeck[item.onDeck].push(this.cards[key]);
         } else {
-          this.cardsOnDeck[card.onDeck] = [this.cards[cardId]];
+          this.cardsOnDeck[item.onDeck] = [this.cards[key]];
         }
       }
     }
 
-    for (const [deckId, deck] of Object.entries(this.replica.decks)) {
-      if (this.cards.hasOwnProperty(deckId)) {
-        this.decks[deckId].update();
-      } else {
-        this.decks[deckId] = new Deck(this, deckId, deck);
+    for (const [key, item] of Object.entries(remote.decks)) {
+      if (!this.decks.hasOwnProperty(key)) {
+        this.decks[key] = new Deck(this, key, null);
       }
+      this.decks[key].synchronizeWith(item);
     }
   }
 
@@ -85,23 +84,64 @@ class Scene {
     }
   }
 
-  createDeck(): Deck {
-    return new Deck(this, "", null);
+  createDeck(ref: Card): Deck {
+    for (let i = 0; i < 1000; i++) {
+      const name = "deck" + i;
+      if (!this.decks.hasOwnProperty(name)) {
+        return new Deck(this, name, ref);
+      }
+    }
+
+    throw new Error("Ids for decks exhausted.");
   }
 
-  topZOfCardsAndDecks(): number {
+  topZOfCards(): number {
     let z: number = 0;
 
     for (const [cardId, card] of Object.entries(this.cards)) {
-      if (card.rect.z > z) {
-        z = card.rect.z;
+      if (card.z > z) {
+        z = card.z;
       }
     }
 
     return z;
   }
 
-  largestOverlapWithCard(card: Card): Card | null {
+  pixelsOverlap(a: Card, b: Card | PrivateArea): number {
+    const h = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+    const v = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
+    return Math.max(0, h) * Math.max(0, v);
+  }
+
+  overlapsPrivateArea(card: Card): PrivateArea | null {
+    for (const [areaId, area] of Object.entries(this.privateAreas)) {
+      if (this.pixelsOverlap(card, area) > 0) {
+        return area;
+      }
+    }
+
     return null;
+  }
+
+  overlapsCard(card: Card): Card | null {
+    let largest: Card | null = null;
+    let pixels: number = 500;
+
+    for (const [otherId, other] of Object.entries(this.cards)) {
+      if (other === card) {
+        continue;
+      }
+
+      const priv = this.overlapsPrivateArea(other);
+      const area = this.pixelsOverlap(card, other);
+      const ownsOther = other.owner === card.owner;
+
+      if (area > pixels && ((priv && ownsOther) || !priv)) {
+        pixels = area;
+        largest = other;
+      }
+    }
+
+    return largest;
   }
 }

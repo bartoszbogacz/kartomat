@@ -17,37 +17,53 @@ interface ReplicatedCard {
 class Card {
   private _name: string;
   private _onDeck: Deck | null = null;
-  private _rect: Rectangle = { x: 0, y: 0, z: 0, w: 100, h: 150 };
+  private _x: number = 0;
+  private _y: number = 0;
+  private _z: number = 0;
+  private _w: number = 100;
+  private _h: number = 150;
 
-  private replica: ReplicatedCard;
+  private replica: ReplicatedCard = {
+    tick: 0,
+    owner: null,
+    x: 0,
+    y: 0,
+    z: 0,
+    w: 0,
+    h: 0,
+    onDeck: null,
+    images: [""],
+    colors: [""],
+    current: 0,
+  };
+
   private scene: Scene;
-  private elem: HTMLElement;
-  private image: string = "";
+  private visElem: HTMLElement;
+  private ownerElem: HTMLElement;
 
-  constructor(scene: Scene, name: string, replica: ReplicatedCard | null) {
+  constructor(scene: Scene, name: string) {
     this._name = name;
     this.scene = scene;
 
-    this.elem = document.createElement("div");
-    new DragAndDrop(this.elem, this);
+    this.visElem = document.createElement("div");
+    this.visElem.style.position = "absolute";
+    this.visElem.style.userSelect = "none";
+    document.body.appendChild(this.visElem);
 
-    if (replica === null) {
-      this.replica = {
-        tick: 0,
-        owner: null,
-        x: 0,
-        y: 0,
-        z: 0,
-        w: 100,
-        h: 150,
-        onDeck: null,
-        images: [""],
-        colors: [""],
-        current: 0,
-      };
-    } else {
-      this.replica = replica;
-    }
+    this.ownerElem = document.createElement("div");
+    this.ownerElem.style.position = "absolute";
+    this.ownerElem.style.userSelect = "none";
+    document.body.appendChild(this.ownerElem);
+
+    new DragAndDrop(this.visElem, this);
+  }
+
+  get tick(): number {
+    return this.replica.tick;
+  }
+
+  get owner(): string | null {
+    return this.replica.owner;
   }
 
   get name(): string {
@@ -58,32 +74,68 @@ class Card {
     return this._onDeck;
   }
 
-  get rect(): Rectangle {
-    return this._rect;
+  get x(): number {
+    return this._x;
   }
 
-  update() {
-    this.image = this.replica.images[this.replica.current];
-    this.elem.style.width = this.rect.w + "px";
-    this.elem.style.height = this.rect.h + "px";
+  get y(): number {
+    return this._y;
+  }
+
+  get z(): number {
+    return this._z;
+  }
+
+  get w(): number {
+    return this._w;
+  }
+
+  get h(): number {
+    return this._h;
+  }
+
+  synchronizeWith(remote: ReplicatedCard) {
+    if (remote.tick > this.tick) {
+      this.replica = remote;
+    }
+
+    this.visElem.style.width = this.w + "px";
+    this.visElem.style.height = this.h + "px";
+    this.visElem.style.backgroundSize = this.w + "px " + this.h + "px";
+    this.visElem.style.backgroundColor = this.replica.colors[
+      this.replica.current
+    ];
+    this.visElem.style.backgroundImage =
+      "url(" + this.replica.images[this.replica.current] + ")";
+
+    if (this.tick + 5 < this.scene.tick || this.owner === null) {
+      this.ownerElem.style.visibility = "hidden";
+    } else {
+      this.ownerElem.style.visibility = "visible";
+      this.ownerElem.innerHTML = this.owner;
+    }
   }
 
   render(x: number, y: number, z: number, onDeck: Deck | null) {
-    this._rect.x = x;
-    this._rect.y = y;
-    this._rect.z = z;
+    this._x = x;
+    this._y = y;
+    this._z = z;
     this._onDeck = onDeck;
 
-    this.elem.style.left = this.rect.x + "px";
-    this.elem.style.top = this.rect.y + "px";
-    this.elem.style.zIndex = this.rect.z.toString();
-    this.elem.style.backgroundImage = this.image;
+    this.visElem.style.left = this.x + "px";
+    this.visElem.style.top = this.y + "px";
+    this.visElem.style.zIndex = this.z.toString();
+
+    this.ownerElem.style.left = this.x + "px";
+    this.ownerElem.style.top = this.y + "px";
+    this.ownerElem.style.zIndex = (this.z + 1).toString();
   }
 
   take() {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
-    this.replica.z = this.scene.topZOfCardsAndDecks() + 1;
+    this.replica.onDeck = null;
+    this.replica.z = this.scene.topZOfCards() + 1;
   }
 
   move(x: number, y: number) {
@@ -94,20 +146,32 @@ class Card {
   }
 
   place(wasOutside: boolean) {
-    this.replica.tick = this.scene.tick;
-    this.replica.owner = this.scene.playerId;
-    const other = this.scene.largestOverlapWithCard(this);
-    if (other === null) {
-      //
+    const other = this.scene.overlapsCard(this);
+
+    if (other === null && wasOutside) {
+      // Nothing to do
+    } else if (other === null) {
+      this.turn();
     } else if (other.onDeck === null) {
-      const deck = this.scene.createDeck();
+      const deck = this.scene.createDeck(this);
+      this.replica.tick = this.scene.tick;
+      this.replica.owner = this.scene.playerId;
       this.replica.onDeck = deck.name;
+      other.replica.tick = this.scene.tick;
+      other.replica.owner = this.scene.playerId;
       other.replica.onDeck = deck.name;
     } else {
       this.replica.tick = this.scene.tick;
       this.replica.owner = this.scene.playerId;
       this.replica.onDeck = other.onDeck.name;
-      this.replica.x = other.onDeck.indexAt(this.rect.x);
+      this.replica.x = other.onDeck.indexFor(this.x);
     }
+  }
+
+  turn() {
+    this.replica.tick = this.scene.tick;
+    this.replica.owner = this.scene.playerId;
+    this.replica.current =
+      (this.replica.current + 1) % this.replica.images.length;
   }
 }

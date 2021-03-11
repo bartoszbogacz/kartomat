@@ -14,67 +14,112 @@ interface ReplicatedDeck {
 
 class Deck {
   private _name: string;
-  private _rect: Rectangle = { x: 0, y: 0, z: 0, w: 30, h: 150 };
+  private _z: number = 0;
+
   private stride: number = 10;
   private cards: Card[] = [];
 
-  private replica: ReplicatedDeck;
-  private scene: Scene;
-  private elem: HTMLElement;
+  private replica: ReplicatedDeck = {
+    tick: 0,
+    owner: null,
+    x: 0,
+    y: 0,
+    z: 0,
+    w: 30,
+    h: 150,
+    strides: [2, 10],
+    current: 0,
+  };
 
-  constructor(scene: Scene, name: string, replica: ReplicatedDeck | null) {
+  private scene: Scene;
+  private visElem: HTMLElement;
+  private ownerElem: HTMLElement;
+
+  constructor(scene: Scene, name: string, ref: Card | null) {
     this._name = name;
     this.scene = scene;
-    this.elem = document.createElement("div");
-    if (replica === null) {
-      this.replica = {
-        tick: 0,
-        owner: null,
-        x: 0,
-        y: 0,
-        z: 0,
-        w: 30,
-        h: 150,
-        strides: [2, 10],
-        current: 1,
-      };
-    } else {
-      this.replica = replica;
+
+    this.visElem = document.createElement("div");
+    this.visElem.style.position = "absolute";
+    this.visElem.style.userSelect = "none";
+    document.body.appendChild(this.visElem);
+
+    this.ownerElem = document.createElement("div");
+    this.ownerElem.style.position = "absolute";
+    this.ownerElem.style.userSelect = "none";
+    document.body.appendChild(this.ownerElem);
+
+    if (ref !== null) {
+      this.replica.tick = ref.tick;
+      this.replica.owner = ref.owner;
+      this.replica.x = ref.x - 30;
+      this.replica.y = ref.y;
+      this.replica.z = ref.z;
     }
+  }
+
+  get tick(): number {
+    return this.replica.tick;
+  }
+
+  get owner(): string | null {
+    return this.replica.owner;
   }
 
   get name(): string {
     return this._name;
   }
 
-  get rect(): Rectangle {
-    return this._rect;
+  get x(): number {
+    return this.replica.x;
   }
 
-  indexAt(x: number): number {
-    return 0;
+  get y(): number {
+    return this.replica.y;
   }
 
-  update() {
-    this._rect.x = this.replica.x;
-    this._rect.y = this.replica.y;
-    this._rect.w = this.replica.w;
-    this._rect.h = this.replica.h;
+  get z(): number {
+    return this._z;
+  }
+
+  get w(): number {
+    return this.replica.w;
+  }
+
+  get h(): number {
+    return this.replica.h;
+  }
+
+  synchronizeWith(remote: ReplicatedDeck) {
+    if (remote.tick > this.tick) {
+      this.replica = remote;
+    }
+
     this.stride = this.replica.strides[this.replica.current];
 
-    this.elem.style.left = this.rect.x + "px";
-    this.elem.style.top = this.rect.y + "px";
-    this.elem.style.width = this.rect.w + "px";
-    this.elem.style.height = this.rect.h + "px";
+    this.visElem.style.left = this.x + "px";
+    this.visElem.style.top = this.y + "px";
+    this.visElem.style.width = this.w + "px";
+    this.visElem.style.height = this.h + "px";
+
+    this.ownerElem.style.left = this.x + "px";
+    this.ownerElem.style.top = this.y + "px";
+
+    if (this.tick + 5 < this.scene.tick || this.owner === null) {
+      this.ownerElem.style.visibility = "hidden";
+    } else {
+      this.ownerElem.style.visibility = "visible";
+      this.ownerElem.innerHTML = this.owner;
+    }
   }
 
   render(z: number, cards: Card[]) {
-    this._rect.z = z;
+    this._z = z;
     this.cards = cards;
 
-    const x = this.rect.x;
-    const y = this.rect.y;
-    const w = this.rect.w;
+    const x = this.x;
+    const y = this.y;
+    const w = this.w;
     const s = this.stride;
 
     for (let i = 0; i < this.cards.length; i++) {
@@ -85,6 +130,29 @@ class Deck {
   take() {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
-    this.replica.z = this.scene.topZOfCardsAndDecks() + 1;
+    this.replica.z = this.scene.topZOfCards() + 1;
+  }
+
+  move(x: number, y: number) {
+    this.replica.tick = this.scene.tick;
+    this.replica.owner = this.scene.playerId;
+    this.replica.x = x;
+    this.replica.y = y;
+  }
+
+  indexFor(x: number): number {
+    let f: number = 0;
+    // We use a small offset to bias card insertion to the left.
+    // If you put a card very close on top to another one, the new
+    // stackable will be placed on the left.
+    for (const card of this.cards) {
+      if (card.x + 10 > x) {
+        return (card.x + x) * 0.5;
+      } else {
+        f = card.x;
+      }
+    }
+    // Reached last card. Put the new card behind that one.
+    return x + 1;
   }
 }
