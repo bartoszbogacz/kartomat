@@ -77,7 +77,7 @@ class Scene {
     return this.replica.clientId;
   }
 
-  /** Apply changes from remote and taking ownership of the object */
+  /** Apply changes from remote. Takes ownership of the argument. */
   synchronizeWith(remote: ReplicatedScene) {
     // Never regress tick even if server tells us so. Otherwise we may
     // not be able to change our own objects if their tick is higher than
