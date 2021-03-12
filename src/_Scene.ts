@@ -1,5 +1,6 @@
 interface ReplicatedScene {
   tick: number;
+  boardId: string;
   gameId: string;
   playerId: string;
   clientId: string;
@@ -14,6 +15,7 @@ interface ReplicatedScene {
 }
 
 class Scene {
+  private remoteTick: number = 0;
   private replica: ReplicatedScene;
 
   private avatars: { [key: string]: Avatar } = {};
@@ -29,6 +31,7 @@ class Scene {
   constructor() {
     this.replica = {
       tick: 0,
+      boardId: "",
       gameId: "",
       playerId: "",
       clientId: "",
@@ -46,12 +49,47 @@ class Scene {
     return this.replica.tick;
   }
 
+  get boardId(): string {
+    return this.replica.boardId;
+  }
+
+  set boardId(value: string) {
+    this.replica.boardId = value;
+  }
+
+  get gameId(): string {
+    return this.replica.gameId;
+  }
+
+  set gameId(value: string) {
+    this.replica.gameId = value;
+  }
+
   get playerId(): string {
     return this.replica.playerId;
   }
 
+  set playerId(value: string) {
+    this.replica.playerId = value;
+  }
+
+  get clientId(): string {
+    return this.replica.clientId;
+  }
+
+  /** Apply changes from remote and taking ownership of the object */
   synchronizeWith(remote: ReplicatedScene) {
-    this.cardsOnDeck = {};
+    // Never regress tick even if server tells us so. Otherwise we may
+    // not be able to change our own objects if their tick is higher than
+    // ours. Client tick and server tick behave like Lamport timestamp.
+    this.remoteTick = remote.tick;
+    this.replica.tick = Math.max(this.replica.tick, remote.tick);
+
+    // Take over settings from server
+    this.replica.boardId = remote.boardId;
+    this.replica.gameId = remote.gameId;
+    this.replica.playerId = remote.playerId;
+    this.replica.clientId = remote.clientId;
 
     for (const [key, avatar] of Object.entries(remote.avatars)) {
       if (!this.avatars.hasOwnProperty(key)) {
@@ -95,6 +133,8 @@ class Scene {
       this.decks[key].synchronizeWith(deck);
     }
 
+    this.cardsOnDeck = {};
+
     for (const [key, card] of Object.entries(remote.cards)) {
       if (!this.cards.hasOwnProperty(key)) {
         this.cards[key] = new Card(this, key);
@@ -110,6 +150,69 @@ class Scene {
         }
       }
     }
+  }
+
+  differences(): ReplicatedScene {
+    const result: ReplicatedScene = {
+      tick: this.tick,
+      boardId: this.boardId,
+      gameId: this.gameId,
+      playerId: this.playerId,
+      clientId: this.clientId,
+      avatars: {},
+      boards: {},
+      marbles: {},
+      notepads: {},
+      privateAreas: {},
+      decks: {},
+      cards: {},
+    };
+
+    for (const [key, avatar] of Object.entries(this.replica.avatars)) {
+      if (avatar.tick > this.remoteTick) {
+        result.avatars[key] = avatar;
+      }
+    }
+
+    for (const [key, board] of Object.entries(this.replica.boards)) {
+      if (board.tick > this.remoteTick) {
+        result.boards[key] = board;
+      }
+    }
+
+    for (const [key, marble] of Object.entries(this.replica.marbles)) {
+      if (marble.tick > this.remoteTick) {
+        result.marbles[key] = marble;
+      }
+    }
+
+    for (const [key, notepad] of Object.entries(this.replica.notepads)) {
+      if (notepad.tick > this.remoteTick) {
+        result.notepads[key] = notepad;
+      }
+    }
+
+    for (const [key, privateArea] of Object.entries(
+      this.replica.privateAreas
+    )) {
+      if (privateArea.tick > this.remoteTick) {
+        result.privateAreas[key] = privateArea;
+      }
+    }
+
+    for (const [key, deck] of Object.entries(this.replica.decks)) {
+      if (deck.tick > this.remoteTick) {
+        result.decks[key] = deck;
+      }
+    }
+
+    for (const [key, card] of Object.entries(this.replica.cards)) {
+      if (card.tick > this.remoteTick) {
+        result.cards[key] = card;
+      }
+    }
+
+    return result;
   }
 
   render() {
