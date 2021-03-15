@@ -182,7 +182,7 @@ function generateDog6() {
     l: 0,
     w: 770,
     h: 770,
-    images: "boards/dog.jpeg",
+    image: "boards/dog.jpeg",
   };
 
   scene["privateAreas"]["privatearea1"] = {
@@ -256,7 +256,7 @@ function generateDog8() {
     l: 0,
     w: 770,
     h: 770,
-    images: "boards/dog8.png",
+    image: "boards/dog8.png",
   };
 
   scene["privateAreas"]["privatearea1"] = {

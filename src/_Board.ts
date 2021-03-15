@@ -82,7 +82,7 @@ class Board {
     this.visElem.style.width = this.w + "px";
     this.visElem.style.height = this.h + "px";
     this.visElem.style.backgroundSize = this.w + "px " + this.h + "px";
-    this.visElem.style.backgroundImage = this.replica.image;
+    this.visElem.style.backgroundImage = "url(" + this.replica.image + ")";
   }
 
   render(z: number): number {
