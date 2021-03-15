@@ -1,3 +1,28 @@
+function parseUrl(url: string): [string, { [key: string]: any }] {
+  let path = null;
+  let parameters: { [key: string]: any } = {};
+
+  const pathQuery = url.split("?");
+
+  if (pathQuery.length === 1) {
+    path = pathQuery[0];
+  } else {
+    path = pathQuery[0];
+    const parts = pathQuery[1].split("&");
+
+    for (const p of parts) {
+      const keyValue = p.split("=");
+      if (keyValue.length === 1) {
+        parameters[keyValue[0]] = true;
+      } else {
+        parameters[keyValue[0]] = keyValue[1];
+      }
+    }
+  }
+
+  return [path, parameters];
+}
+
 class Client {
   scene: Scene;
   websocket: WebSocket | null = null;
@@ -29,11 +54,11 @@ class Client {
     };
 
     this.websocket.onerror = function (ev: Event) {
-      window.setTimeout(outer.connect, 2000);
+      window.setTimeout(outer.connect.bind(outer), 2000);
     };
 
     this.websocket.onclose = function (ev: Event) {
-      window.setTimeout(outer.connect, 2000);
+      window.setTimeout(outer.connect.bind(outer), 2000);
     };
   }
 
@@ -50,22 +75,29 @@ class Client {
 
     if (
       parameters.hasOwnProperty("board") === false ||
-      parameters.board !== _computed.boardId
+      parameters.board !== this.scene.boardId
     ) {
       history.pushState(
         {},
         "",
-        "/client.html?board=" + _computed.boardId + "&game=" + _computed.gameId
+        "/client.html?board=" +
+          this.scene.boardId +
+          "&game=" +
+          this.scene.gameId
       );
     }
 
     // The server drives the tick rate. We answer to each message of the server.
     this.send();
 
-    window.requestAnimationFrame(this.render);
+    window.requestAnimationFrame(this.render.bind(this));
   }
 
   render() {
     this.scene.render();
   }
 }
+
+const client = new Client();
+client.connect();
+window.setInterval(client.render.bind(client), 1000);

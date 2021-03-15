@@ -8,6 +8,16 @@ const path = require("path");
 const httpPort = 8000;
 const wsPort = 8080;
 
+const KLASSES = [
+  "avatars",
+  "boards",
+  "marbles",
+  "notepads",
+  "privateAreas",
+  "decks",
+  "cards",
+];
+
 let _wsServer = null;
 let _httpServer = null;
 let _runningGames = {};
@@ -24,106 +34,39 @@ function generateAvatars(scene, count) {
     [1130, 150],
   ];
 
-  if (!scene.hasOwnProperty("avatars")) {
-    scene["avatars"] = {};
-  }
-  if (!scene.hasOwnProperty("locatables")) {
-    scene["locatables"] = {};
-  }
   for (let i = 0; i < count; i++) {
-    const itemId = "avatar" + (i + 1);
-    if (
-      scene["avatars"].hasOwnProperty(itemId) ||
-      scene["locatables"].hasOwnProperty(itemId)
-    ) {
-      throw new Error("ItemId already in use.");
-    }
-    scene["avatars"][itemId] = {
-      represents: null,
-      text: "Player" + (i + 1),
-    };
-    scene["locatables"][itemId] = {
+    scene["avatars"]["avatar" + (i + 1)] = {
+      tick: 1,
+      owner: null,
       x: xys[i][0],
       y: xys[i][1],
       w: 200,
       h: 30,
       z: 0,
       l: 0,
-      cssClass: "",
-      images: [""],
-      colors: [""],
-      current: 0,
+      represents: null,
+      text: "Player" + (i + 1),
     };
   }
 }
 
 function generateMarbles(scene, xycs) {
-  if (!scene.hasOwnProperty("draggables")) {
-    scene["draggables"] = {};
-  }
-  if (!scene.hasOwnProperty("locatables")) {
-    scene["locatables"] = {};
-  }
-
   for (let i = 0; i < xycs.length; i++) {
-    const itemId = "marble" + (i + 1);
-    if (
-      scene["draggables"].hasOwnProperty(itemId) ||
-      scene["locatables"].hasOwnProperty(itemId)
-    ) {
-      throw new Error("ItemId already in use.");
-    }
-
-    scene["draggables"][itemId] = {};
-    scene["locatables"][itemId] = {
+    scene["marbles"]["marble" + (i + 1)] = {
+      tick: 1,
+      owner: null,
       x: xycs[i][0],
       y: xycs[i][1],
       w: 20,
       h: 20,
       z: 0,
       l: 2,
-      cssClass: "Marble",
-      images: [""],
-      colors: [xycs[i][2]],
-      current: 0,
+      color: xycs[i][2],
     };
   }
 }
 
 function generateRummy(scene) {
-  if (!scene.hasOwnProperty("stackings")) {
-    scene["stackings"] = {};
-  }
-  if (!scene.hasOwnProperty("stackables")) {
-    scene["stackables"] = {};
-  }
-  if (!scene.hasOwnProperty("draggables")) {
-    scene["draggables"] = {};
-  }
-  if (!scene.hasOwnProperty("locatables")) {
-    scene["locatables"] = {};
-  }
-
-  scene["draggables"]["stacking0"] = {};
-
-  scene["stackings"]["stacking0"] = {
-    strides: [2, 30],
-    current: 0,
-  };
-
-  scene["locatables"]["stacking0"] = {
-    x: 830,
-    y: 270,
-    z: 0,
-    l: 1,
-    w: 30,
-    h: 30,
-    cssClass: "MoveControl",
-    colors: [""],
-    images: ["controls/move.png"],
-    current: 0,
-  };
-
   const images = [
     ["rummy/club_1.png", "rummy/back_blue.png"],
     ["rummy/club_2.png", "rummy/back_blue.png"],
@@ -183,89 +126,74 @@ function generateRummy(scene) {
   ];
 
   for (let i = 0; i < images.length; i++) {
-    const itemId = "card" + (i + 1);
-    if (
-      scene["stackables"].hasOwnProperty(itemId) ||
-      scene["draggables"].hasOwnProperty(itemId) ||
-      scene["locatables"].hasOwnProperty(itemId)
-    ) {
-      throw new Error("ItemId already in use.");
-    }
-
-    scene["stackables"][itemId] = { onStacking: "stacking0" };
-    scene["draggables"][itemId] = {};
-    scene["locatables"][itemId] = {
+    scene["cards"]["card" + (i + 1)] = {
+      tick: 1,
+      owner: null,
       x: i,
       y: 0,
       w: 100,
       h: 150,
       z: 0,
       l: 2,
-      cssClass: "Card",
-      images: images[i],
       colors: ["", ""],
+      images: images[i],
       current: 0,
+      onDeck: null,
     };
   }
 }
 
 function generateWriteable(scene) {
-  if (!scene.hasOwnProperty("locatables")) {
-    scene["locatables"] = {};
-  }
-  if (!scene.hasOwnProperty("writeables")) {
-    scene["writeables"] = {};
-  }
-
-  scene["locatables"]["textarea1"] = {
+  scene["notepads"]["notepad1"] = {
+    tick: 1,
+    owner: null,
     x: 1100,
     y: 200,
     z: 0,
     l: 0,
     w: 230,
     h: 250,
-    cssClass: "",
-    images: [""],
-    colors: [""],
-    current: 0,
-  };
-
-  scene["writeables"]["textarea1"] = {
     text: "You can collaboratively write here.",
   };
 }
 
 function generateDog6() {
   let scene = {
-    locatables: {
-      board: {
-        x: 0,
-        y: 0,
-        z: 0,
-        l: 0,
-        w: 770,
-        h: 770,
-        cssClass: "Board",
-        images: ["boards/dog.jpeg"],
-        colors: [""],
-        current: 0,
-      },
-      privateArea: {
-        x: 830,
-        y: 470,
-        z: 0,
-        l: 1,
-        w: 500,
-        h: 300,
-        cssClass: "PrivateArea",
-        colors: [""],
-        images: [""],
-        current: 0,
-      },
-    },
-    dividers: {
-      privateArea: {},
-    },
+    tick: 1,
+    boardId: "Dog6",
+    gameId: "LIDLn6",
+    playerId: "",
+    clientId: "",
+    avatars: {},
+    boards: {},
+    marbles: {},
+    notepads: {},
+    privateAreas: {},
+    decks: {},
+    cards: {},
+  };
+
+  scene["boards"]["board1"] = {
+    tick: 1,
+    owner: null,
+    x: 0,
+    y: 0,
+    z: 0,
+    l: 0,
+    w: 770,
+    h: 770,
+    images: "boards/dog.jpeg",
+  };
+
+  scene["privateAreas"]["privatearea1"] = {
+    tick: 1,
+    owner: null,
+    x: 830,
+    y: 470,
+    z: 0,
+    l: 1,
+    w: 500,
+    h: 300,
   };
 
   const marbles = [
@@ -305,35 +233,41 @@ function generateDog6() {
 
 function generateDog8() {
   let scene = {
-    locatables: {
-      board: {
-        x: 0,
-        y: 0,
-        z: 0,
-        l: 0,
-        w: 770,
-        h: 770,
-        cssClass: "Board",
-        images: ["boards/dog8.png"],
-        colors: [""],
-        current: 0,
-      },
-      privateArea: {
-        x: 830,
-        y: 470,
-        z: 0,
-        l: 1,
-        w: 500,
-        h: 300,
-        cssClass: "PrivateArea",
-        colors: [""],
-        images: [""],
-        current: 0,
-      },
-    },
-    dividers: {
-      privateArea: {},
-    },
+    tick: 1,
+    boardId: "Dog8",
+    gameId: "LIDLn8",
+    playerId: "",
+    clientId: "",
+    avatars: {},
+    boards: {},
+    marbles: {},
+    notepads: {},
+    privateAreas: {},
+    decks: {},
+    cards: {},
+  };
+
+  scene["boards"]["board1"] = {
+    tick: 1,
+    owner: null,
+    x: 0,
+    y: 0,
+    z: 0,
+    l: 0,
+    w: 770,
+    h: 770,
+    images: "boards/dog8.png",
+  };
+
+  scene["privateAreas"]["privatearea1"] = {
+    tick: 1,
+    owner: null,
+    x: 830,
+    y: 470,
+    z: 0,
+    l: 1,
+    w: 500,
+    h: 300,
   };
 
   const marbles = [
@@ -465,24 +399,14 @@ function initWebSocketServer() {
   });
 }
 
-function hydrateScene(scene) {
-  for (const component of Object.keys(scene)) {
-    for (const [key, value] of Object.entries(scene[component])) {
-      value["tick"] = 0;
-      value["ownedBy"] = null;
-    }
-  }
-  return scene;
-}
-
 // The method assembleBoard will be called by handleHTTPRequest with boardId
 // set by the ?board=Dog query parameter.
 
 function assembleBoard(boardId) {
   if (boardId === "Dog6") {
-    return hydrateScene(generateDog6());
+    return generateDog6();
   } else if (boardId === "Dog8") {
-    return hydrateScene(generateDog8());
+    return generateDog8();
   } else {
     throw new Error("Board not implemented");
   }
@@ -508,32 +432,39 @@ function reloadGame(gameId) {
 }
 
 function handleClientMessage(socket, msg) {
-  msg = JSON.parse(msg);
+  const scene = JSON.parse(msg);
 
-  const boardId = msg.boardId || "Dog";
-  const gameId = msg.gameId || "Game-" + randomId(8);
-  const playerId = msg.playerId || "Player-" + randomId(8);
+  // If the clients does not even specify a board, set a
+  // reasonable default.
+
+  const boardId = scene.boardId || "Dog6";
+  const gameId = scene.gameId || "Game-" + randomId(8);
+  const playerId = scene.playerId || "Player-" + randomId(8);
+  const clientId = scene.clientId || "Client-" + randomId(8);
 
   // If there is no such game, create it
+
   if (_runningGames.hasOwnProperty(gameId) === false) {
     const board = assembleBoard(boardId);
 
     _runningGames[gameId] = {
-      tick: 1,
-      sockets: {},
-      boardId: boardId,
+      clients: {},
       scene: board,
     };
     console.log(playerId, "created", gameId, "playing", boardId);
   }
 
+  // TODO: Refactor client record setup
+  // TODO: Use local and remote instead of board and scene
+
   // If player not yet part of game, join
-  if (_runningGames[gameId].sockets.hasOwnProperty(playerId) === false) {
-    _runningGames[gameId].sockets[playerId] = [socket];
-    console.log(playerId, "joined", gameId, "playing", boardId);
-  } else if (_runningGames[gameId].sockets[playerId].indexOf(socket) === -1) {
-    _runningGames[gameId].sockets[playerId].push(socket);
-    console.log("views", playerId, "in", gameId, "playing", boardId);
+  if (!_runningGames[gameId].clients.hasOwnProperty(clientId)) {
+    _runningGames[gameId].clients[clientId] = {
+      playerId: playerId,
+      socket: socket,
+      scene: scene,
+    };
+    console.log(clientId, playerId, "joined", gameId, "playing", boardId);
   }
 
   // Step tick forward is client is ahead of us. Client may have
@@ -541,79 +472,77 @@ function handleClientMessage(socket, msg) {
   // a game. Never regress tick of clients. Server tick and client
   // tick behave like a Lamport timestamp.
 
-  _runningGames[gameId].tick = Math.max(_runningGames[gameId].tick, msg.tick);
-
-  // Synchronize with client
-  for (const [key, values] of Object.entries(msg.scene)) {
-    _runningGames[gameId].scene[key] = unionLastWriterWins(
-      msg.scene[key] || {},
-      _runningGames[gameId].scene[key] || {}
-    );
-  }
+  synchronizeWith(_runningGames[gameId].scene, scene);
 }
 
 function sendServerMessage() {
   for (const [gameId, game] of Object.entries(_runningGames)) {
     // Each time a scene is announced to all, increase ticks for this game
-    game.tick += 1;
+    game.scene.tick += 1;
+
     // Propagate changes to all players
-    for (const [playerId, clientSockets] of Object.entries(game.sockets)) {
-      const msg = {
-        boardId: game.boardId,
-        gameId: gameId,
-        playerId: playerId,
-        tick: game.tick,
-        scene: game.scene,
-      };
-      for (const cs of clientSockets) {
-        cs.send(JSON.stringify(msg));
-      }
+    for (const [clientId, client] of Object.entries(game.clients)) {
+      const scene = differenceTo(
+        game.scene,
+        client.scene,
+        client.playerId,
+        clientId
+      );
+      client.socket.send(JSON.stringify(scene));
     }
   }
 }
 
 function handleClientDisconnected(socket) {
   for (const [gid, game] of Object.entries(_runningGames)) {
-    for (const [pid, sockets] of Object.entries(game.sockets)) {
-      const i = sockets.indexOf(socket);
-      if (i !== -1) {
-        _runningGames[gid].sockets[pid].splice(i, 1);
+    for (const [clientId, client] of Object.entries(game.clients)) {
+      if (client.socket === socket) {
+        delete game.clients[clientId];
       }
     }
   }
 }
 
-/** Union two LWWMaps returning a copy of the superset.
- *
- * The union is biased towards state2 on equal tick counts of both,
- * by performing the merging of state2 onto result secondary and
- * avoid an explicit lesser equals check there.
- *
- */
-function unionLastWriterWins(state1, state2) {
-  const result = {};
+function synchronizeWith(local, remote) {
+  local.tick = Math.max(local.tick, remote.tick);
 
-  for (const key of Object.keys(state2)) {
-    if (state1.hasOwnProperty(key) && state1[key].tick > state2[key].tick) {
-      continue;
+  for (const klass of KLASSES) {
+    for (const key of Object.keys(remote[klass])) {
+      if (remote[klass][key].tick > local[klass][key].tick) {
+        local[klass][key] = remote[klass][key];
+      }
     }
-    result[key] = {};
-    for (const [prop, value] of Object.entries(state2[key])) {
-      result[key][prop] = value;
+  }
+}
+
+function differenceTo(local, remote, playerId, clientId) {
+  const changes = {
+    tick: local.tick,
+    boardId: local.boardId,
+    gameId: local.gameId,
+    playerId: playerId,
+    clientId: clientId,
+    avatars: {},
+    boards: {},
+    marbles: {},
+    notepads: {},
+    privateAreas: {},
+    decks: {},
+    cards: {},
+  };
+
+  for (const klass of KLASSES) {
+    for (const key of Object.keys(local[klass])) {
+      if (
+        !remote[klass].hasOwnProperty(key) ||
+        local[klass][key].tick > remote[klass][key].tick
+      ) {
+        changes[klass][key] = local[klass][key];
+      }
     }
   }
 
-  for (const key of Object.keys(state1)) {
-    if (state2.hasOwnProperty(key) && state2[key].tick > state1[key].tick) {
-      continue;
-    }
-    result[key] = {};
-    for (const [prop, value] of Object.entries(state1[key])) {
-      result[key][prop] = value;
-    }
-  }
-
-  return result;
+  return changes;
 }
 
 function parseUrl(url) {

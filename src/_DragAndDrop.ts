@@ -28,11 +28,11 @@ class DragAndDrop {
 
     // https://developers.google.com/web/updates/2016/06/
     // passive-event-listeners
-    source.addEventListener("mousedown", this.mouseDown, {
+    source.addEventListener("mousedown", this.mouseDown.bind(this), {
       passive: false,
       capture: true,
     });
-    source.addEventListener("touchstart", this.mouseDown, {
+    source.addEventListener("touchstart", this.mouseDown.bind(this), {
       passive: false,
       capture: true,
     });
@@ -58,8 +58,8 @@ class DragAndDrop {
 
     this.target.take();
 
-    document.onmousemove = this.mouseMove;
-    document.onmouseup = this.mouseUp;
+    document.onmousemove = this.mouseMove.bind(this);
+    document.onmouseup = this.mouseUp.bind(this);
   }
 
   mouseMove(event: Event) {

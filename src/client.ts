@@ -620,31 +620,6 @@ function unionLastWriterWins<T extends Synchronized, K extends keyof T>(
   return result;
 }
 
-function parseUrl(url: string): [string, { [key: string]: any }] {
-  let path = null;
-  let parameters: { [key: string]: any } = {};
-
-  const pathQuery = url.split("?");
-
-  if (pathQuery.length === 1) {
-    path = pathQuery[0];
-  } else {
-    path = pathQuery[0];
-    const parts = pathQuery[1].split("&");
-
-    for (const p of parts) {
-      const keyValue = p.split("=");
-      if (keyValue.length === 1) {
-        parameters[keyValue[0]] = true;
-      } else {
-        parameters[keyValue[0]] = keyValue[1];
-      }
-    }
-  }
-
-  return [path, parameters];
-}
-
 initWebSocketClient();
 initDocumentControls();
 window.setInterval(render, 1000);
