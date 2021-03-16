@@ -80,11 +80,14 @@ class Marble {
     return this.replica.h;
   }
 
-  synchronizeWith(remote: ReplicatedMarble) {
+  synchronize(remote: ReplicatedMarble) {
     if (remote.tick > this.tick) {
       this.replica = remote;
+      this.update();
     }
+  }
 
+  update() {
     this.visElem.style.left = this.x + "px";
     this.visElem.style.top = this.y + "px";
     this.visElem.style.width = this.w + "px";
@@ -92,14 +95,9 @@ class Marble {
     this.visElem.style.backgroundSize = this.w + "px " + this.h + "px";
     this.visElem.style.backgroundColor = this.replica.color;
 
-    if (this.tick + 5 < this.scene.tick || this.owner === null) {
-      this.ownerElem.style.visibility = "hidden";
-    } else {
-      this.ownerElem.style.left = this.x + "px";
-      this.ownerElem.style.top = this.y + "px";
-      this.ownerElem.style.visibility = "visible";
-      this.ownerElem.innerHTML = this.owner;
-    }
+    this.ownerElem.style.left = this.x + "px";
+    this.ownerElem.style.top = this.y + 15 + "px";
+    this.ownerElem.innerHTML = this.owner || "";
   }
 
   render(z: number) {
@@ -107,6 +105,11 @@ class Marble {
 
     this.visElem.style.zIndex = this.z.toString();
     this.ownerElem.style.zIndex = (this.z + 1).toString();
+    if (this.tick + 5 < this.scene.tick || this.owner === null) {
+      this.ownerElem.style.visibility = "hidden";
+    } else {
+      this.ownerElem.style.visibility = "visible";
+    }
 
     return z + 2;
   }
@@ -115,6 +118,7 @@ class Marble {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.z = this.scene.topZOfCards() + 1;
+    this.update();
   }
 
   move(x: number, y: number) {
@@ -122,6 +126,7 @@ class Marble {
     this.replica.owner = this.scene.playerId;
     this.replica.x = x;
     this.replica.y = y;
+    this.update();
   }
 
   place(wasOutside: boolean) {

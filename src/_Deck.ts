@@ -13,30 +13,25 @@ interface ReplicatedDeck {
 }
 
 class Deck {
-  private _name: string;
-  private _z: number = 0;
-
-  private stride: number = 10;
-  private cards: Card[] = [];
-
-  private replica: ReplicatedDeck = {
-    tick: 0,
-    owner: null,
-    x: 0,
-    y: 0,
-    z: 0,
-    w: 30,
-    h: 150,
-    strides: [2, 10],
-    current: 0,
-  };
+  public name: string;
+  public replica: ReplicatedDeck;
+  public tick: number = 0;
+  public owner: string | null = null;
+  public x: number = 0;
+  public y: number = 0;
+  public z: number = 0;
+  public w: number = 100;
+  public h: number = 150;
+  public d: number = 2;
+  public cards: Card[] = [];
 
   private scene: Scene;
   private visElem: HTMLElement;
   private ownerElem: HTMLElement;
 
-  constructor(scene: Scene, name: string, ref: Card | null) {
-    this._name = name;
+  constructor(name: string, replica: ReplicatedDeck, scene: Scene) {
+    this.name = name;
+    this.replica = replica;
     this.scene = scene;
 
     this.visElem = document.createElement("div");
@@ -48,54 +43,17 @@ class Deck {
     this.ownerElem.style.position = "absolute";
     this.ownerElem.style.userSelect = "none";
     document.body.appendChild(this.ownerElem);
-
-    if (ref !== null) {
-      this.replica.tick = ref.tick;
-      this.replica.owner = ref.owner;
-      this.replica.x = ref.x - 30;
-      this.replica.y = ref.y;
-      this.replica.z = ref.z;
-    }
   }
 
-  get tick(): number {
-    return this.replica.tick;
-  }
+  synchronize() {
+    this.tick = this.replica.tick;
+    this.owner = this.replica.owner;
+    this.x = this.replica.x;
+    this.y = this.replica.y;
+    this.w = this.replica.w;
+    this.h = this.replica.h;
 
-  get owner(): string | null {
-    return this.replica.owner;
-  }
-
-  get name(): string {
-    return this._name;
-  }
-
-  get x(): number {
-    return this.replica.x;
-  }
-
-  get y(): number {
-    return this.replica.y;
-  }
-
-  get z(): number {
-    return this._z;
-  }
-
-  get w(): number {
-    return this.replica.w;
-  }
-
-  get h(): number {
-    return this.replica.h;
-  }
-
-  synchronizeWith(remote: ReplicatedDeck) {
-    if (remote.tick > this.tick) {
-      this.replica = remote;
-    }
-
-    this.stride = this.replica.strides[this.replica.current];
+    this.d = this.cards.length;
 
     this.visElem.style.left = this.x + "px";
     this.visElem.style.top = this.y + "px";
@@ -103,36 +61,32 @@ class Deck {
     this.visElem.style.height = this.h + "px";
 
     this.ownerElem.style.left = this.x + "px";
-    this.ownerElem.style.top = this.y + "px";
+    this.ownerElem.style.top = this.y + this.h + "px";
+    this.ownerElem.innerHTML = this.owner || "";
 
+    for (let i = 0; i < this.cards.length; i++) {
+      this.cards[i].x =
+        this.x + this.w + this.replica.strides[this.replica.current] * i;
+      this.cards[i].y = this.y;
+      this.cards[i].z = this.z + 1 * i;
+      this.cards[i].onDeck = this;
+      this.cards[i].synchronize();
+    }
+  }
+
+  render() {
     if (this.tick + 5 < this.scene.tick || this.owner === null) {
       this.ownerElem.style.visibility = "hidden";
     } else {
       this.ownerElem.style.visibility = "visible";
-      this.ownerElem.innerHTML = this.owner;
     }
-  }
-
-  render(z: number, cards: Card[]): number {
-    this._z = z;
-    this.cards = cards;
-
-    const x = this.x;
-    const y = this.y;
-    const w = this.w;
-    const s = this.stride;
-
-    for (let i = 0; i < this.cards.length; i++) {
-      this.cards[i].render(x + w + s * i, y, z + 1 + i, this);
-    }
-
-    return z + 1 + this.cards.length;
   }
 
   take() {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.z = this.scene.topZOfCards() + 1;
+    this.synchronize();
   }
 
   move(x: number, y: number) {
@@ -140,6 +94,7 @@ class Deck {
     this.replica.owner = this.scene.playerId;
     this.replica.x = x;
     this.replica.y = y;
+    this.synchronize();
   }
 
   place(wasOutside: boolean) {
@@ -166,6 +121,7 @@ class Deck {
     this.replica.owner = this.scene.playerId;
     this.replica.current =
       (this.replica.current + 1) % this.replica.strides.length;
+    this.synchronize();
   }
 
   /** This modification is not atomic and may lead to inconsistencies */

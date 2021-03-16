@@ -91,6 +91,9 @@ class Scene {
     this.replica.playerId = remote.playerId;
     this.replica.clientId = remote.clientId;
 
+    // Order elements
+    let z: number = 0;
+
     for (const [key, avatar] of Object.entries(remote.avatars)) {
       if (!this.avatars.hasOwnProperty(key)) {
         this.replica.avatars[key] = avatar;
@@ -104,7 +107,7 @@ class Scene {
         this.replica.marbles[key] = marble;
         this.marbles[key] = new Marble(this, key);
       }
-      this.marbles[key].synchronizeWith(marble);
+      this.marbles[key].synchronize(marble);
     }
 
     for (const [key, board] of Object.entries(remote.boards)) {
@@ -131,20 +134,15 @@ class Scene {
       this.privateAreas[key].synchronizeWith(privateArea);
     }
 
-    for (const [key, deck] of Object.entries(remote.decks)) {
-      if (!this.decks.hasOwnProperty(key)) {
-        this.replica.decks[key] = deck;
-        this.decks[key] = new Deck(this, key, null);
-      }
-      this.decks[key].synchronizeWith(deck);
-    }
-
     for (const [key, card] of Object.entries(remote.cards)) {
       if (!this.cards.hasOwnProperty(key)) {
         this.replica.cards[key] = card;
-        this.cards[key] = new Card(this, key);
+        this.cards[key] = new Card(key, card, this);
       }
-      this.cards[key].synchronizeWith(card);
+      if (card.tick > this.cards[key].tick) {
+        this.cards[key].replica = card;
+        this.cards[key].synchronize();
+      }
     }
 
     // Re-compute card assignments
@@ -159,6 +157,18 @@ class Scene {
         } else {
           this.cardsOnDeck[card.onDeck] = [this.cards[key]];
         }
+      }
+    }
+
+    for (const [key, deck] of Object.entries(remote.decks)) {
+      if (!this.decks.hasOwnProperty(key)) {
+        this.replica.decks[key] = deck;
+        this.decks[key] = new Deck(key, deck, this);
+      }
+      if (deck.tick > this.decks[key].tick) {
+        this.decks[key].replica = deck;
+        this.decks[key].cards = this.cardsOnDeck[key];
+        this.decks[key].synchronize();
       }
     }
   }
@@ -250,7 +260,11 @@ class Scene {
     }
 
     for (const [key, deck] of Object.entries(this.decks)) {
-      z = deck.render(z, this.cardsOnDeck[key]);
+      deck.render();
+    }
+
+    for (const [key, card] of Object.entries(this.cards)) {
+      card.render();
     }
   }
 
@@ -258,10 +272,20 @@ class Scene {
     for (let i = 0; i < 1000; i++) {
       const name = "deck" + i;
       if (!this.decks.hasOwnProperty(name)) {
-        return new Deck(this, name, ref);
+        const replica: ReplicatedDeck = {
+          tick: this.tick,
+          owner: this.playerId,
+          x: ref.x - 30,
+          y: ref.y,
+          z: ref.z,
+          w: ref.w,
+          h: ref.h,
+          strides: [0, 20],
+          current: 0,
+        };
+        return new Deck(name, replica, this);
       }
     }
-
     throw new Error("Ids for decks exhausted.");
   }
 
