@@ -93,6 +93,7 @@ class Scene {
 
     for (const [key, avatar] of Object.entries(remote.avatars)) {
       if (!this.avatars.hasOwnProperty(key)) {
+        this.replica.avatars[key] = avatar;
         this.avatars[key] = new Avatar(this, key);
       }
       this.avatars[key].synchronizeWith(avatar);
@@ -100,6 +101,7 @@ class Scene {
 
     for (const [key, marble] of Object.entries(remote.marbles)) {
       if (!this.marbles.hasOwnProperty(key)) {
+        this.replica.marbles[key] = marble;
         this.marbles[key] = new Marble(this, key);
       }
       this.marbles[key].synchronizeWith(marble);
@@ -107,6 +109,7 @@ class Scene {
 
     for (const [key, board] of Object.entries(remote.boards)) {
       if (!this.boards.hasOwnProperty(key)) {
+        this.replica.boards[key] = board;
         this.boards[key] = new Board(this, key);
       }
       this.boards[key].synchronizeWith(board);
@@ -114,6 +117,7 @@ class Scene {
 
     for (const [key, notepad] of Object.entries(remote.notepads)) {
       if (!this.notepads.hasOwnProperty(key)) {
+        this.replica.notepads[key] = notepad;
         this.notepads[key] = new Notepad(this, key);
       }
       this.notepads[key].synchronizeWith(notepad);
@@ -121,6 +125,7 @@ class Scene {
 
     for (const [key, privateArea] of Object.entries(remote.privateAreas)) {
       if (!this.privateAreas.hasOwnProperty(key)) {
+        this.replica.privateAreas[key] = privateArea;
         this.privateAreas[key] = new PrivateArea(this, key);
       }
       this.privateAreas[key].synchronizeWith(privateArea);
@@ -128,20 +133,26 @@ class Scene {
 
     for (const [key, deck] of Object.entries(remote.decks)) {
       if (!this.decks.hasOwnProperty(key)) {
+        this.replica.decks[key] = deck;
         this.decks[key] = new Deck(this, key, null);
       }
       this.decks[key].synchronizeWith(deck);
     }
 
-    this.cardsOnDeck = {};
-
     for (const [key, card] of Object.entries(remote.cards)) {
       if (!this.cards.hasOwnProperty(key)) {
+        this.replica.cards[key] = card;
         this.cards[key] = new Card(this, key);
       }
-
       this.cards[key].synchronizeWith(card);
+    }
 
+    // Re-compute card assignments
+    // TODO: Only do this for cards that actually changed.
+
+    this.cardsOnDeck = {};
+
+    for (const [key, card] of Object.entries(this.replica.cards)) {
       if (card.onDeck !== null) {
         if (this.cardsOnDeck.hasOwnProperty(card.onDeck)) {
           this.cardsOnDeck[card.onDeck].push(this.cards[key]);
@@ -218,20 +229,20 @@ class Scene {
   render() {
     let z: number = 0;
 
-    for (const [key, avatar] of Object.entries(this.avatars)) {
-      z = avatar.render(z);
-    }
-
-    for (const [key, marble] of Object.entries(this.marbles)) {
-      z = marble.render(z);
-    }
-
     for (const [key, board] of Object.entries(this.boards)) {
       z = board.render(z);
     }
 
     for (const [key, notepad] of Object.entries(this.notepads)) {
       z = notepad.render(z);
+    }
+
+    for (const [key, avatar] of Object.entries(this.avatars)) {
+      z = avatar.render(z);
+    }
+
+    for (const [key, marble] of Object.entries(this.marbles)) {
+      z = marble.render(z);
     }
 
     for (const [key, privateArea] of Object.entries(this.privateAreas)) {

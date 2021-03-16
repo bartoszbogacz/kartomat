@@ -31,7 +31,7 @@ class Client {
     this.scene = new Scene();
   }
 
-  connect() {
+  connect(this: Client) {
     let [path, parameters] = parseUrl(window.location.href);
 
     this.scene.boardId = parameters.board || null;
@@ -62,11 +62,11 @@ class Client {
     };
   }
 
-  send() {
+  send(this: Client) {
     this.websocket?.send(JSON.stringify(this.scene.differences()));
   }
 
-  receive(msg: string) {
+  receive(this: Client, msg: string) {
     this.scene.synchronizeWith(JSON.parse(msg));
 
     window.localStorage.setItem("playerId", this.scene.playerId);
@@ -93,7 +93,7 @@ class Client {
     window.requestAnimationFrame(this.render.bind(this));
   }
 
-  render() {
+  render(this: Client) {
     this.scene.render();
   }
 }

@@ -489,6 +489,10 @@ function sendServerMessage() {
         clientId
       );
       client.socket.send(JSON.stringify(scene));
+
+      // Assume the client received our update and send only differences later.
+      // TODO: Better keep track of last known tick.
+      client.scene = game.scene;
     }
   }
 }
@@ -583,4 +587,4 @@ initHTTPServer();
 initWebSocketServer();
 
 // Clients have no tick and are driven by the server.
-setInterval(sendServerMessage, 300);
+setInterval(sendServerMessage, 3000);
