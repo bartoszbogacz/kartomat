@@ -15,23 +15,21 @@ interface ReplicatedCard {
 }
 
 class Card {
-  public name: string;
-  public x: number = 0;
-  public y: number = 0;
-  public z: number = 0;
-  public w: number = 100;
-  public h: number = 150;
-  public d: number = 2;
+  public key: string;
+  public box: BoundingBox;
   public onDeck: Deck | null = null;
 
-  public replica: ReplicatedCard;
+  private remoteTick: number;
+  private replica: ReplicatedCard;
 
   private scene: Scene;
   private visElem: HTMLElement;
   private ownerElem: HTMLElement;
 
-  constructor(name: string, replica: ReplicatedCard, scene: Scene) {
-    this.name = name;
+  constructor(key: string, replica: ReplicatedCard, scene: Scene) {
+    this.key = key;
+    this.box = new BoundingBox();
+    this.remoteTick = replica.tick;
     this.replica = replica;
     this.scene = scene;
 
@@ -48,35 +46,58 @@ class Card {
     new DragAndDrop(this.visElem, this);
   }
 
-  /** Re-compute based on changes to replica. */
-  synchronize() {
-    if (this.onDeck === null) {
-      this.x = this.replica.x;
-      this.y = this.replica.y;
-    }
-    this.w = this.replica.w;
-    this.h = this.replica.h;
+  get owner(): string | null {
+    return this.replica.owner;
+  }
 
-    this.visElem.style.left = this.x + "px";
-    this.visElem.style.top = this.y + "px";
-    this.visElem.style.zIndex = this.z.toString();
-    this.visElem.style.width = this.w + "px";
-    this.visElem.style.height = this.h + "px";
-    this.visElem.style.backgroundSize = this.w + "px " + this.h + "px";
+  /** Re-compute based on changes to replica. */
+  synchronize(remote: ReplicatedCard) {
+    if (this.replica.tick > remote.tick) {
+      return;
+    }
+    this.remoteTick = remote.tick;
+
+    this.box.x = this.replica.x;
+    this.box.y = this.replica.y;
+    this.box.z = this.replica.z;
+    this.box.w = this.replica.w;
+    this.box.h = this.replica.h;
+
+    this.visElem.style.left = this.box.x + "px";
+    this.visElem.style.top = this.box.y + "px";
+    this.visElem.style.zIndex = this.box.z.toString();
+    this.visElem.style.width = this.box.w + "px";
+    this.visElem.style.height = this.box.h + "px";
+    this.visElem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
     this.visElem.style.backgroundColor = this.replica.colors[
       this.replica.current
     ];
     this.visElem.style.backgroundImage =
       "url(" + this.replica.images[this.replica.current] + ")";
 
-    this.ownerElem.style.left = this.x + "px";
-    this.ownerElem.style.top = this.y + this.h + "px";
-    this.ownerElem.style.zIndex = (this.z + 1).toString();
+    this.ownerElem.style.left = this.box.x + "px";
+    this.ownerElem.style.top = this.box.y + this.box.h + "px";
+    this.ownerElem.style.zIndex = (this.box.z + 1).toString();
     this.ownerElem.innerHTML = this.replica.owner || "";
   }
 
   /** Re-compute based on timing changes. */
-  render() {
+  render(x: number, y: number, z: number, onDeck: Deck | null) {
+    this.onDeck = onDeck;
+    if (onDeck !== null) {
+      this.box.x = x;
+      this.box.y = y;
+    }
+    this.box.z = z;
+
+    this.visElem.style.left = this.box.x + "px";
+    this.visElem.style.top = this.box.y + "px";
+    this.visElem.style.zIndex = this.box.z.toString();
+
+    this.ownerElem.style.left = this.box.x + "px";
+    this.ownerElem.style.top = this.box.y + this.box.h + "px";
+    this.ownerElem.style.zIndex = (this.box.z + 1).toString();
+
     if (
       this.replica.tick + 5 < this.scene.tick ||
       this.replica.owner === null
@@ -92,7 +113,7 @@ class Card {
     this.replica.owner = this.scene.playerId;
     this.replica.onDeck = null;
     this.replica.z = this.scene.topZOfCards() + 1;
-    this.synchronize();
+    this.synchronize(this.replica);
   }
 
   move(x: number, y: number) {
@@ -100,7 +121,7 @@ class Card {
     this.replica.owner = this.scene.playerId;
     this.replica.x = x;
     this.replica.y = y;
-    this.synchronize();
+    this.synchronize(this.replica);
   }
 
   place(wasOutside: boolean) {
@@ -116,16 +137,16 @@ class Card {
       const deck = this.scene.createDeck(this);
       this.replica.tick = this.scene.tick;
       this.replica.owner = this.scene.playerId;
-      this.replica.onDeck = deck.name;
-      this.synchronize();
+      this.replica.onDeck = deck.key;
+      this.synchronize(this.replica);
       other.replica.tick = this.scene.tick;
       other.replica.owner = this.scene.playerId;
-      other.replica.onDeck = deck.name;
-      other.synchronize();
+      other.replica.onDeck = deck.key;
+      other.synchronize(this.replica);
       return;
     }
 
-    const [w, v] = other.onDeck.gapFor(this.x);
+    const [w, v] = other.onDeck.gapFor(this.box.x);
     this.putOn(other.onDeck, (w + v) * 0.5);
   }
 
@@ -134,15 +155,23 @@ class Card {
     this.replica.owner = this.scene.playerId;
     this.replica.current =
       (this.replica.current + 1) % this.replica.images.length;
-    this.synchronize();
+    this.synchronize(this.replica);
   }
 
   /** Put card onDeck at fractional index */
   putOn(onDeck: Deck, f: number) {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
-    this.replica.onDeck = onDeck.name;
+    this.replica.onDeck = onDeck.key;
     this.replica.x = f;
-    this.synchronize();
+    this.synchronize(this.replica);
+  }
+
+  changed(): ReplicatedCard | null {
+    if (this.replica.tick > this.remoteTick) {
+      return this.replica;
+    } else {
+      return null;
+    }
   }
 }

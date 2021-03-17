@@ -13,23 +13,22 @@ interface ReplicatedDeck {
 }
 
 class Deck {
-  public name: string;
-  public x: number = 0;
-  public y: number = 0;
-  public z: number = 0;
-  public w: number = 100;
-  public h: number = 150;
-  public d: number = 2;
-  public cards: Card[] = [];
+  public key: string;
+  public box: BoundingBox;
 
-  public replica: ReplicatedDeck;
+  private remoteTick: number;
+  private replica: ReplicatedDeck;
+
+  private cards: Card[] = [];
 
   private scene: Scene;
   private visElem: HTMLElement;
   private ownerElem: HTMLElement;
 
-  constructor(name: string, replica: ReplicatedDeck, scene: Scene) {
-    this.name = name;
+  constructor(key: string, replica: ReplicatedDeck, scene: Scene) {
+    this.key = key;
+    this.box = new BoundingBox();
+    this.remoteTick = replica.tick;
     this.replica = replica;
     this.scene = scene;
 
@@ -44,34 +43,47 @@ class Deck {
     document.body.appendChild(this.ownerElem);
   }
 
-  synchronize() {
-    this.x = this.replica.x;
-    this.y = this.replica.y;
-    this.w = this.replica.w;
-    this.h = this.replica.h;
-
-    this.d = this.cards.length;
-
-    this.visElem.style.left = this.x + "px";
-    this.visElem.style.top = this.y + "px";
-    this.visElem.style.width = this.w + "px";
-    this.visElem.style.height = this.h + "px";
-
-    this.ownerElem.style.left = this.x + "px";
-    this.ownerElem.style.top = this.y + this.h + "px";
-    this.ownerElem.innerHTML = this.replica.owner || "";
-
-    for (let i = 0; i < this.cards.length; i++) {
-      this.cards[i].x =
-        this.x + this.w + this.replica.strides[this.replica.current] * i;
-      this.cards[i].y = this.y;
-      this.cards[i].z = this.z + 1 * i;
-      this.cards[i].onDeck = this;
-      this.cards[i].synchronize();
-    }
+  get owner(): string | null {
+    return this.replica.owner;
   }
 
-  render() {
+  synchronize(remote: ReplicatedDeck) {
+    if (this.replica.tick > remote.tick) {
+      return;
+    }
+    this.remoteTick = remote.tick;
+
+    this.box.x = this.replica.x;
+    this.box.y = this.replica.y;
+    this.box.z = this.replica.z;
+    this.box.w = this.replica.w;
+    this.box.h = this.replica.h;
+
+    this.visElem.style.left = this.box.x + "px";
+    this.visElem.style.top = this.box.y + "px";
+    this.visElem.style.width = this.box.w + "px";
+    this.visElem.style.height = this.box.h + "px";
+
+    this.ownerElem.style.left = this.box.x + "px";
+    this.ownerElem.style.top = this.box.y + this.box.h + "px";
+    this.ownerElem.innerHTML = this.replica.owner || "";
+  }
+
+  render(z: number, cards: Card[]) {
+    this.cards = cards;
+    this.box.z = z;
+    this.box.d = cards.length;
+
+    for (let i = 0; i < this.cards.length; i++) {
+      const x: number = this.box.x;
+      const y: number = this.box.y;
+      const z: number = this.box.z;
+      const w: number = this.box.w;
+      const s: number = this.replica.strides[this.replica.current];
+
+      this.cards[i].render(x + w + s * i, y, z, this);
+    }
+
     if (
       this.replica.tick + 5 < this.scene.tick ||
       this.replica.owner === null
@@ -86,7 +98,7 @@ class Deck {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.z = this.scene.topZOfCards() + 1;
-    this.synchronize();
+    this.synchronize(this.replica);
   }
 
   move(x: number, y: number) {
@@ -94,7 +106,7 @@ class Deck {
     this.replica.owner = this.scene.playerId;
     this.replica.x = x;
     this.replica.y = y;
-    this.synchronize();
+    this.synchronize(this.replica);
   }
 
   place(wasOutside: boolean) {
@@ -104,12 +116,12 @@ class Deck {
     }
 
     if (other.onDeck === null) {
-      const [w, v] = this.gapFor(other.x);
+      const [w, v] = this.gapFor(other.box.x);
       other.putOn(this, (w + v) * 0.5);
       return;
     }
 
-    const [w, v] = this.gapFor(this.x);
+    const [w, v] = this.gapFor(this.box.x);
     const n = this.cards.length;
     for (let i = 0; i < n; i++) {
       this.cards[i].putOn(other.onDeck, w + ((i + 1) / (n + 2)) * (v - w));
@@ -121,21 +133,21 @@ class Deck {
     this.replica.owner = this.scene.playerId;
     this.replica.current =
       (this.replica.current + 1) % this.replica.strides.length;
-    this.synchronize();
+    this.synchronize(this.replica);
   }
 
   /** This modification is not atomic and may lead to inconsistencies */
   turn() {
     for (const card of this.cards) {
       card.turn();
-      card.move(-card.x, card.y);
+      card.move(-card.box.x, card.box.y);
     }
   }
 
   /** This modification is not atomic and may lead to inconsistencies */
   shuffle() {
     for (const card of this.cards) {
-      card.move(Math.random(), card.y);
+      card.move(Math.random(), card.box.y);
     }
   }
 
@@ -145,13 +157,21 @@ class Deck {
     // If you put a card very close on top to another one, the new
     // stackable will be placed on the left.
     for (const card of this.cards) {
-      if (card.x + 10 > x) {
-        return [v, card.x];
+      if (card.box.x + 10 > x) {
+        return [v, card.box.x];
       } else {
-        v = card.x;
+        v = card.box.x;
       }
     }
     // Reached last card. Put the new card behind that one.
     return [v, v + 1];
+  }
+
+  changed(): ReplicatedDeck | null {
+    if (this.replica.tick > this.remoteTick) {
+      return this.replica;
+    } else {
+      return null;
+    }
   }
 }

@@ -12,24 +12,23 @@ interface ReplicatedNotepad {
 }
 
 class Notepad {
-  public name: string;
-  public x: number = 0;
-  public y: number = 0;
-  public z: number = 0;
-  public w: number = 15;
-  public h: number = 15;
-  public d: number = 2;
+  public key: string;
+  public box: BoundingBox;
 
-  public replica: ReplicatedNotepad;
+  private remoteTick: number;
+  private replica: ReplicatedNotepad;
 
   private scene: Scene;
   private visElem: HTMLElement;
   private ownerElem: HTMLElement;
 
-  constructor(name: string, replica: ReplicatedNotepad, scene: Scene) {
-    this.name = name;
+  constructor(key: string, replica: ReplicatedNotepad, scene: Scene) {
+    this.key = key;
+    this.box = new BoundingBox();
+    this.remoteTick = replica.tick;
     this.replica = replica;
     this.scene = scene;
+
     this.visElem = document.createElement("div");
     this.visElem.style.position = "absolute";
     this.visElem.style.userSelect = "none";
@@ -43,26 +42,35 @@ class Notepad {
     new DragAndDrop(this.visElem, this);
   }
 
-  synchronize() {
-    this.x = this.replica.x;
-    this.y = this.replica.y;
-    this.w = this.replica.w;
-    this.h = this.replica.h;
+  synchronize(remote: ReplicatedNotepad) {
+    if (this.replica.tick > remote.tick) {
+      return;
+    }
+    this.remoteTick = remote.tick;
 
-    this.visElem.style.left = this.x + "px";
-    this.visElem.style.top = this.y + "px";
-    this.visElem.style.width = this.w + "px";
-    this.visElem.style.height = this.h + "px";
-    this.visElem.style.zIndex = this.z.toString();
-    this.visElem.style.backgroundSize = this.w + "px " + this.h + "px";
+    this.box.x = this.replica.x;
+    this.box.y = this.replica.y;
+    this.box.z = this.replica.z;
+    this.box.w = this.replica.w;
+    this.box.h = this.replica.h;
 
-    this.ownerElem.style.left = this.x + "px";
-    this.ownerElem.style.top = this.y + 15 + "px";
-    this.ownerElem.style.zIndex = (this.z + 1).toString();
+    this.visElem.style.left = this.box.x + "px";
+    this.visElem.style.top = this.box.y + "px";
+    this.visElem.style.width = this.box.w + "px";
+    this.visElem.style.height = this.box.h + "px";
+    this.visElem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
+
+    this.ownerElem.style.left = this.box.x + "px";
+    this.ownerElem.style.top = this.box.y + 15 + "px";
     this.ownerElem.innerHTML = this.replica.owner || "";
   }
 
-  render() {
+  render(z: number) {
+    this.box.z = z;
+
+    this.visElem.style.zIndex = this.box.z.toString();
+    this.ownerElem.style.zIndex = (this.box.z + 1).toString();
+
     if (
       this.replica.tick + 5 < this.scene.tick ||
       this.replica.owner === null
@@ -88,5 +96,13 @@ class Notepad {
 
   place(wasOutside: boolean) {
     // Nothing happens
+  }
+
+  changed(): ReplicatedNotepad | null {
+    if (this.replica.tick > this.remoteTick) {
+      return this.replica;
+    } else {
+      return null;
+    }
   }
 }

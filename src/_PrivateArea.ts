@@ -10,21 +10,19 @@ interface ReplicatedPrivateArea {
 }
 
 class PrivateArea {
-  public name: string;
-  public x: number = 0;
-  public y: number = 0;
-  public z: number = 0;
-  public w: number = 100;
-  public h: number = 30;
-  public d: number = 1;
+  public key: string;
+  public box: BoundingBox;
 
-  public replica: ReplicatedPrivateArea;
+  private remoteTick: number;
+  private replica: ReplicatedPrivateArea;
 
   private scene: Scene;
   private elem: HTMLElement;
 
-  constructor(name: string, replica: ReplicatedPrivateArea, scene: Scene) {
-    this.name = name;
+  constructor(key: string, replica: ReplicatedPrivateArea, scene: Scene) {
+    this.key = key;
+    this.box = new BoundingBox();
+    this.remoteTick = replica.tick;
     this.replica = replica;
     this.scene = scene;
 
@@ -34,20 +32,35 @@ class PrivateArea {
     document.body.appendChild(this.elem);
   }
 
-  synchronize() {
-    this.x = this.replica.x;
-    this.y = this.replica.y;
-    this.w = this.replica.w;
-    this.h = this.replica.h;
+  synchronize(remote: ReplicatedPrivateArea) {
+    if (this.replica.tick > remote.tick) {
+      return;
+    }
+    this.remoteTick = remote.tick;
 
-    this.elem.style.left = this.x + "px";
-    this.elem.style.top = this.y + "px";
-    this.elem.style.width = this.w + "px";
-    this.elem.style.height = this.h + "px";
-    this.elem.style.zIndex = this.z.toString();
+    this.box.x = this.replica.x;
+    this.box.y = this.replica.y;
+    this.box.z = this.replica.z;
+    this.box.w = this.replica.w;
+    this.box.h = this.replica.h;
+
+    this.elem.style.left = this.box.x + "px";
+    this.elem.style.top = this.box.y + "px";
+    this.elem.style.width = this.box.w + "px";
+    this.elem.style.height = this.box.h + "px";
+    this.elem.style.zIndex = this.box.z.toString();
   }
 
-  render() {
-    //
+  render(z: number) {
+    this.box.z = z;
+    this.elem.style.zIndex = this.box.z.toString();
+  }
+
+  changed(): ReplicatedPrivateArea | null {
+    if (this.replica.tick > this.remoteTick) {
+      return this.replica;
+    } else {
+      return null;
+    }
   }
 }

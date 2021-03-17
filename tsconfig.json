@@ -14,6 +14,7 @@
     "src/writeable.ts",
     "src/divider.ts",
     "src/avatar.ts",
+    "src/BoundingBox.ts",
     "src/_Client.ts",
     "src/_Scene.ts",
     "src/_DragAndDrop.ts",
