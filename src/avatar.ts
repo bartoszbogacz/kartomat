@@ -1,91 +1,88 @@
-interface AvatarItem extends Synchronized {
+interface ReplicatedAvatar {
+  tick: number;
+  owner: string | null;
+
+  x: number;
+  y: number;
+  z: number;
+  w: number;
+  h: number;
+
+  color: string;
   represents: string | null;
-  text: string;
 }
 
-function avatarsCompute(local: GameState, computed: ComputedState) {
-  const playerAvatars: { [key: string]: string } = {};
+class Avatar {
+  public key: string;
+  public box: BoundingBox;
 
-  for (const [itemId, avatar] of Object.entries(local.avatars)) {
-    if (avatar.represents !== null) {
-      playerAvatars[avatar.represents] = itemId;
-    }
+  private remoteTick: number;
+  private replica: ReplicatedAvatar;
+
+  private scene: Scene;
+  private elem: HTMLElement;
+
+  constructor(key: string, replica: ReplicatedAvatar, scene: Scene) {
+    this.key = key;
+    this.box = new BoundingBox();
+    this.remoteTick = replica.tick;
+    this.replica = replica;
+    this.scene = scene;
+
+    this.elem = document.createElement("div");
+    this.elem.style.position = "absolute";
+    this.elem.style.userSelect = "none";
+    document.body.appendChild(this.elem);
+
+    new DragAndDrop(this.elem, this);
   }
 
-  if (
-    computed.playerId !== null &&
-    playerAvatars.hasOwnProperty(computed.playerId) === false
-  ) {
-    for (const [itemId, avatar] of Object.entries(local.avatars)) {
-      if (avatar.represents === null) {
-        avatar.tick = computed.tick;
-        avatar.ownedBy = computed.playerId;
-        avatar.represents = computed.playerId;
-        break;
-      }
+  synchronize(remote: ReplicatedAvatar) {
+    if (this.replica.tick > remote.tick) {
+      return;
     }
+    this.remoteTick = remote.tick;
+
+    this.box.x = this.replica.x;
+    this.box.y = this.replica.y;
+    this.box.w = this.replica.w;
+    this.box.h = this.replica.h;
+
+    this.elem.style.left = this.box.x + "px";
+    this.elem.style.top = this.box.y + "px";
+    this.elem.style.width = this.box.w + "px";
+    this.elem.style.height = this.box.h + "px";
+    this.elem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
+    this.elem.style.backgroundColor = this.replica.color;
   }
 
-  computed.playerAvatars = playerAvatars;
-}
+  render(z: number) {
+    this.box.z = z;
+    this.elem.style.zIndex = this.box.z.toString();
+  }
 
-function avatarsRender(local: GameState, computed: ComputedState) {
-  for (const key of Object.keys(local.avatars)) {
-    const avt = local.avatars[key];
-    const loc = local.locatables[key];
+  take() {
+    this.replica.tick = this.scene.tick;
+    this.replica.owner = this.scene.playerId;
+    this.replica.z = this.scene.topZOfCards() + 1;
+  }
 
-    let elem = document.getElementById(key);
-    if (elem === null) {
-      elem = document.createElement("textarea");
-      elem.onkeyup = onKeyUp;
-      elem.id = key;
-      elem.className = "Writeable";
-      (elem as any).value = avt.text;
-      elem.style.position = "absolute";
-      elem.style.resize = "none";
-      elem.style.outline = "none";
-      elem.style.fontFamily = "monospace";
-      elem.style.fontSize = "16px";
-      document.body.appendChild(elem);
-    }
+  move(x: number, y: number) {
+    this.replica.tick = this.scene.tick;
+    this.replica.owner = this.scene.playerId;
+    this.replica.x = x;
+    this.replica.y = y;
+  }
 
-    if (local.avatars[key].represents === computed.playerId) {
-      (elem as any).disabled = false;
+  place(wasOutside: boolean) {
+    //
+  }
+
+  changed(): ReplicatedAvatar | null {
+    if (this.replica.tick > this.remoteTick) {
+      return this.replica;
     } else {
-      (elem as any).disabled = true;
-      (elem as any).value = avt.text;
-    }
-
-    if (local.avatars[key].represents === computed.playerId) {
-      elem.style.backgroundColor = "#fdfdee";
-      elem.style.border = "2px solid #93a1a1";
-      elem.style.color = "#586e75";
-    } else if (local.avatars[key].represents !== null) {
-      elem.style.backgroundColor = "#eeeae2";
-      elem.style.border = "2px solid #93a1a1";
-      elem.style.color = "#586e75";
-    } else {
-      elem.style.backgroundColor = "snow";
-      elem.style.border = "gray";
-      elem.style.color = "lightgray";
-    }
-
-    // Element position and zIndex will be taken care of by Locatable
-    // in a later call to locatablesRender in the client.ts/render function.
-  }
-}
-
-function avatarsKeyUp(
-  local: GameState,
-  computed: ComputedState,
-  itemId: string
-) {
-  if (local.avatars.hasOwnProperty(itemId)) {
-    let elem = document.getElementById(itemId);
-    if (elem !== null) {
-      local.avatars[itemId].tick = computed.tick;
-      local.avatars[itemId].ownedBy = computed.playerId;
-      local.avatars[itemId].text = (elem as any).value;
+      return null;
     }
   }
 }

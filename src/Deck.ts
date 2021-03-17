@@ -81,7 +81,7 @@ class Deck {
       const w: number = this.box.w;
       const s: number = this.replica.strides[this.replica.current];
 
-      this.cards[i].render(x + w + s * i, y, z, this);
+      this.cards[i].render(x + w + s * i, y, z + 1 + i, this);
     }
 
     if (

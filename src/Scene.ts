@@ -221,6 +221,11 @@ class Scene {
       item.render(z, this.cardsOnDeck[key]);
       z += item.box.d;
     }
+
+    for (const [key, item] of Object.entries(this.cards)) {
+      item.render(item.box.x, item.box.y, z, null);
+      z += item.box.d;
+    }
   }
 
   createDeck(ref: Card): Deck {
