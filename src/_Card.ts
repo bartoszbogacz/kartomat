@@ -16,9 +16,6 @@ interface ReplicatedCard {
 
 class Card {
   public name: string;
-  public replica: ReplicatedCard;
-  public tick: number = 0;
-  public owner: string | null = null;
   public x: number = 0;
   public y: number = 0;
   public z: number = 0;
@@ -26,6 +23,8 @@ class Card {
   public h: number = 150;
   public d: number = 2;
   public onDeck: Deck | null = null;
+
+  public replica: ReplicatedCard;
 
   private scene: Scene;
   private visElem: HTMLElement;
@@ -51,8 +50,6 @@ class Card {
 
   /** Re-compute based on changes to replica. */
   synchronize() {
-    this.tick = this.replica.tick;
-    this.owner = this.replica.owner;
     if (this.onDeck === null) {
       this.x = this.replica.x;
       this.y = this.replica.y;
@@ -75,12 +72,15 @@ class Card {
     this.ownerElem.style.left = this.x + "px";
     this.ownerElem.style.top = this.y + this.h + "px";
     this.ownerElem.style.zIndex = (this.z + 1).toString();
-    this.ownerElem.innerHTML = this.owner || "";
+    this.ownerElem.innerHTML = this.replica.owner || "";
   }
 
   /** Re-compute based on timing changes. */
   render() {
-    if (this.tick + 5 < this.scene.tick || this.owner === null) {
+    if (
+      this.replica.tick + 5 < this.scene.tick ||
+      this.replica.owner === null
+    ) {
       this.ownerElem.style.visibility = "hidden";
     } else {
       this.ownerElem.style.visibility = "visible";

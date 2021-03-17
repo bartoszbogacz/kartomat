@@ -10,78 +10,44 @@ interface ReplicatedPrivateArea {
 }
 
 class PrivateArea {
-  private _name: string;
+  public name: string;
+  public x: number = 0;
+  public y: number = 0;
+  public z: number = 0;
+  public w: number = 100;
+  public h: number = 30;
+  public d: number = 1;
 
-  private _z: number = 0;
-
-  private replica: ReplicatedPrivateArea = {
-    tick: 0,
-    owner: null,
-    x: 0,
-    y: 0,
-    z: 0,
-    w: 200,
-    h: 200,
-  };
+  public replica: ReplicatedPrivateArea;
 
   private scene: Scene;
   private elem: HTMLElement;
 
-  constructor(scene: Scene, name: string) {
-    this._name = name;
+  constructor(name: string, replica: ReplicatedPrivateArea, scene: Scene) {
+    this.name = name;
+    this.replica = replica;
     this.scene = scene;
 
     this.elem = document.createElement("div");
+    this.elem.style.position = "absolute";
+    this.elem.style.userSelect = "none";
+    document.body.appendChild(this.elem);
   }
 
-  get name(): string {
-    return this._name;
-  }
-
-  get tick(): number {
-    return this.replica.tick;
-  }
-
-  get owner(): string | null {
-    return this.replica.owner;
-  }
-
-  get x(): number {
-    return this.replica.x;
-  }
-
-  get y(): number {
-    return this.replica.y;
-  }
-
-  get z(): number {
-    return this._z;
-  }
-
-  get w(): number {
-    return this.replica.w;
-  }
-
-  get h(): number {
-    return this.replica.h;
-  }
-
-  synchronizeWith(remote: ReplicatedPrivateArea) {
-    if (remote.tick > this.tick) {
-      this.replica = remote;
-    }
+  synchronize() {
+    this.x = this.replica.x;
+    this.y = this.replica.y;
+    this.w = this.replica.w;
+    this.h = this.replica.h;
 
     this.elem.style.left = this.x + "px";
     this.elem.style.top = this.y + "px";
     this.elem.style.width = this.w + "px";
     this.elem.style.height = this.h + "px";
+    this.elem.style.zIndex = this.z.toString();
   }
 
-  render(z: number) {
-    this._z = z;
-
-    this.elem.style.zIndex = this.z.toString();
-
-    return z + 1;
+  render() {
+    //
   }
 }

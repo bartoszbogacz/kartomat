@@ -15,9 +15,16 @@ interface ReplicatedScene {
 }
 
 class Scene {
-  private remoteTick: number = 0;
-  private replica: ReplicatedScene;
+  public tick: number = 0;
+  public boardId: string = "";
+  public gameId: string = "";
+  public playerId: string = "";
+  public clientId: string = "";
 
+  // Last seen tick from server
+  private remoteTick: number = 0;
+
+  // Scene graph derived from replicated state
   private avatars: { [key: string]: Avatar } = {};
   private boards: { [key: string]: Board } = {};
   private marbles: { [key: string]: Marble } = {};
@@ -26,123 +33,95 @@ class Scene {
   private decks: { [key: string]: Deck } = {};
   private cards: { [key: string]: Card } = {};
 
+  // Computed properties
   private cardsOnDeck: { [key: string]: Card[] } = {};
 
   constructor() {
-    this.replica = {
-      tick: 0,
-      boardId: "",
-      gameId: "",
-      playerId: "",
-      clientId: "",
-      boards: {},
-      marbles: {},
-      avatars: {},
-      notepads: {},
-      cards: {},
-      decks: {},
-      privateAreas: {},
-    };
-  }
-
-  get tick(): number {
-    return this.replica.tick;
-  }
-
-  get boardId(): string {
-    return this.replica.boardId;
-  }
-
-  set boardId(value: string) {
-    this.replica.boardId = value;
-  }
-
-  get gameId(): string {
-    return this.replica.gameId;
-  }
-
-  set gameId(value: string) {
-    this.replica.gameId = value;
-  }
-
-  get playerId(): string {
-    return this.replica.playerId;
-  }
-
-  set playerId(value: string) {
-    this.replica.playerId = value;
-  }
-
-  get clientId(): string {
-    return this.replica.clientId;
+    //
   }
 
   /** Apply changes from remote. Takes ownership of the argument. */
   synchronizeWith(remote: ReplicatedScene) {
+    // Last known tick from server informs which changes happened
+    this.remoteTick = remote.tick;
+
     // Never regress tick even if server tells us so. Otherwise we may
     // not be able to change our own objects if their tick is higher than
-    // ours. Client tick and server tick behave like Lamport timestamp.
-    this.remoteTick = remote.tick;
-    this.replica.tick = Math.max(this.replica.tick, remote.tick);
+    // ours. Client tick and server tick behave like a Lamport timestamp.
+    this.tick = Math.max(this.tick, remote.tick);
 
     // Take over settings from server
-    this.replica.boardId = remote.boardId;
-    this.replica.gameId = remote.gameId;
-    this.replica.playerId = remote.playerId;
-    this.replica.clientId = remote.clientId;
+    this.boardId = remote.boardId;
+    this.gameId = remote.gameId;
+    this.playerId = remote.playerId;
+    this.clientId = remote.clientId;
 
     // Order elements
     let z: number = 0;
 
-    for (const [key, avatar] of Object.entries(remote.avatars)) {
-      if (!this.avatars.hasOwnProperty(key)) {
-        this.replica.avatars[key] = avatar;
-        this.avatars[key] = new Avatar(this, key);
-      }
-      this.avatars[key].synchronizeWith(avatar);
-    }
-
-    for (const [key, marble] of Object.entries(remote.marbles)) {
-      if (!this.marbles.hasOwnProperty(key)) {
-        this.replica.marbles[key] = marble;
-        this.marbles[key] = new Marble(this, key);
-      }
-      this.marbles[key].synchronize(marble);
-    }
-
     for (const [key, board] of Object.entries(remote.boards)) {
       if (!this.boards.hasOwnProperty(key)) {
-        this.replica.boards[key] = board;
-        this.boards[key] = new Board(this, key);
+        this.boards[key] = new Board(key, board, this);
+        this.boards[key].synchronize();
       }
-      this.boards[key].synchronizeWith(board);
+      if (board.tick > this.boards[key].replica.tick) {
+        this.boards[key].z = z;
+        this.boards[key].replica = board;
+        this.boards[key].synchronize();
+      }
+      z = z + this.boards[key].d;
     }
 
     for (const [key, notepad] of Object.entries(remote.notepads)) {
       if (!this.notepads.hasOwnProperty(key)) {
-        this.replica.notepads[key] = notepad;
-        this.notepads[key] = new Notepad(this, key);
+        this.notepads[key] = new Notepad(key, notepad, this);
+        this.notepads[key].synchronize();
       }
-      this.notepads[key].synchronizeWith(notepad);
+      if (notepad.tick > this.notepads[key].replica.tick) {
+        this.notepads[key].z = z;
+        this.notepads[key].replica = notepad;
+        this.notepads[key].synchronize();
+      }
+      z = z + this.notepads[key].d;
+    }
+
+    for (const [key, avatar] of Object.entries(remote.avatars)) {
+      if (!this.avatars.hasOwnProperty(key)) {
+        this.avatars[key] = new Avatar(key, avatar, this);
+        this.avatars[key].synchronize();
+      }
+      if (avatar.tick > this.avatars[key].replica.tick) {
+        this.avatars[key].z = z;
+        this.avatars[key].replica = avatar;
+        this.avatars[key].synchronize();
+      }
+      z = z + this.avatars[key].d;
     }
 
     for (const [key, privateArea] of Object.entries(remote.privateAreas)) {
       if (!this.privateAreas.hasOwnProperty(key)) {
-        this.replica.privateAreas[key] = privateArea;
-        this.privateAreas[key] = new PrivateArea(this, key);
+        this.privateAreas[key] = new PrivateArea(key, privateArea, this);
+        this.privateAreas[key].synchronize();
       }
-      this.privateAreas[key].synchronizeWith(privateArea);
+      if (privateArea.tick > this.privateAreas[key].replica.tick) {
+        this.privateAreas[key].z = z;
+        this.privateAreas[key].replica = privateArea;
+        this.privateAreas[key].synchronize();
+      }
+      z = z + this.privateAreas[key].d;
     }
 
     for (const [key, card] of Object.entries(remote.cards)) {
       if (!this.cards.hasOwnProperty(key)) {
-        this.replica.cards[key] = card;
         this.cards[key] = new Card(key, card, this);
+        this.cards[key].synchronize();
       }
-      if (card.tick > this.cards[key].tick) {
+      if (card.tick > this.cards[key].replica.tick) {
+        this.cards[key].z = z;
         this.cards[key].replica = card;
         this.cards[key].synchronize();
       }
+      z = z + this.cards[key].d;
     }
 
     // Re-compute card assignments
@@ -150,26 +129,41 @@ class Scene {
 
     this.cardsOnDeck = {};
 
-    for (const [key, card] of Object.entries(this.replica.cards)) {
-      if (card.onDeck !== null) {
-        if (this.cardsOnDeck.hasOwnProperty(card.onDeck)) {
-          this.cardsOnDeck[card.onDeck].push(this.cards[key]);
+    for (const [key, card] of Object.entries(this.cards)) {
+      if (card.replica.onDeck !== null) {
+        if (this.cardsOnDeck.hasOwnProperty(card.replica.onDeck)) {
+          this.cardsOnDeck[card.replica.onDeck].push(this.cards[key]);
         } else {
-          this.cardsOnDeck[card.onDeck] = [this.cards[key]];
+          this.cardsOnDeck[card.replica.onDeck] = [this.cards[key]];
         }
       }
     }
 
     for (const [key, deck] of Object.entries(remote.decks)) {
       if (!this.decks.hasOwnProperty(key)) {
-        this.replica.decks[key] = deck;
         this.decks[key] = new Deck(key, deck, this);
+        this.decks[key].synchronize();
       }
-      if (deck.tick > this.decks[key].tick) {
+      if (deck.tick > this.decks[key].replica.tick) {
+        this.decks[key].z = z;
         this.decks[key].replica = deck;
         this.decks[key].cards = this.cardsOnDeck[key];
         this.decks[key].synchronize();
       }
+      z = z + this.decks[key].d;
+    }
+
+    for (const [key, marble] of Object.entries(remote.marbles)) {
+      if (!this.marbles.hasOwnProperty(key)) {
+        this.marbles[key] = new Marble(key, marble, this);
+        this.marbles[key].synchronize();
+      }
+      if (marble.tick > this.marbles[key].replica.tick) {
+        this.marbles[key].z = z;
+        this.marbles[key].replica = marble;
+        this.marbles[key].synchronize();
+      }
+      z = z + this.marbles[key].d;
     }
   }
 
@@ -189,47 +183,45 @@ class Scene {
       cards: {},
     };
 
-    for (const [key, avatar] of Object.entries(this.replica.avatars)) {
-      if (avatar.tick > this.remoteTick) {
-        result.avatars[key] = avatar;
+    for (const [key, avatar] of Object.entries(this.avatars)) {
+      if (avatar.replica.tick > this.remoteTick) {
+        result.avatars[key] = avatar.replica;
       }
     }
 
-    for (const [key, board] of Object.entries(this.replica.boards)) {
-      if (board.tick > this.remoteTick) {
-        result.boards[key] = board;
+    for (const [key, board] of Object.entries(this.boards)) {
+      if (board.replica.tick > this.remoteTick) {
+        result.boards[key] = board.replica;
       }
     }
 
-    for (const [key, marble] of Object.entries(this.replica.marbles)) {
-      if (marble.tick > this.remoteTick) {
-        result.marbles[key] = marble;
+    for (const [key, marble] of Object.entries(this.marbles)) {
+      if (marble.replica.tick > this.remoteTick) {
+        result.marbles[key] = marble.replica;
       }
     }
 
-    for (const [key, notepad] of Object.entries(this.replica.notepads)) {
-      if (notepad.tick > this.remoteTick) {
-        result.notepads[key] = notepad;
+    for (const [key, notepad] of Object.entries(this.notepads)) {
+      if (notepad.replica.tick > this.remoteTick) {
+        result.notepads[key] = notepad.replica;
       }
     }
 
-    for (const [key, privateArea] of Object.entries(
-      this.replica.privateAreas
-    )) {
-      if (privateArea.tick > this.remoteTick) {
-        result.privateAreas[key] = privateArea;
+    for (const [key, privateArea] of Object.entries(this.privateAreas)) {
+      if (privateArea.replica.tick > this.remoteTick) {
+        result.privateAreas[key] = privateArea.replica;
       }
     }
 
-    for (const [key, deck] of Object.entries(this.replica.decks)) {
-      if (deck.tick > this.remoteTick) {
-        result.decks[key] = deck;
+    for (const [key, deck] of Object.entries(this.decks)) {
+      if (deck.replica.tick > this.remoteTick) {
+        result.decks[key] = deck.replica;
       }
     }
 
-    for (const [key, card] of Object.entries(this.replica.cards)) {
-      if (card.tick > this.remoteTick) {
-        result.cards[key] = card;
+    for (const [key, card] of Object.entries(this.cards)) {
+      if (card.replica.tick > this.remoteTick) {
+        result.cards[key] = card.replica;
       }
     }
 
@@ -237,26 +229,24 @@ class Scene {
   }
 
   render() {
-    let z: number = 0;
-
     for (const [key, board] of Object.entries(this.boards)) {
-      z = board.render(z);
+      board.render();
     }
 
     for (const [key, notepad] of Object.entries(this.notepads)) {
-      z = notepad.render(z);
+      notepad.render();
     }
 
     for (const [key, avatar] of Object.entries(this.avatars)) {
-      z = avatar.render(z);
+      avatar.render();
     }
 
     for (const [key, marble] of Object.entries(this.marbles)) {
-      z = marble.render(z);
+      marble.render();
     }
 
     for (const [key, privateArea] of Object.entries(this.privateAreas)) {
-      z = privateArea.render(z);
+      privateArea.render();
     }
 
     for (const [key, deck] of Object.entries(this.decks)) {
@@ -328,7 +318,7 @@ class Scene {
 
       const priv = this.overlapsPrivateArea(other);
       const area = this.pixelsOverlap(card, other);
-      const ownsOther = other.owner === card.owner;
+      const ownsOther = other.replica.owner === card.replica.owner;
 
       if (area > pixels && ((priv && ownsOther) || !priv)) {
         pixels = area;

@@ -12,84 +12,46 @@ interface ReplicatedBoard {
 }
 
 class Board {
-  private _name: string;
+  public name: string;
+  public x: number = 0;
+  public y: number = 0;
+  public z: number = 0;
+  public w: number = 100;
+  public h: number = 30;
+  public d: number = 1;
 
-  private _z: number = 0;
-
-  private replica: ReplicatedBoard = {
-    tick: 0,
-    owner: null,
-    x: 0,
-    y: 0,
-    z: 0,
-    w: 0,
-    h: 0,
-    image: "",
-  };
+  public replica: ReplicatedBoard;
 
   private scene: Scene;
-  private visElem: HTMLElement;
+  private elem: HTMLElement;
 
-  constructor(scene: Scene, name: string) {
-    this._name = name;
+  constructor(name: string, replica: ReplicatedBoard, scene: Scene) {
+    this.name = name;
+    this.replica = replica;
     this.scene = scene;
 
-    this.visElem = document.createElement("div");
-    this.visElem.style.position = "absolute";
-    this.visElem.style.userSelect = "none";
-    document.body.appendChild(this.visElem);
+    this.elem = document.createElement("div");
+    this.elem.style.position = "absolute";
+    this.elem.style.userSelect = "none";
+    document.body.appendChild(this.elem);
   }
 
-  get name(): string {
-    return this._name;
+  synchronize() {
+    this.x = this.replica.x;
+    this.y = this.replica.y;
+    this.w = this.replica.w;
+    this.h = this.replica.h;
+
+    this.elem.style.left = this.x + "px";
+    this.elem.style.top = this.y + "px";
+    this.elem.style.width = this.w + "px";
+    this.elem.style.height = this.h + "px";
+    this.elem.style.zIndex = this.z.toString();
+    this.elem.style.backgroundSize = this.w + "px " + this.h + "px";
+    this.elem.style.backgroundImage = "url(" + this.replica.image + ")";
   }
 
-  get tick(): number {
-    return this.replica.tick;
-  }
-
-  get owner(): string | null {
-    return this.replica.owner;
-  }
-
-  get x(): number {
-    return this.replica.x;
-  }
-
-  get y(): number {
-    return this.replica.y;
-  }
-
-  get z(): number {
-    return this._z;
-  }
-
-  get w(): number {
-    return this.replica.w;
-  }
-
-  get h(): number {
-    return this.replica.h;
-  }
-
-  synchronizeWith(remote: ReplicatedBoard) {
-    if (remote.tick > this.tick) {
-      this.replica = remote;
-    }
-
-    this.visElem.style.left = this.x + "px";
-    this.visElem.style.top = this.y + "px";
-    this.visElem.style.width = this.w + "px";
-    this.visElem.style.height = this.h + "px";
-    this.visElem.style.backgroundSize = this.w + "px " + this.h + "px";
-    this.visElem.style.backgroundImage = "url(" + this.replica.image + ")";
-  }
-
-  render(z: number): number {
-    this._z = z;
-
-    this.visElem.style.zIndex = this.z.toString();
-
-    return z + 1;
+  render() {
+    //
   }
 }

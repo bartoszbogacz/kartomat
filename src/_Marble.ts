@@ -12,27 +12,23 @@ interface ReplicatedMarble {
 }
 
 class Marble {
-  private _name: string;
+  public name: string;
+  public x: number = 0;
+  public y: number = 0;
+  public z: number = 0;
+  public w: number = 15;
+  public h: number = 15;
+  public d: number = 2;
 
-  private _z: number = 0;
-
-  private replica: ReplicatedMarble = {
-    tick: 0,
-    owner: null,
-    x: 0,
-    y: 0,
-    z: 0,
-    w: 0,
-    h: 0,
-    color: "",
-  };
+  public replica: ReplicatedMarble;
 
   private scene: Scene;
   private visElem: HTMLElement;
   private ownerElem: HTMLElement;
 
-  constructor(scene: Scene, name: string) {
-    this._name = name;
+  constructor(name: string, replica: ReplicatedMarble, scene: Scene) {
+    this.name = name;
+    this.replica = replica;
     this.scene = scene;
 
     this.visElem = document.createElement("div");
@@ -48,77 +44,42 @@ class Marble {
     new DragAndDrop(this.visElem, this);
   }
 
-  get name(): string {
-    return this._name;
-  }
+  synchronize() {
+    this.x = this.replica.x;
+    this.y = this.replica.y;
+    this.w = this.replica.w;
+    this.h = this.replica.h;
 
-  get tick(): number {
-    return this.replica.tick;
-  }
-
-  get owner(): string | null {
-    return this.replica.owner;
-  }
-
-  get x(): number {
-    return this.replica.x;
-  }
-
-  get y(): number {
-    return this.replica.y;
-  }
-
-  get z(): number {
-    return this._z;
-  }
-
-  get w(): number {
-    return this.replica.w;
-  }
-
-  get h(): number {
-    return this.replica.h;
-  }
-
-  synchronize(remote: ReplicatedMarble) {
-    if (remote.tick > this.tick) {
-      this.replica = remote;
-      this.update();
-    }
-  }
-
-  update() {
     this.visElem.style.left = this.x + "px";
     this.visElem.style.top = this.y + "px";
     this.visElem.style.width = this.w + "px";
     this.visElem.style.height = this.h + "px";
+    this.visElem.style.zIndex = this.z.toString();
     this.visElem.style.backgroundSize = this.w + "px " + this.h + "px";
     this.visElem.style.backgroundColor = this.replica.color;
 
     this.ownerElem.style.left = this.x + "px";
     this.ownerElem.style.top = this.y + 15 + "px";
-    this.ownerElem.innerHTML = this.owner || "";
+    this.ownerElem.style.zIndex = (this.z + 1).toString();
+    this.ownerElem.innerHTML = this.replica.owner || "";
   }
 
-  render(z: number) {
-    this._z = z;
-
-    this.visElem.style.zIndex = this.z.toString();
-    this.ownerElem.style.zIndex = (this.z + 1).toString();
-    if (this.tick + 5 < this.scene.tick || this.owner === null) {
+  render() {
+    if (
+      this.replica.tick + 5 < this.scene.tick ||
+      this.replica.owner === null
+    ) {
       this.ownerElem.style.visibility = "hidden";
     } else {
       this.ownerElem.style.visibility = "visible";
     }
-
-    return z + 2;
   }
 
   take() {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.z = this.scene.topZOfCards() + 1;
-    this.update();
+    this.synchronize();
   }
 
   move(x: number, y: number) {
@@ -126,7 +87,7 @@ class Marble {
     this.replica.owner = this.scene.playerId;
     this.replica.x = x;
     this.replica.y = y;
-    this.update();
+    this.synchronize();
   }
 
   place(wasOutside: boolean) {

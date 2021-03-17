@@ -14,9 +14,6 @@ interface ReplicatedDeck {
 
 class Deck {
   public name: string;
-  public replica: ReplicatedDeck;
-  public tick: number = 0;
-  public owner: string | null = null;
   public x: number = 0;
   public y: number = 0;
   public z: number = 0;
@@ -24,6 +21,8 @@ class Deck {
   public h: number = 150;
   public d: number = 2;
   public cards: Card[] = [];
+
+  public replica: ReplicatedDeck;
 
   private scene: Scene;
   private visElem: HTMLElement;
@@ -46,8 +45,6 @@ class Deck {
   }
 
   synchronize() {
-    this.tick = this.replica.tick;
-    this.owner = this.replica.owner;
     this.x = this.replica.x;
     this.y = this.replica.y;
     this.w = this.replica.w;
@@ -62,7 +59,7 @@ class Deck {
 
     this.ownerElem.style.left = this.x + "px";
     this.ownerElem.style.top = this.y + this.h + "px";
-    this.ownerElem.innerHTML = this.owner || "";
+    this.ownerElem.innerHTML = this.replica.owner || "";
 
     for (let i = 0; i < this.cards.length; i++) {
       this.cards[i].x =
@@ -75,7 +72,10 @@ class Deck {
   }
 
   render() {
-    if (this.tick + 5 < this.scene.tick || this.owner === null) {
+    if (
+      this.replica.tick + 5 < this.scene.tick ||
+      this.replica.owner === null
+    ) {
       this.ownerElem.style.visibility = "hidden";
     } else {
       this.ownerElem.style.visibility = "visible";
