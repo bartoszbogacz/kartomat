@@ -53,53 +53,70 @@ class Scene {
 
     // Propagate changes to itmes
 
-    for (const [key, item] of Object.entries(remote.boards)) {
-      if (!this.boards.hasOwnProperty(key)) {
-        this.boards[key] = new Board(key, item, this);
+    for (const [key, replica] of Object.entries(remote.boards)) {
+      const item = this.boards[key];
+      if (item === undefined) {
+        this.boards[key] = new Board(key, replica, this);
+      } else {
+        item.synchronize(replica);
       }
-      this.boards[key].synchronize(item);
     }
 
-    for (const [key, item] of Object.entries(remote.notepads)) {
-      if (!this.notepads.hasOwnProperty(key)) {
-        this.notepads[key] = new Notepad(key, item, this);
+    for (const [key, replica] of Object.entries(remote.notepads)) {
+      const item = this.notepads[key];
+      if (item === undefined) {
+        this.notepads[key] = new Notepad(key, replica, this);
+      } else {
+        item.synchronize(replica);
       }
-      this.notepads[key].synchronize(item);
     }
 
-    for (const [key, item] of Object.entries(remote.avatars)) {
-      if (!this.avatars.hasOwnProperty(key)) {
-        this.avatars[key] = new Avatar(key, item, this);
+    for (const [key, replica] of Object.entries(remote.avatars)) {
+      const item = this.avatars[key];
+      if (item === undefined) {
+        this.avatars[key] = new Avatar(key, replica, this);
+      } else {
+        item.synchronize(replica);
       }
-      this.avatars[key].synchronize(item);
     }
 
-    for (const [key, item] of Object.entries(remote.privateAreas)) {
-      if (!this.privateAreas.hasOwnProperty(key)) {
-        this.privateAreas[key] = new PrivateArea(key, item, this);
+    for (const [key, replica] of Object.entries(remote.privateAreas)) {
+      const item = this.privateAreas[key];
+      if (item === undefined) {
+        this.privateAreas[key] = new PrivateArea(key, replica, this);
+      } else {
+        item.synchronize(replica);
       }
-      this.privateAreas[key].synchronize(item);
     }
 
-    for (const [key, item] of Object.entries(remote.cards)) {
-      if (!this.cards.hasOwnProperty(key)) {
-        this.cards[key] = new Card(key, this);
+    // TODO: Use card and deck-like constructor for all items
+    // Neccessitates to use card and deck-like check for all items.
+
+    for (const [key, replica] of Object.entries(remote.cards)) {
+      let item = this.cards[key];
+      if (item === undefined) {
+        item = new Card(key, this);
+        this.cards[key] = item;
       }
-      this.cards[key].synchronize(item);
+      item.synchronize(replica);
     }
 
-    for (const [key, item] of Object.entries(remote.decks)) {
-      if (!this.decks.hasOwnProperty(key)) {
-        this.decks[key] = new Deck(key, this);
+    for (const [key, replica] of Object.entries(remote.decks)) {
+      let item = this.decks[key];
+      if (item === undefined) {
+        item = new Deck(key, this);
+        this.decks[key] = item;
       }
-      this.decks[key].synchronize(item);
+      item.synchronize(replica);
     }
 
-    for (const [key, item] of Object.entries(remote.marbles)) {
-      if (!this.marbles.hasOwnProperty(key)) {
-        this.marbles[key] = new Marble(key, item, this);
+    for (const [key, replica] of Object.entries(remote.marbles)) {
+      const item = this.marbles[key];
+      if (item === undefined) {
+        this.marbles[key] = new Marble(key, replica, this);
+      } else {
+        item.synchronize(replica);
       }
-      this.marbles[key].synchronize(item);
     }
   }
 
@@ -117,7 +134,10 @@ class Scene {
 
     for (const [key, card] of Object.entries(this.cards)) {
       if (card.replica.onDeck !== null) {
-        this.cardsOnDeck[card.replica.onDeck].push(this.cards[key]);
+        const cards = this.cardsOnDeck[card.replica.onDeck];
+        if (cards) {
+          cards.push(card);
+        }
       }
     }
 

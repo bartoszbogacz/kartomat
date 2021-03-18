@@ -76,12 +76,10 @@ class Card {
     this.visElem.style.width = this.box.w + "px";
     this.visElem.style.height = this.box.h + "px";
     this.visElem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
-    this.visElem.style.backgroundColor = this.replica.colors[
-      this.replica.current
-    ];
-    this.visElem.style.backgroundImage =
-      "url(" + this.replica.images[this.replica.current] + ")";
-
+    const color = this.replica.colors[this.replica.current];
+    this.visElem.style.backgroundColor = color ? color : "";
+    const image = this.replica.images[this.replica.current];
+    this.visElem.style.backgroundImage = "url(" + (image ? image : "") + ")";
     this.ownerElem.innerHTML = this.replica.owner || "";
   }
 
@@ -164,8 +162,10 @@ class Card {
     }
 
     const otherDeck = this.scene.decks[other.replica.onDeck];
-    const [w, v] = otherDeck.gapFor(this.box.x);
-    this.putOn(otherDeck, (w + v) * 0.5);
+    if (otherDeck) {
+      const [w, v] = otherDeck.gapFor(this.box.x);
+      this.putOn(otherDeck, (w + v) * 0.5);
+    }
   }
 
   turn() {

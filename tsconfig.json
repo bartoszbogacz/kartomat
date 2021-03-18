@@ -3,7 +3,11 @@
     "target": "es2017",
     "module": "commonjs",
     "strict": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true
   },
   "files": [
     "src/Avatar.ts",

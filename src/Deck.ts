@@ -80,7 +80,8 @@ class Deck {
   }
 
   render(z: number) {
-    this.cards = this.scene.cardsOnDeck[this.key];
+    const cards = this.scene.cardsOnDeck[this.key];
+    this.cards = cards ? cards : [];
     this.box.z = this.replica.z + z;
     this.box.d = this.cards.length;
 
@@ -89,9 +90,9 @@ class Deck {
       const y: number = this.box.y;
       const z: number = this.box.z;
       const w: number = this.box.w;
-      const s: number = this.replica.strides[this.replica.current];
-
-      this.cards[i].renderOnDeck(x + w + s * i, y, z + 1 + i);
+      const stride = this.replica.strides[this.replica.current];
+      const s: number = stride ? stride : 2;
+      this.cards[i]?.renderOnDeck(x + w + s * i, y, z + 1 + i);
     }
 
     if (
@@ -134,10 +135,12 @@ class Deck {
     }
 
     const otherDeck = this.scene.decks[other.replica.onDeck];
-    const [w, v] = otherDeck.gapFor(this.box.x);
-    const n = this.cards.length;
-    for (let i = 0; i < n; i++) {
-      this.cards[i].putOn(otherDeck, w + ((i + 1) / (n + 2)) * (v - w));
+    if (otherDeck) {
+      const [w, v] = otherDeck.gapFor(this.box.x);
+      const n = this.cards.length;
+      for (let i = 0; i < n; i++) {
+        this.cards[i]?.putOn(otherDeck, w + ((i + 1) / (n + 2)) * (v - w));
+      }
     }
   }
 

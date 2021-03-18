@@ -2,7 +2,7 @@ function parseUrl(url: string): [string, { [key: string]: any }] {
   let path = null;
   let parameters: { [key: string]: any } = {};
 
-  const pathQuery = url.split("?");
+  const pathQuery = url.split("?") as [string] | [string, string];
 
   if (pathQuery.length === 1) {
     path = pathQuery[0];
@@ -11,7 +11,7 @@ function parseUrl(url: string): [string, { [key: string]: any }] {
     const parts = pathQuery[1].split("&");
 
     for (const p of parts) {
-      const keyValue = p.split("=");
+      const keyValue = p.split("=") as [string] | [string, string];
       if (keyValue.length === 1) {
         parameters[keyValue[0]] = true;
       } else {
@@ -34,10 +34,10 @@ class Client {
   connect(this: Client) {
     let [path, parameters] = parseUrl(window.location.href);
 
-    this.scene.boardId = parameters.board || null;
-    this.scene.gameId = parameters.game || null;
+    this.scene.boardId = parameters["board"] || null;
+    this.scene.gameId = parameters["game"] || null;
     this.scene.playerId =
-      parameters.player || window.localStorage.getItem("playerId");
+      parameters["player"] || window.localStorage.getItem("playerId");
 
     this.websocket = new WebSocket(
       "ws://" + window.location.hostname + ":8080"
@@ -75,7 +75,7 @@ class Client {
 
     if (
       parameters.hasOwnProperty("board") === false ||
-      parameters.board !== this.scene.boardId
+      parameters["board"] !== this.scene.boardId
     ) {
       history.pushState(
         {},
