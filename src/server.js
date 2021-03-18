@@ -125,6 +125,19 @@ function generateRummy(scene) {
     ["rummy/joker_red.png", "rummy/back_blue.png"],
   ];
 
+  scene["decks"]["rummy1"] = {
+    tick: 0,
+    owner: null,
+    x: 0,
+    y: 0,
+    z: 0,
+    l: 2,
+    w: 30,
+    h: 150,
+    strides: [2, 20],
+    current: 0,
+  };
+
   for (let i = 0; i < images.length; i++) {
     scene["cards"]["card" + (i + 1)] = {
       tick: 1,
@@ -138,7 +151,7 @@ function generateRummy(scene) {
       colors: ["", ""],
       images: images[i],
       current: 0,
-      onDeck: null,
+      onDeck: "rummy1",
     };
   }
 }
@@ -512,7 +525,10 @@ function synchronizeWith(local, remote) {
 
   for (const klass of KLASSES) {
     for (const key of Object.keys(remote[klass])) {
-      if (remote[klass][key].tick > local[klass][key].tick) {
+      if (
+        !local[klass].hasOwnProperty(key) ||
+        remote[klass][key].tick > local[klass][key].tick
+      ) {
         local[klass][key] = remote[klass][key];
       }
     }

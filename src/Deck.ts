@@ -17,17 +17,26 @@ class Deck {
   public replica: ReplicatedDeck;
   public box: BoundingBox;
 
-  private remoteTick: number;
+  private remoteTick: number = 0;
   private cards: Card[] = [];
   private scene: Scene;
   private visElem: HTMLElement;
   private ownerElem: HTMLElement;
 
-  constructor(key: string, replica: ReplicatedDeck, scene: Scene) {
+  constructor(key: string, scene: Scene) {
     this.key = key;
     this.box = new BoundingBox();
-    this.remoteTick = replica.tick;
-    this.replica = replica;
+    this.replica = {
+      tick: 0,
+      owner: null,
+      x: 0,
+      y: 0,
+      z: 0,
+      w: 30,
+      h: 150,
+      strides: [2, 20],
+      current: 1,
+    };
     this.scene = scene;
 
     this.visElem = document.createElement("div");
@@ -82,7 +91,7 @@ class Deck {
       const w: number = this.box.w;
       const s: number = this.replica.strides[this.replica.current];
 
-      this.cards[i].renderOnDeck(x + w + s * i, y, z + 1 + i, this);
+      this.cards[i].renderOnDeck(x + w + s * i, y, z + 1 + i);
     }
 
     if (
@@ -118,16 +127,17 @@ class Deck {
       return;
     }
 
-    if (other.onDeck === null) {
+    if (other.replica.onDeck === null) {
       const [w, v] = this.gapFor(other.box.x);
       other.putOn(this, (w + v) * 0.5);
       return;
     }
 
-    const [w, v] = this.gapFor(this.box.x);
+    const otherDeck = this.scene.decks[other.replica.onDeck];
+    const [w, v] = otherDeck.gapFor(this.box.x);
     const n = this.cards.length;
     for (let i = 0; i < n; i++) {
-      this.cards[i].putOn(other.onDeck, w + ((i + 1) / (n + 2)) * (v - w));
+      this.cards[i].putOn(otherDeck, w + ((i + 1) / (n + 2)) * (v - w));
     }
   }
 
@@ -169,6 +179,16 @@ class Deck {
     }
     // Reached last card. Put the new card behind that one.
     return [v, v + 1];
+  }
+
+  orientate(ref: Card) {
+    this.replica.tick = this.scene.tick;
+    this.replica.owner = this.scene.playerId;
+    this.replica.x = ref.replica.x - 30;
+    this.replica.y = ref.replica.y;
+    this.replica.z = ref.replica.z;
+    this._synchronize();
+    this.scene.render();
   }
 
   changed(): ReplicatedDeck | null {

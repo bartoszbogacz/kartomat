@@ -15,23 +15,24 @@ interface ReplicatedScene {
 }
 
 class Scene {
+  /** Replicated game properties */
   public tick: number = 0;
   public boardId: string = "";
   public gameId: string = "";
   public playerId: string = "";
   public clientId: string = "";
 
+  /** Scene graph */
+  public avatars: { [key: string]: Avatar } = {};
+  public boards: { [key: string]: Board } = {};
+  public marbles: { [key: string]: Marble } = {};
+  public notepads: { [key: string]: Notepad } = {};
+  public privateAreas: { [key: string]: PrivateArea } = {};
+  public decks: { [key: string]: Deck } = {};
+  public cards: { [key: string]: Card } = {};
+
   /** Computed properties */
   public cardsOnDeck: { [key: string]: Card[] } = {};
-
-  // Scene graph derived from replicated state
-  private avatars: { [key: string]: Avatar } = {};
-  private boards: { [key: string]: Board } = {};
-  private marbles: { [key: string]: Marble } = {};
-  private notepads: { [key: string]: Notepad } = {};
-  private privateAreas: { [key: string]: PrivateArea } = {};
-  private decks: { [key: string]: Deck } = {};
-  private cards: { [key: string]: Card } = {};
 
   constructor() {
     //
@@ -82,14 +83,14 @@ class Scene {
 
     for (const [key, item] of Object.entries(remote.cards)) {
       if (!this.cards.hasOwnProperty(key)) {
-        this.cards[key] = new Card(key, item, this);
+        this.cards[key] = new Card(key, this);
       }
       this.cards[key].synchronize(item);
     }
 
     for (const [key, item] of Object.entries(remote.decks)) {
       if (!this.decks.hasOwnProperty(key)) {
-        this.decks[key] = new Deck(key, item, this);
+        this.decks[key] = new Deck(key, this);
       }
       this.decks[key].synchronize(item);
     }
@@ -110,13 +111,13 @@ class Scene {
   private _render(this: Scene) {
     this.cardsOnDeck = {};
 
+    for (const [key, deck] of Object.entries(this.decks)) {
+      this.cardsOnDeck[key] = [];
+    }
+
     for (const [key, card] of Object.entries(this.cards)) {
-      if (card.onDeck !== null) {
-        if (this.cardsOnDeck.hasOwnProperty(card.onDeck.key)) {
-          this.cardsOnDeck[card.onDeck.key].push(this.cards[key]);
-        } else {
-          this.cardsOnDeck[card.onDeck.key] = [this.cards[key]];
-        }
+      if (card.replica.onDeck !== null) {
+        this.cardsOnDeck[card.replica.onDeck].push(this.cards[key]);
       }
     }
 
@@ -219,20 +220,12 @@ class Scene {
 
   createDeck(ref: Card): Deck {
     for (let i = 0; i < 1000; i++) {
-      const name = "deck" + i;
-      if (!this.decks.hasOwnProperty(name)) {
-        const replica: ReplicatedDeck = {
-          tick: this.tick,
-          owner: this.playerId,
-          x: ref.box.x - 30,
-          y: ref.box.y,
-          z: ref.box.z,
-          w: ref.box.w,
-          h: ref.box.h,
-          strides: [0, 20],
-          current: 0,
-        };
-        return new Deck(name, replica, this);
+      const key = "deck" + i;
+      if (!this.decks.hasOwnProperty(key)) {
+        const deck = new Deck(key, this);
+        deck.orientate(ref);
+        this.decks[key] = deck;
+        return deck;
       }
     }
     throw new Error("Ids for decks exhausted.");

@@ -18,18 +18,29 @@ class Card {
   public key: string;
   public replica: ReplicatedCard;
   public box: BoundingBox;
-  public onDeck: Deck | null = null;
 
   private remoteTick: number;
   private scene: Scene;
   private visElem: HTMLElement;
   private ownerElem: HTMLElement;
 
-  constructor(key: string, replica: ReplicatedCard, scene: Scene) {
+  constructor(key: string, scene: Scene) {
     this.key = key;
-    this.replica = replica;
+    this.remoteTick = 0;
+    this.replica = {
+      tick: 0,
+      owner: null,
+      x: 0,
+      y: 0,
+      z: 0,
+      w: 100,
+      h: 150,
+      onDeck: null,
+      images: ["", ""],
+      colors: ["", ""],
+      current: 0,
+    };
     this.box = new BoundingBox();
-    this.remoteTick = replica.tick;
     this.scene = scene;
 
     this.visElem = document.createElement("div");
@@ -76,7 +87,7 @@ class Card {
 
   /** Rendering when card is free staning, z is an offset. */
   render(z: number) {
-    if (this.onDeck === null) {
+    if (this.replica.onDeck === null) {
       this.box.x = this.replica.x;
       this.box.y = this.replica.y;
       this.box.z = this.replica.z + z;
@@ -85,8 +96,7 @@ class Card {
   }
 
   /** Rendering when card is on a deck, x y z are taken literally. */
-  renderOnDeck(x: number, y: number, z: number, onDeck: Deck) {
-    this.onDeck = onDeck;
+  renderOnDeck(x: number, y: number, z: number) {
     this.box.x = x;
     this.box.y = y;
     this.box.z = z;
@@ -139,8 +149,8 @@ class Card {
       return;
     }
 
-    if (other.onDeck === null) {
-      const deck = this.scene.createDeck(this);
+    if (other.replica.onDeck === null) {
+      const deck = this.scene.createDeck(other);
       this.replica.tick = this.scene.tick;
       this.replica.owner = this.scene.playerId;
       this.replica.onDeck = deck.key;
@@ -153,8 +163,9 @@ class Card {
       return;
     }
 
-    const [w, v] = other.onDeck.gapFor(this.box.x);
-    this.putOn(other.onDeck, (w + v) * 0.5);
+    const otherDeck = this.scene.decks[other.replica.onDeck];
+    const [w, v] = otherDeck.gapFor(this.box.x);
+    this.putOn(otherDeck, (w + v) * 0.5);
   }
 
   turn() {
