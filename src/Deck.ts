@@ -70,10 +70,10 @@ class Deck {
     this.ownerElem.innerHTML = this.replica.owner || "";
   }
 
-  render(z: number, cards: Card[]) {
-    this.cards = cards;
-    this.box.z = z;
-    this.box.d = cards.length;
+  render(z: number) {
+    this.cards = this.scene.cardsOnDeck[this.key];
+    this.box.z = this.replica.z + z;
+    this.box.d = this.cards.length;
 
     for (let i = 0; i < this.cards.length; i++) {
       const x: number = this.box.x;
@@ -82,7 +82,7 @@ class Deck {
       const w: number = this.box.w;
       const s: number = this.replica.strides[this.replica.current];
 
-      this.cards[i].render(x + w + s * i, y, z + 1 + i, this);
+      this.cards[i].renderOnDeck(x + w + s * i, y, z + 1 + i, this);
     }
 
     if (

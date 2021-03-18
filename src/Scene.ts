@@ -21,6 +21,9 @@ class Scene {
   public playerId: string = "";
   public clientId: string = "";
 
+  /** Computed properties */
+  public cardsOnDeck: { [key: string]: Card[] } = {};
+
   // Scene graph derived from replicated state
   private avatars: { [key: string]: Avatar } = {};
   private boards: { [key: string]: Board } = {};
@@ -46,9 +49,6 @@ class Scene {
     this.gameId = remote.gameId;
     this.playerId = remote.playerId;
     this.clientId = remote.clientId;
-
-    // Order elements
-    let z: number = 0;
 
     // Propagate changes to itmes
 
@@ -108,55 +108,44 @@ class Scene {
   }
 
   private _render(this: Scene) {
-    let cardsOnDeck: { [key: string]: Card[] } = {};
+    this.cardsOnDeck = {};
 
     for (const [key, card] of Object.entries(this.cards)) {
       if (card.onDeck !== null) {
-        if (cardsOnDeck.hasOwnProperty(card.onDeck.key)) {
-          cardsOnDeck[card.onDeck.key].push(this.cards[key]);
+        if (this.cardsOnDeck.hasOwnProperty(card.onDeck.key)) {
+          this.cardsOnDeck[card.onDeck.key].push(this.cards[key]);
         } else {
-          cardsOnDeck[card.onDeck.key] = [this.cards[key]];
+          this.cardsOnDeck[card.onDeck.key] = [this.cards[key]];
         }
       }
     }
 
-    let z: number = 0;
-
     for (const [key, item] of Object.entries(this.boards)) {
-      item.render(z);
-      z += item.box.d;
+      item.render(100);
     }
 
     for (const [key, item] of Object.entries(this.notepads)) {
-      item.render(z);
-      z += item.box.d;
+      item.render(200);
     }
 
     for (const [key, item] of Object.entries(this.avatars)) {
-      item.render(z);
-      z += item.box.d;
+      item.render(300);
     }
 
     for (const [key, item] of Object.entries(this.marbles)) {
-      item.render(z);
-      z += item.box.d;
+      item.render(400);
     }
 
     for (const [key, item] of Object.entries(this.privateAreas)) {
-      item.render(z);
-      z += item.box.d;
+      item.render(500);
     }
 
     for (const [key, item] of Object.entries(this.decks)) {
-      item.render(z, cardsOnDeck[key]);
-      z += item.box.d;
+      item.render(600);
     }
 
     for (const [key, item] of Object.entries(this.cards)) {
-      if (item.onDeck === null) {
-        item.render(item.replica.x, item.replica.y, z, null);
-        z += item.box.d;
-      }
+      item.render(700);
     }
   }
 

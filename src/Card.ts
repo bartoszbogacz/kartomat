@@ -59,9 +59,6 @@ class Card {
   }
 
   private _synchronize() {
-    this.box.x = this.replica.x;
-    this.box.y = this.replica.y;
-    this.box.z = this.replica.z;
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
 
@@ -77,15 +74,26 @@ class Card {
     this.ownerElem.innerHTML = this.replica.owner || "";
   }
 
-  /** Re-compute based on timing changes. */
-  render(x: number, y: number, z: number, onDeck: Deck | null) {
-    this.onDeck = onDeck;
-    if (onDeck !== null) {
-      this.box.x = x;
-      this.box.y = y;
+  /** Rendering when card is free staning, z is an offset. */
+  render(z: number) {
+    if (this.onDeck === null) {
+      this.box.x = this.replica.x;
+      this.box.y = this.replica.y;
+      this.box.z = this.replica.z + z;
+      this._render();
     }
-    this.box.z = z;
+  }
 
+  /** Rendering when card is on a deck, x y z are taken literally. */
+  renderOnDeck(x: number, y: number, z: number, onDeck: Deck) {
+    this.onDeck = onDeck;
+    this.box.x = x;
+    this.box.y = y;
+    this.box.z = z;
+    this._render();
+  }
+
+  private _render() {
     this.visElem.style.left = this.box.x + "px";
     this.visElem.style.top = this.box.y + "px";
     this.visElem.style.zIndex = this.box.z.toString();
@@ -141,6 +149,7 @@ class Card {
       other.replica.owner = this.scene.playerId;
       other.replica.onDeck = deck.key;
       other._synchronize();
+      this.scene.render();
       return;
     }
 
