@@ -53,44 +53,43 @@ class Scene {
 
     // Propagate changes to itmes
 
+    // TODO: Use card and deck-like constructor for all items
+
     for (const [key, replica] of Object.entries(remote.boards)) {
-      const item = this.boards[key];
+      let item = this.boards[key];
       if (item === undefined) {
-        this.boards[key] = new Board(key, replica, this);
-      } else {
-        item.synchronize(replica);
+        item = new Board(key, replica, this);
+        this.boards[key] = item;
       }
+      item.synchronize(replica);
     }
 
     for (const [key, replica] of Object.entries(remote.notepads)) {
-      const item = this.notepads[key];
+      let item = this.notepads[key];
       if (item === undefined) {
-        this.notepads[key] = new Notepad(key, replica, this);
-      } else {
-        item.synchronize(replica);
+        item = new Notepad(key, replica, this);
+        this.notepads[key] = item;
       }
+      item.synchronize(replica);
     }
 
     for (const [key, replica] of Object.entries(remote.avatars)) {
-      const item = this.avatars[key];
+      let item = this.avatars[key];
       if (item === undefined) {
-        this.avatars[key] = new Avatar(key, replica, this);
-      } else {
-        item.synchronize(replica);
+        item = new Avatar(key, replica, this);
+        this.avatars[key] = item;
       }
+      item.synchronize(replica);
     }
 
     for (const [key, replica] of Object.entries(remote.privateAreas)) {
-      const item = this.privateAreas[key];
+      let item = this.privateAreas[key];
       if (item === undefined) {
-        this.privateAreas[key] = new PrivateArea(key, replica, this);
-      } else {
-        item.synchronize(replica);
+        item = new PrivateArea(key, replica, this);
+        this.privateAreas[key] = item;
       }
+      item.synchronize(replica);
     }
-
-    // TODO: Use card and deck-like constructor for all items
-    // Neccessitates to use card and deck-like check for all items.
 
     for (const [key, replica] of Object.entries(remote.cards)) {
       let item = this.cards[key];
@@ -111,12 +110,12 @@ class Scene {
     }
 
     for (const [key, replica] of Object.entries(remote.marbles)) {
-      const item = this.marbles[key];
+      let item = this.marbles[key];
       if (item === undefined) {
-        this.marbles[key] = new Marble(key, replica, this);
-      } else {
-        item.synchronize(replica);
+        item = new Marble(key, replica, this);
+        this.marbles[key] = item;
       }
+      item.synchronize(replica);
     }
   }
 
