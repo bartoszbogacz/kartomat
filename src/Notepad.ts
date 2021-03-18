@@ -38,16 +38,21 @@ class Notepad {
     this.ownerElem.style.position = "absolute";
     this.ownerElem.style.userSelect = "none";
     document.body.appendChild(this.ownerElem);
-
-    new DragAndDrop(this.visElem, this);
   }
 
+  /** Re-compute based on changes to replica. */
   synchronize(remote: ReplicatedNotepad) {
+    this.remoteTick = remote.tick;
+
     if (this.replica.tick > remote.tick) {
       return;
     }
-    this.remoteTick = remote.tick;
+    this.replica = remote;
 
+    this._synchronize();
+  }
+
+  private _synchronize() {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
     this.box.z = this.replica.z;
@@ -79,23 +84,6 @@ class Notepad {
     } else {
       this.ownerElem.style.visibility = "visible";
     }
-  }
-
-  take() {
-    this.replica.tick = this.scene.tick;
-    this.replica.owner = this.scene.playerId;
-    this.replica.z = this.scene.topZOfCards() + 1;
-  }
-
-  move(x: number, y: number) {
-    this.replica.tick = this.scene.tick;
-    this.replica.owner = this.scene.playerId;
-    this.replica.x = x;
-    this.replica.y = y;
-  }
-
-  place(wasOutside: boolean) {
-    // Nothing happens
   }
 
   changed(): ReplicatedNotepad | null {

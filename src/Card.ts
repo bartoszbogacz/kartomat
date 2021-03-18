@@ -16,24 +16,24 @@ interface ReplicatedCard {
 
 class Card {
   public key: string;
+  public replica: ReplicatedCard;
   public box: BoundingBox;
   public onDeck: Deck | null = null;
 
   private remoteTick: number;
-  private replica: ReplicatedCard;
-
   private scene: Scene;
   private visElem: HTMLElement;
   private ownerElem: HTMLElement;
 
   constructor(key: string, replica: ReplicatedCard, scene: Scene) {
     this.key = key;
+    this.replica = replica;
     this.box = new BoundingBox();
     this.remoteTick = replica.tick;
-    this.replica = replica;
     this.scene = scene;
 
     this.visElem = document.createElement("div");
+    this.visElem.className = "Card";
     this.visElem.style.position = "absolute";
     this.visElem.style.userSelect = "none";
     document.body.appendChild(this.visElem);
@@ -46,26 +46,25 @@ class Card {
     new DragAndDrop(this.visElem, this);
   }
 
-  get owner(): string | null {
-    return this.replica.owner;
-  }
-
   /** Re-compute based on changes to replica. */
   synchronize(remote: ReplicatedCard) {
+    this.remoteTick = remote.tick;
+
     if (this.replica.tick > remote.tick) {
       return;
     }
-    this.remoteTick = remote.tick;
+    this.replica = remote;
 
+    this._synchronize();
+  }
+
+  private _synchronize() {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
     this.box.z = this.replica.z;
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
 
-    this.visElem.style.left = this.box.x + "px";
-    this.visElem.style.top = this.box.y + "px";
-    this.visElem.style.zIndex = this.box.z.toString();
     this.visElem.style.width = this.box.w + "px";
     this.visElem.style.height = this.box.h + "px";
     this.visElem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
@@ -75,9 +74,6 @@ class Card {
     this.visElem.style.backgroundImage =
       "url(" + this.replica.images[this.replica.current] + ")";
 
-    this.ownerElem.style.left = this.box.x + "px";
-    this.ownerElem.style.top = this.box.y + this.box.h + "px";
-    this.ownerElem.style.zIndex = (this.box.z + 1).toString();
     this.ownerElem.innerHTML = this.replica.owner || "";
   }
 
@@ -113,7 +109,8 @@ class Card {
     this.replica.owner = this.scene.playerId;
     this.replica.onDeck = null;
     this.replica.z = this.scene.topZOfCards() + 1;
-    this.synchronize(this.replica);
+    this._synchronize();
+    this.scene.render();
   }
 
   move(x: number, y: number) {
@@ -121,7 +118,8 @@ class Card {
     this.replica.owner = this.scene.playerId;
     this.replica.x = x;
     this.replica.y = y;
-    this.synchronize(this.replica);
+    this._synchronize();
+    this.scene.render();
   }
 
   place(wasOutside: boolean) {
@@ -138,11 +136,11 @@ class Card {
       this.replica.tick = this.scene.tick;
       this.replica.owner = this.scene.playerId;
       this.replica.onDeck = deck.key;
-      this.synchronize(this.replica);
+      this._synchronize();
       other.replica.tick = this.scene.tick;
       other.replica.owner = this.scene.playerId;
       other.replica.onDeck = deck.key;
-      other.synchronize(this.replica);
+      other._synchronize();
       return;
     }
 
@@ -155,7 +153,8 @@ class Card {
     this.replica.owner = this.scene.playerId;
     this.replica.current =
       (this.replica.current + 1) % this.replica.images.length;
-    this.synchronize(this.replica);
+    this._synchronize();
+    this.scene.render();
   }
 
   /** Put card onDeck at fractional index */
@@ -164,7 +163,8 @@ class Card {
     this.replica.owner = this.scene.playerId;
     this.replica.onDeck = onDeck.key;
     this.replica.x = f;
-    this.synchronize(this.replica);
+    this._synchronize();
+    this.scene.render();
   }
 
   changed(): ReplicatedCard | null {

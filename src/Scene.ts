@@ -30,15 +30,12 @@ class Scene {
   private decks: { [key: string]: Deck } = {};
   private cards: { [key: string]: Card } = {};
 
-  // Computed properties
-  private cardsOnDeck: { [key: string]: Card[] } = {};
-
   constructor() {
     //
   }
 
-  /** Apply changes from remote. Takes ownership of the argument. */
-  synchronizeWith(remote: ReplicatedScene) {
+  /** Distribute changes from remote */
+  synchronize(remote: ReplicatedScene) {
     // Never regress tick even if server tells us so. Otherwise we may
     // not be able to change our own objects if their tick is higher than
     // ours. Client tick and server tick behave like a Lamport timestamp.
@@ -103,20 +100,62 @@ class Scene {
       }
       this.marbles[key].synchronize(item);
     }
+  }
 
-    // Re-compute derived properties
+  /** Re-compute properties dependent on replicas */
+  render() {
+    window.requestAnimationFrame(this._render.bind(this));
+  }
 
-    // TODO: Only do this for cards that actually changed.
-
-    this.cardsOnDeck = {};
+  private _render(this: Scene) {
+    let cardsOnDeck: { [key: string]: Card[] } = {};
 
     for (const [key, card] of Object.entries(this.cards)) {
       if (card.onDeck !== null) {
-        if (this.cardsOnDeck.hasOwnProperty(card.onDeck.key)) {
-          this.cardsOnDeck[card.onDeck.key].push(this.cards[key]);
+        if (cardsOnDeck.hasOwnProperty(card.onDeck.key)) {
+          cardsOnDeck[card.onDeck.key].push(this.cards[key]);
         } else {
-          this.cardsOnDeck[card.onDeck.key] = [this.cards[key]];
+          cardsOnDeck[card.onDeck.key] = [this.cards[key]];
         }
+      }
+    }
+
+    let z: number = 0;
+
+    for (const [key, item] of Object.entries(this.boards)) {
+      item.render(z);
+      z += item.box.d;
+    }
+
+    for (const [key, item] of Object.entries(this.notepads)) {
+      item.render(z);
+      z += item.box.d;
+    }
+
+    for (const [key, item] of Object.entries(this.avatars)) {
+      item.render(z);
+      z += item.box.d;
+    }
+
+    for (const [key, item] of Object.entries(this.marbles)) {
+      item.render(z);
+      z += item.box.d;
+    }
+
+    for (const [key, item] of Object.entries(this.privateAreas)) {
+      item.render(z);
+      z += item.box.d;
+    }
+
+    for (const [key, item] of Object.entries(this.decks)) {
+      item.render(z, cardsOnDeck[key]);
+      z += item.box.d;
+    }
+
+    for (const [key, item] of Object.entries(this.cards)) {
+      if (item.onDeck === null) {
+        item.render(item.replica.x, item.replica.y, z, null);
+        z += item.box.d;
       }
     }
   }
@@ -189,45 +228,6 @@ class Scene {
     return result;
   }
 
-  render() {
-    let z: number = 0;
-
-    for (const [key, item] of Object.entries(this.boards)) {
-      item.render(z);
-      z += item.box.d;
-    }
-
-    for (const [key, item] of Object.entries(this.notepads)) {
-      item.render(z);
-      z += item.box.d;
-    }
-
-    for (const [key, item] of Object.entries(this.avatars)) {
-      item.render(z);
-      z += item.box.d;
-    }
-
-    for (const [key, item] of Object.entries(this.marbles)) {
-      item.render(z);
-      z += item.box.d;
-    }
-
-    for (const [key, item] of Object.entries(this.privateAreas)) {
-      item.render(z);
-      z += item.box.d;
-    }
-
-    for (const [key, item] of Object.entries(this.decks)) {
-      item.render(z, this.cardsOnDeck[key]);
-      z += item.box.d;
-    }
-
-    for (const [key, item] of Object.entries(this.cards)) {
-      item.render(item.box.x, item.box.y, z, null);
-      z += item.box.d;
-    }
-  }
-
   createDeck(ref: Card): Deck {
     for (let i = 0; i < 1000; i++) {
       const name = "deck" + i;
@@ -292,7 +292,7 @@ class Scene {
 
       const priv = this.overlapsPrivateArea(other);
       const area = this.pixelsOverlap(card, other);
-      const ownsOther = other.owner === card.owner;
+      const ownsOther = other.replica.owner === card.replica.owner;
 
       if (area > pixels && ((priv && ownsOther) || !priv)) {
         pixels = area;

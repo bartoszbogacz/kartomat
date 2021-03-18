@@ -30,6 +30,7 @@ class Marble {
     this.scene = scene;
 
     this.visElem = document.createElement("div");
+    this.visElem.className = "Marble";
     this.visElem.style.position = "absolute";
     this.visElem.style.userSelect = "none";
     document.body.appendChild(this.visElem);
@@ -42,12 +43,19 @@ class Marble {
     new DragAndDrop(this.visElem, this);
   }
 
+  /** Re-compute based on changes to replica. */
   synchronize(remote: ReplicatedMarble) {
+    this.remoteTick = remote.tick;
+
     if (this.replica.tick > remote.tick) {
       return;
     }
-    this.remoteTick = remote.tick;
+    this.replica = remote;
 
+    this._synchronize();
+  }
+
+  private _synchronize() {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
     this.box.z = this.replica.z;
@@ -86,7 +94,8 @@ class Marble {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.z = this.scene.topZOfCards() + 1;
-    this.synchronize(this.replica);
+    this._synchronize();
+    this.scene.render();
   }
 
   move(x: number, y: number) {
@@ -94,7 +103,8 @@ class Marble {
     this.replica.owner = this.scene.playerId;
     this.replica.x = x;
     this.replica.y = y;
-    this.synchronize(this.replica);
+    this._synchronize();
+    this.scene.render();
   }
 
   place(wasOutside: boolean) {

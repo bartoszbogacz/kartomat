@@ -14,13 +14,11 @@ interface ReplicatedDeck {
 
 class Deck {
   public key: string;
+  public replica: ReplicatedDeck;
   public box: BoundingBox;
 
   private remoteTick: number;
-  private replica: ReplicatedDeck;
-
   private cards: Card[] = [];
-
   private scene: Scene;
   private visElem: HTMLElement;
   private ownerElem: HTMLElement;
@@ -43,16 +41,19 @@ class Deck {
     document.body.appendChild(this.ownerElem);
   }
 
-  get owner(): string | null {
-    return this.replica.owner;
-  }
-
+  /** Re-compute based on changes to replica. */
   synchronize(remote: ReplicatedDeck) {
+    this.remoteTick = remote.tick;
+
     if (this.replica.tick > remote.tick) {
       return;
     }
-    this.remoteTick = remote.tick;
+    this.replica = remote;
 
+    this._synchronize();
+  }
+
+  private _synchronize() {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
     this.box.z = this.replica.z;
@@ -98,7 +99,8 @@ class Deck {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.z = this.scene.topZOfCards() + 1;
-    this.synchronize(this.replica);
+    this._synchronize();
+    this.scene.render();
   }
 
   move(x: number, y: number) {
@@ -106,7 +108,8 @@ class Deck {
     this.replica.owner = this.scene.playerId;
     this.replica.x = x;
     this.replica.y = y;
-    this.synchronize(this.replica);
+    this._synchronize();
+    this.scene.render();
   }
 
   place(wasOutside: boolean) {
@@ -133,7 +136,8 @@ class Deck {
     this.replica.owner = this.scene.playerId;
     this.replica.current =
       (this.replica.current + 1) % this.replica.strides.length;
-    this.synchronize(this.replica);
+    this._synchronize();
+    this.scene.render();
   }
 
   /** This modification is not atomic and may lead to inconsistencies */

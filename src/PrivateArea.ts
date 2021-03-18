@@ -27,17 +27,25 @@ class PrivateArea {
     this.scene = scene;
 
     this.elem = document.createElement("div");
+    this.elem.className = "PrivateArea";
     this.elem.style.position = "absolute";
     this.elem.style.userSelect = "none";
     document.body.appendChild(this.elem);
   }
 
+  /** Re-compute based on changes to replica. */
   synchronize(remote: ReplicatedPrivateArea) {
+    this.remoteTick = remote.tick;
+
     if (this.replica.tick > remote.tick) {
       return;
     }
-    this.remoteTick = remote.tick;
+    this.replica = remote;
 
+    this._synchronize();
+  }
+
+  private _synchronize() {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
     this.box.z = this.replica.z;

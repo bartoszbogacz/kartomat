@@ -37,12 +37,19 @@ class Avatar {
     new DragAndDrop(this.elem, this);
   }
 
+  /** Re-compute based on changes to replica. */
   synchronize(remote: ReplicatedAvatar) {
+    this.remoteTick = remote.tick;
+
     if (this.replica.tick > remote.tick) {
       return;
     }
-    this.remoteTick = remote.tick;
+    this.replica = remote;
 
+    this._synchronize();
+  }
+
+  private _synchronize() {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
     this.box.w = this.replica.w;
@@ -65,6 +72,8 @@ class Avatar {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.z = this.scene.topZOfCards() + 1;
+    this._synchronize();
+    this.scene.render();
   }
 
   move(x: number, y: number) {
@@ -72,6 +81,8 @@ class Avatar {
     this.replica.owner = this.scene.playerId;
     this.replica.x = x;
     this.replica.y = y;
+    this._synchronize();
+    this.scene.render();
   }
 
   place(wasOutside: boolean) {
