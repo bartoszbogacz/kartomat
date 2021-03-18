@@ -242,8 +242,8 @@ class Scene {
     let z: number = 0;
 
     for (const [cardId, card] of Object.entries(this.cards)) {
-      if (card.box.z > z) {
-        z = card.box.z;
+      if (card.replica.z > z) {
+        z = card.replica.z;
       }
     }
 
