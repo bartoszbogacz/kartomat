@@ -64,6 +64,8 @@ class Deck {
     this.moveElem.style.backgroundSize = "30px 30px";
     document.body.appendChild(this.moveElem);
 
+    new DragAndDrop(this.moveElem, this);
+
     this.shuffleElem = document.createElement("div");
     this.shuffleElem.className = "Control";
     this.shuffleElem.style.position = "absolute";
@@ -72,6 +74,11 @@ class Deck {
     this.shuffleElem.style.backgroundImage = 'url("controls/shuffle.png")';
     this.shuffleElem.style.backgroundSize = "30px 30px";
     document.body.appendChild(this.shuffleElem);
+
+    this.shuffleElem.addEventListener("mousedown", this.shuffle.bind(this), {
+      passive: false,
+      capture: true,
+    });
 
     this.foldElem = document.createElement("div");
     this.foldElem.className = "Control";
@@ -82,6 +89,11 @@ class Deck {
     this.foldElem.style.backgroundSize = "30px 30px";
     document.body.appendChild(this.foldElem);
 
+    this.foldElem.addEventListener("mousedown", this.fold.bind(this), {
+      passive: false,
+      capture: true,
+    });
+
     this.turnElem = document.createElement("div");
     this.turnElem.className = "Control";
     this.turnElem.style.position = "absolute";
@@ -91,7 +103,10 @@ class Deck {
     this.turnElem.style.backgroundSize = "30px 30px";
     document.body.appendChild(this.turnElem);
 
-    new DragAndDrop(this.moveElem, this);
+    this.turnElem.addEventListener("mousedown", this.turn.bind(this), {
+      passive: false,
+      capture: true,
+    });
   }
 
   /** Re-compute based on changes to replica. */
@@ -178,7 +193,7 @@ class Deck {
     }
   }
 
-  take() {
+  take(this: Deck) {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.z = this.scene.topZOfCards() + 1;
@@ -186,7 +201,7 @@ class Deck {
     this.scene.render();
   }
 
-  move(x: number, y: number) {
+  move(this: Deck, x: number, y: number) {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.x = x;
@@ -195,7 +210,7 @@ class Deck {
     this.scene.render();
   }
 
-  place(wasOutside: boolean) {
+  place(this: Deck, wasOutside: boolean) {
     const other = this.scene.overlapsCard(this);
     if (other === null) {
       return;
@@ -217,7 +232,7 @@ class Deck {
     }
   }
 
-  fold() {
+  fold(this: Deck) {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.current =
@@ -227,7 +242,7 @@ class Deck {
   }
 
   /** This modification is not atomic and may lead to inconsistencies */
-  turn() {
+  turn(this: Deck) {
     for (const card of this.cards) {
       card.turn();
       card.move(-card.box.x, card.box.y);
@@ -235,7 +250,7 @@ class Deck {
   }
 
   /** This modification is not atomic and may lead to inconsistencies */
-  shuffle() {
+  shuffle(this: Deck) {
     for (const card of this.cards) {
       card.move(Math.random(), card.box.y);
     }
