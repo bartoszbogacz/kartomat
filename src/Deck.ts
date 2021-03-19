@@ -141,7 +141,7 @@ class Deck {
   render(z: number) {
     const cards = this.scene.cardsOnDeck[this.key];
     this.cards = cards ? cards : [];
-    this.cards.sort((a, b) => a.box.x - b.box.x);
+    this.cards.sort((a, b) => a.replica.x - b.replica.x);
     this.box.z = this.replica.z + z;
     this.box.d = this.cards.length;
 
@@ -245,31 +245,33 @@ class Deck {
   turn(this: Deck) {
     for (const card of this.cards) {
       card.turn();
-      card.move(-card.box.x, card.box.y);
+      card.move(-card.replica.x, card.replica.y);
     }
   }
 
   /** This modification is not atomic and may lead to inconsistencies */
   shuffle(this: Deck) {
     for (const card of this.cards) {
-      card.move(Math.random(), card.box.y);
+      card.move(Math.random(), card.replica.y);
     }
   }
 
   gapFor(x: number): [number, number] {
     let v: number = 0;
+    let f: number = 0;
     // We use a small offset to bias card insertion to the left.
     // If you put a card very close on top to another one, the new
     // stackable will be placed on the left.
     for (const card of this.cards) {
-      if (card.box.x + 10 > x) {
-        return [v, card.box.x];
+      if (card.box.x + 3 > x) {
+        return [f, card.replica.x];
       } else {
         v = card.box.x;
+        f = card.replica.x;
       }
     }
     // Reached last card. Put the new card behind that one.
-    return [v, v + 1];
+    return [f, f + 1];
   }
 
   orientate(ref: Card) {
