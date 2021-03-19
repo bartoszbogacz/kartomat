@@ -20,8 +20,14 @@ class Deck {
   private remoteTick: number = 0;
   private cards: Card[] = [];
   private scene: Scene;
+
   private visElem: HTMLElement;
   private ownerElem: HTMLElement;
+
+  private moveElem: HTMLElement;
+  private shuffleElem: HTMLElement;
+  private foldElem: HTMLElement;
+  private turnElem: HTMLElement;
 
   constructor(key: string, scene: Scene) {
     this.key = key;
@@ -48,6 +54,44 @@ class Deck {
     this.ownerElem.style.position = "absolute";
     this.ownerElem.style.userSelect = "none";
     document.body.appendChild(this.ownerElem);
+
+    this.moveElem = document.createElement("div");
+    this.moveElem.className = "Control";
+    this.moveElem.style.position = "absolute";
+    this.moveElem.style.width = "30px";
+    this.moveElem.style.height = "30px";
+    this.moveElem.style.backgroundImage = 'url("controls/move.png")';
+    this.moveElem.style.backgroundSize = "30px 30px";
+    document.body.appendChild(this.moveElem);
+
+    this.shuffleElem = document.createElement("div");
+    this.shuffleElem.className = "Control";
+    this.shuffleElem.style.position = "absolute";
+    this.shuffleElem.style.width = "30px";
+    this.shuffleElem.style.height = "30px";
+    this.shuffleElem.style.backgroundImage = 'url("controls/shuffle.png")';
+    this.shuffleElem.style.backgroundSize = "30px 30px";
+    document.body.appendChild(this.shuffleElem);
+
+    this.foldElem = document.createElement("div");
+    this.foldElem.className = "Control";
+    this.foldElem.style.position = "absolute";
+    this.foldElem.style.width = "30px";
+    this.foldElem.style.height = "30px";
+    this.foldElem.style.backgroundImage = 'url("controls/fold.png")';
+    this.foldElem.style.backgroundSize = "30px 30px";
+    document.body.appendChild(this.foldElem);
+
+    this.turnElem = document.createElement("div");
+    this.turnElem.className = "Control";
+    this.turnElem.style.position = "absolute";
+    this.turnElem.style.width = "30px";
+    this.turnElem.style.height = "30px";
+    this.turnElem.style.backgroundImage = 'url("controls/turn.png")';
+    this.turnElem.style.backgroundSize = "30px 30px";
+    document.body.appendChild(this.turnElem);
+
+    new DragAndDrop(this.moveElem, this);
   }
 
   /** Re-compute based on changes to replica. */
@@ -82,6 +126,7 @@ class Deck {
   render(z: number) {
     const cards = this.scene.cardsOnDeck[this.key];
     this.cards = cards ? cards : [];
+    this.cards.sort((a, b) => a.box.x - b.box.x);
     this.box.z = this.replica.z + z;
     this.box.d = this.cards.length;
 
@@ -95,6 +140,33 @@ class Deck {
       this.cards[i]?.renderOnDeck(x + w + s * i, y, z + 1 + i);
     }
 
+    if (this.cards.length > 1) {
+      this.moveElem.style.left = this.box.x + "px";
+      this.moveElem.style.top = this.box.y + "px";
+      this.moveElem.style.zIndex = this.box.z.toString();
+      this.moveElem.style.visibility = "visible";
+
+      this.shuffleElem.style.left = this.box.x + "px";
+      this.shuffleElem.style.top = this.box.y + 30 + "px";
+      this.shuffleElem.style.zIndex = this.box.z.toString();
+      this.shuffleElem.style.visibility = "visible";
+
+      this.foldElem.style.left = this.box.x + "px";
+      this.foldElem.style.top = this.box.y + 60 + "px";
+      this.foldElem.style.zIndex = this.box.z.toString();
+      this.foldElem.style.visibility = "visible";
+
+      this.turnElem.style.left = this.box.x + "px";
+      this.turnElem.style.top = this.box.y + 90 + "px";
+      this.turnElem.style.zIndex = this.box.z.toString();
+      this.turnElem.style.visibility = "visible";
+    } else {
+      this.moveElem.style.visibility = "hidden";
+      this.shuffleElem.style.visibility = "hidden";
+      this.foldElem.style.visibility = "hidden";
+      this.turnElem.style.visibility = "hidden";
+    }
+
     if (
       this.replica.tick + 5 < this.scene.tick ||
       this.replica.owner === null
@@ -102,6 +174,7 @@ class Deck {
       this.ownerElem.style.visibility = "hidden";
     } else {
       this.ownerElem.style.visibility = "visible";
+      this.ownerElem.style.zIndex = this.box.z.toString();
     }
   }
 

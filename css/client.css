@@ -22,3 +22,7 @@
   border-radius: 50%;
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
+
+.Control {
+  filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
+}

@@ -123,8 +123,10 @@ class Card {
   take() {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
-    this.replica.onDeck = null;
+    this.replica.x = this.box.x;
+    this.replica.y = this.box.y;
     this.replica.z = this.scene.topZOfCards() + 1;
+    this.replica.onDeck = null;
     this._synchronize();
     this.scene.render();
   }
