@@ -39,13 +39,19 @@ class DragAndDrop {
   }
 
   mouseDown(event: Event) {
-    const touch = event.type === "touchstart";
-    const clientY = touch
-      ? (event as TouchEvent).touches[0].clientY
-      : (event as MouseEvent).clientY;
-    const clientX = touch
-      ? (event as TouchEvent).touches[0].clientX
-      : (event as MouseEvent).clientX;
+    let clientX: number = 0;
+    let clientY: number = 0;
+
+    if (event.type === "touchmove") {
+      const touches = (event as TouchEvent).touches[0];
+      if (touches) {
+        clientX = touches.clientX;
+        clientY = touches.clientY;
+      }
+    } else {
+      clientX = (event as MouseEvent).clientX;
+      clientY = (event as MouseEvent).clientY;
+    }
 
     this.state = {
       element: event.target as HTMLElement,
@@ -72,13 +78,19 @@ class DragAndDrop {
       return;
     }
 
-    const touch = event.type === "touchmove";
-    const clientY = touch
-      ? (event as TouchEvent).touches[0].clientY
-      : (event as MouseEvent).clientY;
-    const clientX = touch
-      ? (event as TouchEvent).touches[0].clientX
-      : (event as MouseEvent).clientX;
+    let clientX: number = 0;
+    let clientY: number = 0;
+
+    if (event.type === "touchmove") {
+      const touches = (event as TouchEvent).touches[0];
+      if (touches) {
+        clientX = touches.clientX;
+        clientY = touches.clientY;
+      }
+    } else {
+      clientX = (event as MouseEvent).clientX;
+      clientY = (event as MouseEvent).clientY;
+    }
 
     const y = this.state.y - this.state.startY + clientY;
     const x = this.state.x - this.state.startX + clientX;
