@@ -24,7 +24,7 @@ class Notepad {
 
   constructor(key: string, replica: ReplicatedNotepad, scene: Scene) {
     this.key = key;
-    this.box = new BoundingBox();
+    this.box = new BoundingBox(0, 0, 100, 100);
     this.remoteTick = replica.tick;
     this.replica = replica;
     this.scene = scene;
@@ -55,7 +55,6 @@ class Notepad {
   private _synchronize() {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
-    this.box.z = this.replica.z;
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
 
@@ -70,11 +69,9 @@ class Notepad {
     this.ownerElem.innerHTML = this.replica.owner || "";
   }
 
-  render(z: number) {
-    this.box.z = z;
-
-    this.visElem.style.zIndex = this.box.z.toString();
-    this.ownerElem.style.zIndex = (this.box.z + 1).toString();
+  render(zOffset: number) {
+    this.visElem.style.zIndex = (this.replica.z + zOffset).toString();
+    this.ownerElem.style.zIndex = (this.replica.z + zOffset).toString();
 
     if (
       this.replica.tick + 5 < this.scene.tick ||

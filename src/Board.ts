@@ -23,7 +23,7 @@ class Board {
 
   constructor(key: string, remote: ReplicatedBoard, scene: Scene) {
     this.key = key;
-    this.box = new BoundingBox();
+    this.box = new BoundingBox(0, 0, 100, 100);
     this.remoteTick = remote.tick;
     this.replica = remote;
     this.scene = scene;
@@ -61,9 +61,8 @@ class Board {
     this.elem.style.backgroundImage = "url(" + this.replica.image + ")";
   }
 
-  render(z: number) {
-    this.box.z = z;
-    this.elem.style.zIndex = this.box.z.toString();
+  render(zOffset: number) {
+    this.elem.style.zIndex = (this.replica.z + zOffset).toString();
   }
 
   changed(): ReplicatedBoard | null {

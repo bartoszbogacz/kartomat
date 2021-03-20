@@ -125,6 +125,11 @@ class Scene {
   }
 
   private _render(this: Scene) {
+    // TODO: If there are static ranges of z allocated for each
+    // item layer, then there is now new information being propagated
+    // by render. Besides, cardsOnDeck, which is known immediately
+    // after synchronize. This, there is no need for a render call at all.
+
     this.cardsOnDeck = {};
 
     for (const [key, deck] of Object.entries(this.decks)) {
@@ -140,32 +145,35 @@ class Scene {
       }
     }
 
+    // TODO: Items themselves should say how much z space they
+    // require, however, statically just as it is now.
+
     for (const [key, item] of Object.entries(this.boards)) {
-      item.render(100);
+      item.render(0);
     }
 
     for (const [key, item] of Object.entries(this.notepads)) {
-      item.render(200);
+      item.render(1);
     }
 
     for (const [key, item] of Object.entries(this.avatars)) {
-      item.render(300);
-    }
-
-    for (const [key, item] of Object.entries(this.marbles)) {
-      item.render(400);
+      item.render(10);
     }
 
     for (const [key, item] of Object.entries(this.privateAreas)) {
-      item.render(500);
+      item.render(100);
     }
 
     for (const [key, item] of Object.entries(this.decks)) {
-      item.render(600);
+      item.render(20000);
     }
 
     for (const [key, item] of Object.entries(this.cards)) {
-      item.render(700);
+      item.render(20000);
+    }
+
+    for (const [key, item] of Object.entries(this.marbles)) {
+      item.render(30000);
     }
   }
 
@@ -250,12 +258,27 @@ class Scene {
     throw new Error("Ids for decks exhausted.");
   }
 
-  topZOfCards(): number {
+  topZ(): number {
     let z: number = 0;
+
+    // TODO: Items themselves should say how much z space they
+    // require, however, statically just as it is now.
+
+    for (const [cardId, deck] of Object.entries(this.decks)) {
+      if (deck.replica.z + 100 > z) {
+        z = deck.replica.z + 100;
+      }
+    }
 
     for (const [cardId, card] of Object.entries(this.cards)) {
       if (card.replica.z > z) {
         z = card.replica.z;
+      }
+    }
+
+    for (const [cardId, marble] of Object.entries(this.marbles)) {
+      if (marble.replica.z > z) {
+        z = marble.replica.z;
       }
     }
 

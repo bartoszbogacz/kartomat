@@ -24,7 +24,7 @@ class Avatar {
 
   constructor(key: string, replica: ReplicatedAvatar, scene: Scene) {
     this.key = key;
-    this.box = new BoundingBox();
+    this.box = new BoundingBox(0, 0, 150, 30);
     this.remoteTick = replica.tick;
     this.replica = replica;
     this.scene = scene;
@@ -63,15 +63,15 @@ class Avatar {
     this.elem.style.backgroundColor = this.replica.color;
   }
 
-  render(z: number) {
-    this.box.z = z;
-    this.elem.style.zIndex = this.box.z.toString();
+  render(zOffset: number) {
+    this.elem.style.zIndex = (this.replica.z + zOffset).toString();
   }
 
   take() {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
-    this.replica.z = this.scene.topZOfCards() + 1;
+    // TODO: We are wasting z space here if this item itself is on the top.
+    this.replica.z = this.scene.topZ() + 1;
     this._synchronize();
     this.scene.render();
   }

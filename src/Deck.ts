@@ -31,7 +31,7 @@ class Deck {
 
   constructor(key: string, scene: Scene) {
     this.key = key;
-    this.box = new BoundingBox();
+    this.box = new BoundingBox(0, 0, 30, 150);
     this.replica = {
       tick: 0,
       owner: null,
@@ -124,7 +124,6 @@ class Deck {
   private _synchronize() {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
-    this.box.z = this.replica.z;
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
 
@@ -138,42 +137,45 @@ class Deck {
     this.ownerElem.innerHTML = this.replica.owner || "";
   }
 
-  render(z: number) {
+  render(zOffset: number) {
+    //
+  }
+
+  renderByPrivateArea(zOffset: number) {
     const cards = this.scene.cardsOnDeck[this.key];
     this.cards = cards ? cards : [];
     this.cards.sort((a, b) => a.replica.x - b.replica.x);
-    this.box.z = this.replica.z + z;
-    this.box.d = this.cards.length;
+
+    const x: number = this.box.x;
+    const y: number = this.box.y;
+    const w: number = this.box.w;
+    const z: number = this.replica.z + zOffset;
+    const stride = this.replica.strides[this.replica.current];
+    const s: number = stride ? stride : 2;
 
     for (let i = 0; i < this.cards.length; i++) {
-      const x: number = this.box.x;
-      const y: number = this.box.y;
-      const z: number = this.box.z;
-      const w: number = this.box.w;
-      const stride = this.replica.strides[this.replica.current];
-      const s: number = stride ? stride : 2;
-      this.cards[i]?.renderOnDeck(x + w + s * i, y, z + 1 + i);
+      this.cards[i]?.renderByDeck(x + w + s * i, y, z + 1 + i);
     }
 
     if (this.cards.length > 1) {
       this.moveElem.style.left = this.box.x + "px";
       this.moveElem.style.top = this.box.y + "px";
-      this.moveElem.style.zIndex = this.box.z.toString();
+      this.moveElem.style.zIndex = z.toString();
       this.moveElem.style.visibility = "visible";
 
       this.shuffleElem.style.left = this.box.x + "px";
       this.shuffleElem.style.top = this.box.y + 30 + "px";
-      this.shuffleElem.style.zIndex = this.box.z.toString();
+      this.shuffleElem.style.zIndex = z.toString();
       this.shuffleElem.style.visibility = "visible";
 
       this.foldElem.style.left = this.box.x + "px";
       this.foldElem.style.top = this.box.y + 60 + "px";
-      this.foldElem.style.zIndex = this.box.z.toString();
+      this.foldElem.style.zIndex = z.toString();
       this.foldElem.style.visibility = "visible";
 
       this.turnElem.style.left = this.box.x + "px";
       this.turnElem.style.top = this.box.y + 90 + "px";
-      this.turnElem.style.zIndex = this.box.z.toString();
+      this.turnElem.style.zIndex = z.toString();
       this.turnElem.style.visibility = "visible";
     } else {
       this.moveElem.style.visibility = "hidden";
@@ -189,14 +191,15 @@ class Deck {
       this.ownerElem.style.visibility = "hidden";
     } else {
       this.ownerElem.style.visibility = "visible";
-      this.ownerElem.style.zIndex = this.box.z.toString();
+      this.ownerElem.style.zIndex = z.toString();
     }
   }
 
   take(this: Deck) {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
-    this.replica.z = this.scene.topZOfCards() + 1;
+    // TODO: We are wasting z space here if this item itself is on the top.
+    this.replica.z = this.scene.topZ() + 1;
     this._synchronize();
     this.scene.render();
   }

@@ -13,10 +13,10 @@ interface ReplicatedMarble {
 
 class Marble {
   public key: string;
+  public replica: ReplicatedMarble;
   public box: BoundingBox;
 
   private remoteTick: number;
-  private replica: ReplicatedMarble;
 
   private scene: Scene;
   private visElem: HTMLElement;
@@ -24,7 +24,7 @@ class Marble {
 
   constructor(key: string, replica: ReplicatedMarble, scene: Scene) {
     this.key = key;
-    this.box = new BoundingBox();
+    this.box = new BoundingBox(0, 0, 15, 15);
     this.remoteTick = replica.tick;
     this.replica = replica;
     this.scene = scene;
@@ -58,7 +58,6 @@ class Marble {
   private _synchronize() {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
-    this.box.z = this.replica.z;
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
 
@@ -71,14 +70,12 @@ class Marble {
 
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + 15 + "px";
-    this.ownerElem.style.zIndex = (this.box.z + 1).toString();
     this.ownerElem.innerHTML = this.replica.owner || "";
   }
 
-  render(z: number) {
-    this.box.z = z;
-
-    this.visElem.style.zIndex = this.box.z.toString();
+  render(zOffset: number) {
+    this.visElem.style.zIndex = (this.replica.z + zOffset).toString();
+    this.ownerElem.style.zIndex = (this.replica.z + zOffset).toString();
 
     if (
       this.replica.tick + 5 < this.scene.tick ||
@@ -93,7 +90,8 @@ class Marble {
   take() {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
-    this.replica.z = this.scene.topZOfCards() + 1;
+    // TODO: We are wasting z space here if this item itself is on the top.
+    this.replica.z = this.scene.topZ() + 1;
     this._synchronize();
     this.scene.render();
   }

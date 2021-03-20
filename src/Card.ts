@@ -40,7 +40,7 @@ class Card {
       colors: ["", ""],
       current: 0,
     };
-    this.box = new BoundingBox();
+    this.box = new BoundingBox(0, 0, 100, 150);
     this.scene = scene;
 
     this.visElem = document.createElement("div");
@@ -83,32 +83,33 @@ class Card {
     this.ownerElem.innerHTML = this.replica.owner || "";
   }
 
-  /** Rendering when card is free staning, z is an offset. */
-  render(z: number) {
+  render(zOffset: number) {
+    //
+  }
+
+  renderByPrivateArea(zOffset: number) {
     if (this.replica.onDeck === null) {
       this.box.x = this.replica.x;
       this.box.y = this.replica.y;
-      this.box.z = this.replica.z + z;
-      this._render();
+      this._render(this.replica.z + zOffset);
     }
   }
 
   /** Rendering when card is on a deck, x y z are taken literally. */
-  renderOnDeck(x: number, y: number, z: number) {
+  renderByDeck(x: number, y: number, z: number) {
     this.box.x = x;
     this.box.y = y;
-    this.box.z = z;
-    this._render();
+    this._render(z);
   }
 
-  private _render() {
+  private _render(z: number) {
     this.visElem.style.left = this.box.x + "px";
     this.visElem.style.top = this.box.y + "px";
-    this.visElem.style.zIndex = this.box.z.toString();
+    this.visElem.style.zIndex = z.toString();
 
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + this.box.h + "px";
-    this.ownerElem.style.zIndex = (this.box.z + 1).toString();
+    this.ownerElem.style.zIndex = z.toString();
 
     if (
       this.replica.tick + 5 < this.scene.tick ||
@@ -125,7 +126,8 @@ class Card {
     this.replica.owner = this.scene.playerId;
     this.replica.x = this.box.x;
     this.replica.y = this.box.y;
-    this.replica.z = this.scene.topZOfCards() + 1;
+    // TODO: We are wasting z space here if this item itself is on the top.
+    this.replica.z = this.scene.topZ() + 1;
     this.replica.onDeck = null;
     this._synchronize();
     this.scene.render();

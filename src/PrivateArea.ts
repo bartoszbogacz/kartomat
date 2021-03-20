@@ -21,7 +21,7 @@ class PrivateArea {
 
   constructor(key: string, replica: ReplicatedPrivateArea, scene: Scene) {
     this.key = key;
-    this.box = new BoundingBox();
+    this.box = new BoundingBox(0, 0, 100, 100);
     this.remoteTick = replica.tick;
     this.replica = replica;
     this.scene = scene;
@@ -48,7 +48,6 @@ class PrivateArea {
   private _synchronize() {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
-    this.box.z = this.replica.z;
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
 
@@ -56,12 +55,34 @@ class PrivateArea {
     this.elem.style.top = this.box.y + "px";
     this.elem.style.width = this.box.w + "px";
     this.elem.style.height = this.box.h + "px";
-    this.elem.style.zIndex = this.box.z.toString();
   }
 
-  render(z: number) {
-    this.box.z = z;
-    this.elem.style.zIndex = this.box.z.toString();
+  render(zOffset: number) {
+    for (const [key, deck] of Object.entries(this.scene.decks)) {
+      if (deck.replica.owner !== this.scene.playerId) {
+        deck.renderByPrivateArea(this.replica.z + zOffset);
+      }
+    }
+
+    for (const [key, card] of Object.entries(this.scene.cards)) {
+      if (card.replica.owner !== this.scene.playerId) {
+        card.renderByPrivateArea(this.replica.z + zOffset);
+      }
+    }
+
+    this.elem.style.zIndex = (this.replica.z + zOffset + 10000).toString();
+
+    for (const [key, deck] of Object.entries(this.scene.decks)) {
+      if (deck.replica.owner === this.scene.playerId) {
+        deck.renderByPrivateArea(zOffset + 10000);
+      }
+    }
+
+    for (const [key, card] of Object.entries(this.scene.cards)) {
+      if (card.replica.owner === this.scene.playerId) {
+        card.renderByPrivateArea(zOffset + 10000);
+      }
+    }
   }
 
   changed(): ReplicatedPrivateArea | null {
