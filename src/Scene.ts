@@ -94,7 +94,7 @@ class Scene {
     for (const [key, replica] of Object.entries(remote.cards)) {
       let item = this.cards[key];
       if (item === undefined) {
-        item = new Card(key, this);
+        item = new Card(key, replica, this);
         this.cards[key] = item;
       }
       item.synchronize(replica);
@@ -103,7 +103,7 @@ class Scene {
     for (const [key, replica] of Object.entries(remote.decks)) {
       let item = this.decks[key];
       if (item === undefined) {
-        item = new Deck(key, this);
+        item = new Deck(key, replica, this);
         this.decks[key] = item;
       }
       item.synchronize(replica);
@@ -240,8 +240,7 @@ class Scene {
     for (let i = 0; i < 1000; i++) {
       const key = "deck" + i;
       if (!this.decks.hasOwnProperty(key)) {
-        const deck = new Deck(key, this);
-        deck.orientate(ref);
+        const deck = Deck.fromCard(key, ref, this);
         this.decks[key] = deck;
         return deck;
       }

@@ -28,20 +28,10 @@ class Deck {
   private foldElem: HTMLElement;
   private turnElem: HTMLElement;
 
-  constructor(key: string, scene: Scene) {
+  constructor(key: string, replica: ReplicatedDeck, scene: Scene) {
     this.key = key;
+    this.replica = replica;
     this.box = new BoundingBox(0, 0, 0, 30, 150);
-    this.replica = {
-      tick: 0,
-      owner: null,
-      x: 0,
-      y: 0,
-      z: 0,
-      w: 30,
-      h: 150,
-      strides: [2, 20],
-      current: 1,
-    };
     this.scene = scene;
 
     this.ownerElem = document.createElement("div");
@@ -104,6 +94,21 @@ class Deck {
     });
   }
 
+  static fromCard(key: string, ref: Card, scene: Scene): Deck {
+    const replica: ReplicatedDeck = {
+      tick: scene.tick,
+      owner: scene.playerId,
+      x: ref.replica.x - 30,
+      y: ref.replica.y,
+      z: ref.replica.z,
+      w: 30,
+      h: 150,
+      strides: [0, 20],
+      current: 1,
+    };
+    return new Deck(key, replica, scene);
+  }
+
   /** Re-compute based on changes to replica. */
   synchronize(remote: ReplicatedDeck) {
     this.remoteTick = remote.tick;
@@ -160,16 +165,19 @@ class Deck {
       this.turnElem.style.visibility = "hidden";
     }
 
-    const visibility =
-      this.replica.tick + 5 < this.scene.tick || this.replica.owner === null
-        ? "hidden"
-        : "visible";
-
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + this.box.h + "px";
     this.ownerElem.style.zIndex = this.box.z.toString();
-    this.ownerElem.style.visibility = visibility;
     this.ownerElem.innerHTML = this.replica.owner || "";
+
+    if (
+      this.replica.owner === null ||
+      this.replica.tick + 5 < this.scene.tick
+    ) {
+      this.ownerElem.style.visibility = "hidden";
+    } else {
+      this.ownerElem.style.visibility = "visible";
+    }
 
     const x: number = this.box.x;
     const y: number = this.box.y;
@@ -264,15 +272,6 @@ class Deck {
     }
     // Reached last card. Put the new card behind that one.
     return [f, f + 1];
-  }
-
-  orientate(ref: Card) {
-    this.replica.tick = this.scene.tick;
-    this.replica.owner = this.scene.playerId;
-    this.replica.x = ref.replica.x - 30;
-    this.replica.y = ref.replica.y;
-    this.replica.z = ref.replica.z;
-    this.render();
   }
 
   changes(): ReplicatedDeck | null {

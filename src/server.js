@@ -128,8 +128,8 @@ function generateRummy(scene) {
   scene["decks"]["rummy1"] = {
     tick: 0,
     owner: null,
-    x: 0,
-    y: 0,
+    x: 830,
+    y: 270,
     z: 0,
     l: 2,
     w: 30,
@@ -348,8 +348,8 @@ function handleHTTPRequest(req, res) {
       res.writeHead(200);
       res.end(data);
     });
-  } else if (filename === "/reload") {
-    reloadGame(params.game);
+  } else if (filename === "/reset") {
+    resetGame(params.game);
     res.setHeader("Content-Type", "text/plain");
     res.writeHead(200);
     res.end();
@@ -425,7 +425,7 @@ function assembleBoard(boardId) {
   }
 }
 
-function reloadGame(gameId) {
+function resetGame(gameId) {
   // Get new board and step ticks forward to force clients
   // to accept changes.
 

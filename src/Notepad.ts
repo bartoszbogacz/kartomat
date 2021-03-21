@@ -31,6 +31,7 @@ class Notepad {
 
     this.visElem = document.createElement("textarea");
     this.visElem.className = "Notepad";
+    this.visElem.onkeyup = this.textTyped.bind(this);
     this.visElem.style.position = "absolute";
     this.visElem.style.userSelect = "none";
     document.body.appendChild(this.visElem);
@@ -56,19 +57,14 @@ class Notepad {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
     this.box.z = zOffset + this.replica.z;
-    this.layout();
+    this.render();
   }
 
-  private layout() {
+  private render() {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
-
-    const visibility =
-      this.replica.tick + 5 < this.scene.tick || this.replica.owner === null
-        ? "hidden"
-        : "visible";
 
     this.visElem.style.left = this.box.x + "px";
     this.visElem.style.top = this.box.y + "px";
@@ -77,11 +73,37 @@ class Notepad {
     this.visElem.style.height = this.box.h + "px";
     this.visElem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
 
+    if (
+      this.replica.owner === null ||
+      this.replica.owner === this.scene.playerId ||
+      this.replica.tick + 5 < this.scene.tick
+    ) {
+      (this.visElem as any).disabled = false;
+    } else {
+      (this.visElem as any).disabled = true;
+      (this.visElem as any).value = this.replica.text;
+    }
+
     this.ownerElem.style.left = this.box.x + "px";
-    this.ownerElem.style.top = this.box.y + 15 + "px";
+    this.ownerElem.style.top = this.box.y + this.box.h + "px";
     this.ownerElem.style.zIndex = this.box.z.toString();
-    this.ownerElem.style.visibility = visibility;
     this.ownerElem.innerHTML = this.replica.owner || "";
+
+    if (
+      this.replica.owner === null ||
+      this.replica.tick + 5 < this.scene.tick
+    ) {
+      this.ownerElem.style.visibility = "hidden";
+    } else {
+      this.ownerElem.style.visibility = "visible";
+    }
+  }
+
+  textTyped(this: Notepad, ev: Event) {
+    this.replica.tick = this.scene.tick;
+    this.replica.owner = this.scene.playerId;
+    this.replica.text = (this.visElem as any).value;
+    this.render();
   }
 
   changes(): ReplicatedNotepad | null {

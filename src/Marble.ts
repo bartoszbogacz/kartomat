@@ -65,11 +65,6 @@ class Marble {
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
 
-    const visibility =
-      this.replica.tick + 5 < this.scene.tick || this.replica.owner === null
-        ? "hidden"
-        : "visible";
-
     this.visElem.style.left = this.box.x + "px";
     this.visElem.style.top = this.box.y + "px";
     this.visElem.style.width = this.box.w + "px";
@@ -81,8 +76,16 @@ class Marble {
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + 15 + "px";
     this.ownerElem.innerHTML = this.replica.owner || "";
-    this.ownerElem.style.visibility = visibility;
     this.ownerElem.style.zIndex = this.box.z.toString();
+
+    if (
+      this.replica.owner === null ||
+      this.replica.tick + 5 < this.scene.tick
+    ) {
+      this.ownerElem.style.visibility = "hidden";
+    } else {
+      this.ownerElem.style.visibility = "visible";
+    }
   }
 
   take() {

@@ -24,22 +24,10 @@ class Card {
   private visElem: HTMLElement;
   private ownerElem: HTMLElement;
 
-  constructor(key: string, scene: Scene) {
+  constructor(key: string, replica: ReplicatedCard, scene: Scene) {
     this.key = key;
+    this.replica = replica;
     this.remoteTick = 0;
-    this.replica = {
-      tick: 0,
-      owner: null,
-      x: 0,
-      y: 0,
-      z: 0,
-      w: 100,
-      h: 150,
-      onDeck: null,
-      images: ["", ""],
-      colors: ["", ""],
-      current: 0,
-    };
     this.box = new BoundingBox(0, 0, 0, 100, 150);
     this.scene = scene;
 
@@ -95,10 +83,6 @@ class Card {
 
     const color = this.replica.colors[this.replica.current];
     const image = this.replica.images[this.replica.current];
-    const visibility =
-      this.replica.tick + 5 < this.scene.tick || this.replica.owner === null
-        ? "hidden"
-        : "visible";
 
     this.visElem.style.left = this.box.x + "px";
     this.visElem.style.top = this.box.y + "px";
@@ -112,8 +96,16 @@ class Card {
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + this.box.h + "px";
     this.ownerElem.style.zIndex = this.box.z.toString();
-    this.ownerElem.style.visibility = visibility;
     this.ownerElem.innerHTML = this.replica.owner || "";
+
+    if (
+      this.replica.owner === null ||
+      this.replica.tick + 5 < this.scene.tick
+    ) {
+      this.ownerElem.style.visibility = "hidden";
+    } else {
+      this.ownerElem.style.visibility = "visible";
+    }
   }
 
   take() {

@@ -9,6 +9,7 @@ interface ReplicatedAvatar {
   h: number;
 
   color: string;
+  text: string;
   represents: string | null;
 }
 
@@ -30,6 +31,7 @@ class Avatar {
     this.scene = scene;
 
     this.elem = document.createElement("textarea");
+    (this.elem as any).value = this.replica.text;
     this.elem.className = "OtherPlayerAvatar";
     this.elem.style.position = "absolute";
     this.elem.style.userSelect = "none";
@@ -67,6 +69,13 @@ class Avatar {
     this.elem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
     this.elem.style.backgroundColor = this.replica.color;
     this.elem.innerHTML = this.replica.represents || "";
+
+    if (this.replica.represents === this.scene.playerId) {
+      (this.elem as any).disabled = false;
+    } else {
+      (this.elem as any).disabled = true;
+      (this.elem as any).value = this.replica.text;
+    }
   }
 
   take() {
