@@ -27,6 +27,12 @@
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
 
+.Button {
+  border: 2px solid crimson;
+  border-radius: 0.3em;
+  padding: 0.3em;
+}
+
 .PlayerTag {
   background-color: #eeeae2;
   border: 2px solid dimgray;

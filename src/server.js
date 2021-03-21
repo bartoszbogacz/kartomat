@@ -429,18 +429,19 @@ function resetGame(gameId) {
   // Get new board and step ticks forward to force clients
   // to accept changes.
 
-  if (_runningGames.hasOwnProperty(gameId) === false) {
+  const game = _runningGames[gameId];
+  if (_runningGames === undefined) {
     return;
   }
 
-  const board = assembleBoard(_runningGames[gameId].boardId);
-  for (const [trait, items] of Object.entries(board)) {
-    for (const [i, item] of Object.entries(items)) {
-      item.tick = _runningGames[gameId].tick;
+  const board = assembleBoard(game.boardId);
+  for (const klass of KLASSES) {
+    for (const [key, item] of Object.entries(board[klass])) {
+      item.tick = game.scene.tick;
     }
   }
+  game.scene = board;
 
-  _runningGames[gameId].scene = board;
   console.log("Reloaded", gameId);
 }
 
@@ -463,6 +464,7 @@ function handleClientMessage(socket, msg) {
     _runningGames[gameId] = {
       clients: {},
       scene: board,
+      boardId: boardId,
     };
     console.log(playerId, "created", gameId, "playing", boardId);
   }

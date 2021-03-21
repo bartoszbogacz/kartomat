@@ -27,8 +27,25 @@ class Client {
   scene: Scene;
   websocket: WebSocket | null = null;
 
+  resetElem: HTMLElement;
+
   constructor() {
     this.scene = new Scene();
+
+    const other = this;
+    this.resetElem = document.createElement("div");
+    this.resetElem.className = "Button";
+    this.resetElem.style.position = "absolute";
+    this.resetElem.style.left = "800px";
+    this.resetElem.style.top = "30px";
+    this.resetElem.style.userSelect = "none";
+    this.resetElem.innerHTML = "Reset Game";
+    this.resetElem.onclick = function () {
+      const httpRequest = new XMLHttpRequest();
+      httpRequest.open("PUT", "/reset?game=" + other.scene.gameId, true);
+      httpRequest.send();
+    };
+    document.body.appendChild(this.resetElem);
   }
 
   connect(this: Client) {
