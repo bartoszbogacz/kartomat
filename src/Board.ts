@@ -23,7 +23,7 @@ class Board {
 
   constructor(key: string, remote: ReplicatedBoard, scene: Scene) {
     this.key = key;
-    this.box = new BoundingBox(0, 0, 100, 100);
+    this.box = new BoundingBox(0, 0, 0, 100, 100);
     this.remoteTick = remote.tick;
     this.replica = remote;
     this.scene = scene;
@@ -43,29 +43,29 @@ class Board {
       return;
     }
     this.replica = remote;
-
-    this._synchronize();
   }
 
-  private _synchronize() {
+  layoutByScene(zOffset: number) {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
+    this.box.z = zOffset + this.replica.z;
+    this.render();
+  }
+
+  private render() {
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
 
     this.elem.style.left = this.box.x + "px";
     this.elem.style.top = this.box.y + "px";
+    this.elem.style.zIndex = this.box.z.toString();
     this.elem.style.width = this.box.w + "px";
     this.elem.style.height = this.box.h + "px";
     this.elem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
     this.elem.style.backgroundImage = "url(" + this.replica.image + ")";
   }
 
-  render(zOffset: number) {
-    this.elem.style.zIndex = (this.replica.z + zOffset).toString();
-  }
-
-  changed(): ReplicatedBoard | null {
+  changes(): ReplicatedBoard | null {
     if (this.replica.tick > this.remoteTick) {
       return this.replica;
     } else {

@@ -24,7 +24,7 @@ class Marble {
 
   constructor(key: string, replica: ReplicatedMarble, scene: Scene) {
     this.key = key;
-    this.box = new BoundingBox(0, 0, 15, 15);
+    this.box = new BoundingBox(0, 0, 0, 15, 15);
     this.remoteTick = replica.tick;
     this.replica = replica;
     this.scene = scene;
@@ -51,15 +51,23 @@ class Marble {
       return;
     }
     this.replica = remote;
-
-    this._synchronize();
   }
 
-  private _synchronize() {
+  layoutByScene(zOffset: number) {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
+    this.box.z = zOffset + this.replica.z;
+    this.layout();
+  }
+
+  private layout() {
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
+
+    const visibility =
+      this.replica.tick + 5 < this.scene.tick || this.replica.owner === null
+        ? "hidden"
+        : "visible";
 
     this.visElem.style.left = this.box.x + "px";
     this.visElem.style.top = this.box.y + "px";
@@ -67,24 +75,13 @@ class Marble {
     this.visElem.style.height = this.box.h + "px";
     this.visElem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
     this.visElem.style.backgroundColor = this.replica.color;
+    this.visElem.style.zIndex = this.box.z.toString();
 
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + 15 + "px";
     this.ownerElem.innerHTML = this.replica.owner || "";
-  }
-
-  render(zOffset: number) {
-    this.visElem.style.zIndex = (this.replica.z + zOffset).toString();
-    this.ownerElem.style.zIndex = (this.replica.z + zOffset).toString();
-
-    if (
-      this.replica.tick + 5 < this.scene.tick ||
-      this.replica.owner === null
-    ) {
-      this.ownerElem.style.visibility = "hidden";
-    } else {
-      this.ownerElem.style.visibility = "visible";
-    }
+    this.ownerElem.style.visibility = visibility;
+    this.ownerElem.style.zIndex = this.box.z.toString();
   }
 
   take() {
@@ -92,24 +89,24 @@ class Marble {
     this.replica.owner = this.scene.playerId;
     // TODO: We are wasting z space here if this item itself is on the top.
     this.replica.z = this.scene.topZ() + 1;
-    this._synchronize();
-    this.scene.render();
+    this.layout();
   }
 
   move(x: number, y: number) {
+    this.box.x = x;
+    this.box.y = y;
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.x = x;
     this.replica.y = y;
-    this._synchronize();
-    this.scene.render();
+    this.layout();
   }
 
   place(wasOutside: boolean) {
     // Nothing happens
   }
 
-  changed(): ReplicatedMarble | null {
+  changes(): ReplicatedMarble | null {
     if (this.replica.tick > this.remoteTick) {
       return this.replica;
     } else {

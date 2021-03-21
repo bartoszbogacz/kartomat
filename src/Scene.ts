@@ -119,17 +119,11 @@ class Scene {
     }
   }
 
-  /** Re-compute properties dependent on replicas */
-  render() {
-    window.requestAnimationFrame(this._render.bind(this));
+  layout() {
+    window.requestAnimationFrame(this._layout.bind(this));
   }
 
-  private _render(this: Scene) {
-    // TODO: If there are static ranges of z allocated for each
-    // item layer, then there is now new information being propagated
-    // by render. Besides, cardsOnDeck, which is known immediately
-    // after synchronize. This, there is no need for a render call at all.
-
+  private _layout(this: Scene) {
     this.cardsOnDeck = {};
 
     for (const [key, deck] of Object.entries(this.decks)) {
@@ -145,35 +139,32 @@ class Scene {
       }
     }
 
-    // TODO: Items themselves should say how much z space they
-    // require, however, statically just as it is now.
-
     for (const [key, item] of Object.entries(this.boards)) {
-      item.render(0);
+      item.layoutByScene(0);
     }
 
     for (const [key, item] of Object.entries(this.notepads)) {
-      item.render(1);
+      item.layoutByScene(1);
     }
 
     for (const [key, item] of Object.entries(this.avatars)) {
-      item.render(10);
+      item.layoutByScene(10);
     }
 
     for (const [key, item] of Object.entries(this.privateAreas)) {
-      item.render(100);
+      item.layoutByScene(100);
     }
 
     for (const [key, item] of Object.entries(this.decks)) {
-      item.render(20000);
+      item.layoutByScene(20000);
     }
 
     for (const [key, item] of Object.entries(this.cards)) {
-      item.render(20000);
+      item.layoutByScene(20000);
     }
 
     for (const [key, item] of Object.entries(this.marbles)) {
-      item.render(30000);
+      item.layoutByScene(30000);
     }
   }
 
@@ -194,51 +185,51 @@ class Scene {
     };
 
     for (const [key, item] of Object.entries(this.avatars)) {
-      const changed = item.changed();
-      if (changed !== null) {
-        result.avatars[key] = changed;
+      const changes = item.changes();
+      if (changes !== null) {
+        result.avatars[key] = changes;
       }
     }
 
     for (const [key, item] of Object.entries(this.boards)) {
-      const changed = item.changed();
-      if (changed !== null) {
-        result.boards[key] = changed;
+      const changes = item.changes();
+      if (changes !== null) {
+        result.boards[key] = changes;
       }
     }
 
     for (const [key, item] of Object.entries(this.marbles)) {
-      const changed = item.changed();
-      if (changed !== null) {
-        result.marbles[key] = changed;
+      const changes = item.changes();
+      if (changes !== null) {
+        result.marbles[key] = changes;
       }
     }
 
     for (const [key, item] of Object.entries(this.notepads)) {
-      const changed = item.changed();
-      if (changed !== null) {
-        result.notepads[key] = changed;
+      const changes = item.changes();
+      if (changes !== null) {
+        result.notepads[key] = changes;
       }
     }
 
     for (const [key, item] of Object.entries(this.privateAreas)) {
-      const changed = item.changed();
-      if (changed !== null) {
-        result.privateAreas[key] = changed;
+      const changes = item.changes();
+      if (changes !== null) {
+        result.privateAreas[key] = changes;
       }
     }
 
     for (const [key, item] of Object.entries(this.decks)) {
-      const changed = item.changed();
-      if (changed !== null) {
-        result.decks[key] = changed;
+      const changes = item.changes();
+      if (changes !== null) {
+        result.decks[key] = changes;
       }
     }
 
     for (const [key, item] of Object.entries(this.cards)) {
-      const changed = item.changed();
-      if (changed !== null) {
-        result.cards[key] = changed;
+      const changes = item.changes();
+      if (changes !== null) {
+        result.cards[key] = changes;
       }
     }
 

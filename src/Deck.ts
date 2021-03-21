@@ -31,7 +31,7 @@ class Deck {
 
   constructor(key: string, scene: Scene) {
     this.key = key;
-    this.box = new BoundingBox(0, 0, 30, 150);
+    this.box = new BoundingBox(0, 0, 0, 30, 150);
     this.replica = {
       tick: 0,
       owner: null,
@@ -117,31 +117,67 @@ class Deck {
       return;
     }
     this.replica = remote;
-
-    this._synchronize();
   }
 
-  private _synchronize() {
+  layoutByScene(zOffset: number) {
+    //
+  }
+
+  layoutByPrivateArea(zOffset: number) {
     this.box.x = this.replica.x;
     this.box.y = this.replica.y;
+    this.box.z = zOffset + this.replica.z;
+    this.render();
+  }
+
+  private render() {
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
 
+    if (this.cards.length > 1) {
+      this.moveElem.style.left = this.box.x + "px";
+      this.moveElem.style.top = this.box.y + "px";
+      this.moveElem.style.zIndex = this.box.z.toString();
+      this.moveElem.style.visibility = "visible";
+
+      this.shuffleElem.style.left = this.box.x + "px";
+      this.shuffleElem.style.top = this.box.y + 30 + "px";
+      this.shuffleElem.style.zIndex = this.box.z.toString();
+      this.shuffleElem.style.visibility = "visible";
+
+      this.foldElem.style.left = this.box.x + "px";
+      this.foldElem.style.top = this.box.y + 60 + "px";
+      this.foldElem.style.zIndex = this.box.z.toString();
+      this.foldElem.style.visibility = "visible";
+
+      this.turnElem.style.left = this.box.x + "px";
+      this.turnElem.style.top = this.box.y + 90 + "px";
+      this.turnElem.style.zIndex = this.box.z.toString();
+      this.turnElem.style.visibility = "visible";
+    } else {
+      this.moveElem.style.visibility = "hidden";
+      this.shuffleElem.style.visibility = "hidden";
+      this.foldElem.style.visibility = "hidden";
+      this.turnElem.style.visibility = "hidden";
+    }
+
+    const visibility =
+      this.replica.tick + 5 < this.scene.tick || this.replica.owner === null
+        ? "hidden"
+        : "visible";
+
     this.visElem.style.left = this.box.x + "px";
     this.visElem.style.top = this.box.y + "px";
+    this.visElem.style.zIndex = this.box.z.toString();
     this.visElem.style.width = this.box.w + "px";
     this.visElem.style.height = this.box.h + "px";
 
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + this.box.h + "px";
+    this.ownerElem.style.zIndex = this.box.z.toString();
+    this.ownerElem.style.visibility = visibility;
     this.ownerElem.innerHTML = this.replica.owner || "";
-  }
 
-  render(zOffset: number) {
-    //
-  }
-
-  renderByPrivateArea(zOffset: number) {
     const cards = this.scene.cardsOnDeck[this.key];
     this.cards = cards ? cards : [];
     this.cards.sort((a, b) => a.replica.x - b.replica.x);
@@ -149,39 +185,12 @@ class Deck {
     const x: number = this.box.x;
     const y: number = this.box.y;
     const w: number = this.box.w;
-    const z: number = this.replica.z + zOffset;
+    const z: number = this.box.z;
     const stride = this.replica.strides[this.replica.current];
     const s: number = stride ? stride : 2;
 
     for (let i = 0; i < this.cards.length; i++) {
-      this.cards[i]?.renderByDeck(x + w + s * i, y, z + 1 + i);
-    }
-
-    if (this.cards.length > 1) {
-      this.moveElem.style.left = this.box.x + "px";
-      this.moveElem.style.top = this.box.y + "px";
-      this.moveElem.style.zIndex = z.toString();
-      this.moveElem.style.visibility = "visible";
-
-      this.shuffleElem.style.left = this.box.x + "px";
-      this.shuffleElem.style.top = this.box.y + 30 + "px";
-      this.shuffleElem.style.zIndex = z.toString();
-      this.shuffleElem.style.visibility = "visible";
-
-      this.foldElem.style.left = this.box.x + "px";
-      this.foldElem.style.top = this.box.y + 60 + "px";
-      this.foldElem.style.zIndex = z.toString();
-      this.foldElem.style.visibility = "visible";
-
-      this.turnElem.style.left = this.box.x + "px";
-      this.turnElem.style.top = this.box.y + 90 + "px";
-      this.turnElem.style.zIndex = z.toString();
-      this.turnElem.style.visibility = "visible";
-    } else {
-      this.moveElem.style.visibility = "hidden";
-      this.shuffleElem.style.visibility = "hidden";
-      this.foldElem.style.visibility = "hidden";
-      this.turnElem.style.visibility = "hidden";
+      this.cards[i]?.layoutByDeck(x + w + s * i, y, z + 1 + i);
     }
 
     if (
@@ -200,17 +209,17 @@ class Deck {
     this.replica.owner = this.scene.playerId;
     // TODO: We are wasting z space here if this item itself is on the top.
     this.replica.z = this.scene.topZ() + 1;
-    this._synchronize();
-    this.scene.render();
+    this.render();
   }
 
   move(this: Deck, x: number, y: number) {
+    this.box.x = x;
+    this.box.y = y;
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.x = x;
     this.replica.y = y;
-    this._synchronize();
-    this.scene.render();
+    this.render();
   }
 
   place(this: Deck, wasOutside: boolean) {
@@ -240,8 +249,7 @@ class Deck {
     this.replica.owner = this.scene.playerId;
     this.replica.current =
       (this.replica.current + 1) % this.replica.strides.length;
-    this._synchronize();
-    this.scene.render();
+    this.render();
   }
 
   /** This modification is not atomic and may lead to inconsistencies */
@@ -250,6 +258,7 @@ class Deck {
       card.turn();
       card.move(-card.replica.x, card.replica.y);
     }
+    this.render();
   }
 
   /** This modification is not atomic and may lead to inconsistencies */
@@ -257,6 +266,7 @@ class Deck {
     for (const card of this.cards) {
       card.move(Math.random(), card.replica.y);
     }
+    this.render();
   }
 
   gapFor(x: number): [number, number] {
@@ -283,11 +293,10 @@ class Deck {
     this.replica.x = ref.replica.x - 30;
     this.replica.y = ref.replica.y;
     this.replica.z = ref.replica.z;
-    this._synchronize();
-    this.scene.render();
+    this.render();
   }
 
-  changed(): ReplicatedDeck | null {
+  changes(): ReplicatedDeck | null {
     if (this.replica.tick > this.remoteTick) {
       return this.replica;
     } else {

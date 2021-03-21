@@ -68,6 +68,7 @@ class Client {
 
   receive(this: Client, msg: string) {
     this.scene.synchronize(JSON.parse(msg));
+    this.scene.layout();
 
     window.localStorage.setItem("playerId", this.scene.playerId);
 
@@ -89,8 +90,6 @@ class Client {
 
     // The server drives the tick rate. We answer to each message of the server.
     this.send();
-
-    this.scene.render();
   }
 }
 
