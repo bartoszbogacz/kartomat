@@ -50,7 +50,7 @@ class Card {
     document.body.appendChild(this.visElem);
 
     this.ownerElem = document.createElement("div");
-    this.ownerElem.className = "Owner";
+    this.ownerElem.className = "PlayerTag";
     this.ownerElem.style.position = "absolute";
     this.ownerElem.style.userSelect = "none";
     document.body.appendChild(this.ownerElem);

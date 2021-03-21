@@ -29,12 +29,14 @@ class Notepad {
     this.replica = replica;
     this.scene = scene;
 
-    this.visElem = document.createElement("div");
+    this.visElem = document.createElement("textarea");
+    this.visElem.className = "Notepad";
     this.visElem.style.position = "absolute";
     this.visElem.style.userSelect = "none";
     document.body.appendChild(this.visElem);
 
     this.ownerElem = document.createElement("div");
+    this.ownerElem.className = "PlayerTag";
     this.ownerElem.style.position = "absolute";
     this.ownerElem.style.userSelect = "none";
     document.body.appendChild(this.ownerElem);

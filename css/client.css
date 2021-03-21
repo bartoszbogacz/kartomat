@@ -26,3 +26,49 @@
 .Control {
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
+
+.PlayerTag {
+  background-color: #eeeae2;
+  border: 2px solid dimgray;
+  left: 0px;
+  position: absolute;
+  top: 160px;
+}
+
+.OtherPlayerAvatar {
+  background-color: #eeeae2;
+  border: 2px solid #93a1a1;
+  color: #586e75;
+  font-family: monospace;
+  font-size: 16px;
+  outline: none;
+  resize: none;
+}
+
+.ThisPlayerAvatar {
+  background-color: yellow;
+  border: 2px solid #93a1a1;
+  color: #586e75;
+  font-family: monospace;
+  font-size: 16px;
+  outline: none;
+  resize: none;
+}
+
+.NoPlayerAvatar {
+  background-color: snow;
+  color: lightgray;
+  font-family: monospace;
+  font-size: 16px;
+  outline: none;
+  resize: none;
+}
+
+.Notepad {
+  background-color: #eeeae2;
+  border: 2px solid #93a1a1;
+  color: #586e75;
+  font-family: monospace;
+  font-size: 16px;
+  resize: none;
+}

@@ -36,6 +36,7 @@ class Marble {
     document.body.appendChild(this.visElem);
 
     this.ownerElem = document.createElement("div");
+    this.ownerElem.className = "PlayerTag";
     this.ownerElem.style.position = "absolute";
     this.ownerElem.style.userSelect = "none";
     document.body.appendChild(this.ownerElem);

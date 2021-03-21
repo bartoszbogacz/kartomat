@@ -29,7 +29,8 @@ class Avatar {
     this.replica = replica;
     this.scene = scene;
 
-    this.elem = document.createElement("div");
+    this.elem = document.createElement("textarea");
+    this.elem.className = "OtherPlayerAvatar";
     this.elem.style.position = "absolute";
     this.elem.style.userSelect = "none";
     document.body.appendChild(this.elem);
@@ -65,6 +66,7 @@ class Avatar {
     this.elem.style.height = this.box.h + "px";
     this.elem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
     this.elem.style.backgroundColor = this.replica.color;
+    this.elem.innerHTML = this.replica.represents || "";
   }
 
   take() {

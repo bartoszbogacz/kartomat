@@ -21,7 +21,6 @@ class Deck {
   private cards: Card[] = [];
   private scene: Scene;
 
-  private visElem: HTMLElement;
   private ownerElem: HTMLElement;
 
   private moveElem: HTMLElement;
@@ -45,12 +44,8 @@ class Deck {
     };
     this.scene = scene;
 
-    this.visElem = document.createElement("div");
-    this.visElem.style.position = "absolute";
-    this.visElem.style.userSelect = "none";
-    document.body.appendChild(this.visElem);
-
     this.ownerElem = document.createElement("div");
+    this.ownerElem.className = "PlayerTag";
     this.ownerElem.style.position = "absolute";
     this.ownerElem.style.userSelect = "none";
     document.body.appendChild(this.ownerElem);
@@ -164,12 +159,6 @@ class Deck {
       this.foldElem.style.visibility = "hidden";
       this.turnElem.style.visibility = "hidden";
     }
-
-    this.visElem.style.left = this.box.x + "px";
-    this.visElem.style.top = this.box.y + "px";
-    this.visElem.style.zIndex = this.box.z.toString();
-    this.visElem.style.width = this.box.w + "px";
-    this.visElem.style.height = this.box.h + "px";
 
     const visibility =
       this.replica.tick + 5 < this.scene.tick || this.replica.owner === null
