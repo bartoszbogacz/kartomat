@@ -131,6 +131,10 @@ class Deck {
   }
 
   private render() {
+    const cards = this.scene.cardsOnDeck[this.key];
+    this.cards = cards ? cards : [];
+    this.cards.sort((a, b) => a.replica.x - b.replica.x);
+
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
 
@@ -161,26 +165,22 @@ class Deck {
       this.turnElem.style.visibility = "hidden";
     }
 
-    const visibility =
-      this.replica.tick + 5 < this.scene.tick || this.replica.owner === null
-        ? "hidden"
-        : "visible";
-
     this.visElem.style.left = this.box.x + "px";
     this.visElem.style.top = this.box.y + "px";
     this.visElem.style.zIndex = this.box.z.toString();
     this.visElem.style.width = this.box.w + "px";
     this.visElem.style.height = this.box.h + "px";
 
+    const visibility =
+      this.replica.tick + 5 < this.scene.tick || this.replica.owner === null
+        ? "hidden"
+        : "visible";
+
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + this.box.h + "px";
     this.ownerElem.style.zIndex = this.box.z.toString();
     this.ownerElem.style.visibility = visibility;
     this.ownerElem.innerHTML = this.replica.owner || "";
-
-    const cards = this.scene.cardsOnDeck[this.key];
-    this.cards = cards ? cards : [];
-    this.cards.sort((a, b) => a.replica.x - b.replica.x);
 
     const x: number = this.box.x;
     const y: number = this.box.y;
@@ -191,16 +191,6 @@ class Deck {
 
     for (let i = 0; i < this.cards.length; i++) {
       this.cards[i]?.layoutByDeck(x + w + s * i, y, z + 1 + i);
-    }
-
-    if (
-      this.replica.tick + 5 < this.scene.tick ||
-      this.replica.owner === null
-    ) {
-      this.ownerElem.style.visibility = "hidden";
-    } else {
-      this.ownerElem.style.visibility = "visible";
-      this.ownerElem.style.zIndex = z.toString();
     }
   }
 
