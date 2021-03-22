@@ -168,7 +168,6 @@ class Deck {
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + this.box.h + "px";
     this.ownerElem.style.zIndex = this.box.z.toString();
-    this.ownerElem.innerHTML = this.replica.owner || "";
 
     if (
       this.replica.owner === null ||
@@ -177,6 +176,8 @@ class Deck {
       this.ownerElem.style.visibility = "hidden";
     } else {
       this.ownerElem.style.visibility = "visible";
+      this.ownerElem.innerHTML =
+        this.scene.playerNames[this.replica.owner] || this.replica.owner;
     }
 
     const x: number = this.box.x;

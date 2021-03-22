@@ -75,7 +75,6 @@ class Marble {
 
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + 15 + "px";
-    this.ownerElem.innerHTML = this.replica.owner || "";
     this.ownerElem.style.zIndex = this.box.z.toString();
 
     if (
@@ -85,6 +84,8 @@ class Marble {
       this.ownerElem.style.visibility = "hidden";
     } else {
       this.ownerElem.style.visibility = "visible";
+      this.ownerElem.innerHTML =
+        this.scene.playerNames[this.replica.owner] || this.replica.owner;
     }
   }
 

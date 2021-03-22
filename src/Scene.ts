@@ -34,7 +34,7 @@ class Scene {
 
   /** Computed properties */
   public cardsOnDeck: { [key: string]: Card[] } = {};
-  public representingAvatar: Avatar | null = null;
+  public playerNames: { [key: string]: string } = {};
 
   constructor() {
     //
@@ -137,15 +137,19 @@ class Scene {
       }
     }
 
-    // Find and/or assign an avatar to the player
+    // Discover names of players and assign an avatar to the player
 
-    if (this.representingAvatar === null) {
+    this.playerNames = {};
+
+    for (const [key, avatar] of Object.entries(this.avatars)) {
+      if (avatar.replica.represents !== null) {
+        this.playerNames[avatar.replica.represents] = avatar.replica.text;
+      }
+    }
+
+    if (this.playerNames[this.playerId] === undefined) {
       for (const [key, avatar] of Object.entries(this.avatars)) {
-        if (
-          avatar.replica.represents === null ||
-          avatar.replica.represents === this.playerId
-        ) {
-          this.representingAvatar = avatar;
+        if (avatar.replica.represents === null) {
           avatar.replica.tick = this.tick;
           avatar.replica.owner = this.playerId;
           avatar.replica.represents = this.playerId;
@@ -154,11 +158,10 @@ class Scene {
           } else {
             avatar.replica.text = this.playerName;
           }
+          this.playerNames[this.playerId] = this.playerName;
           break;
         }
       }
-    } else {
-      this.playerName = this.representingAvatar.replica.text;
     }
   }
 
