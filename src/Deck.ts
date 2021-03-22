@@ -170,6 +170,7 @@ class Deck {
     this.ownerElem.style.zIndex = this.box.z.toString();
 
     if (
+      this.cards.length < 2 ||
       this.replica.owner === null ||
       this.replica.tick + 5 < this.scene.tick
     ) {

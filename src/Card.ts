@@ -136,7 +136,6 @@ class Card {
       if (!wasOutside) {
         this.turn();
       }
-      this.scene.layout();
       return;
     }
 

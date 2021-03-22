@@ -119,7 +119,13 @@ class Scene {
       }
       item.synchronize(replica);
     }
+  }
 
+  layout() {
+    window.requestAnimationFrame(this._layout.bind(this));
+  }
+
+  private _layout(this: Scene) {
     // Compute dependant properties
 
     this.cardsOnDeck = {};
@@ -163,13 +169,9 @@ class Scene {
         }
       }
     }
-  }
 
-  layout() {
-    window.requestAnimationFrame(this._layout.bind(this));
-  }
+    // Propagate new computed properties
 
-  private _layout(this: Scene) {
     for (const [key, item] of Object.entries(this.boards)) {
       item.layoutByScene(0);
     }
