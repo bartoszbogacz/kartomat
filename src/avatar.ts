@@ -15,10 +15,10 @@ interface ReplicatedAvatar {
 
 class Avatar {
   public key: string;
+  public replica: ReplicatedAvatar;
   public box: BoundingBox;
 
   private remoteTick: number;
-  private replica: ReplicatedAvatar;
 
   private scene: Scene;
   private elem: HTMLElement;
@@ -31,8 +31,9 @@ class Avatar {
     this.scene = scene;
 
     this.elem = document.createElement("textarea");
+    this.elem.onkeyup = this.textTyped.bind(this);
     (this.elem as any).value = this.replica.text;
-    this.elem.className = "OtherPlayerAvatar";
+    this.elem.className = "NoPlayerAvatar";
     this.elem.style.position = "absolute";
     this.elem.style.userSelect = "none";
     document.body.appendChild(this.elem);
@@ -60,6 +61,14 @@ class Avatar {
   private render() {
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
+
+    if (this.replica.represents === this.scene.playerId) {
+      this.elem.className = "ThisPlayerAvatar";
+    } else if (this.replica.represents === null) {
+      this.elem.className = "NoPlayerAvatar";
+    } else {
+      this.elem.className = "OtherPlayerAvatar";
+    }
 
     this.elem.style.left = this.box.x + "px";
     this.elem.style.top = this.box.y + "px";
@@ -98,6 +107,13 @@ class Avatar {
 
   place(wasOutside: boolean) {
     //
+  }
+
+  textTyped(this: Avatar, ev: Event) {
+    this.replica.tick = this.scene.tick;
+    this.replica.owner = this.scene.playerId;
+    this.replica.text = (this.elem as any).value;
+    this.render();
   }
 
   changes(): ReplicatedAvatar | null {

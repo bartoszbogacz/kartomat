@@ -55,6 +55,7 @@ class Client {
     this.scene.gameId = parameters["game"] || null;
     this.scene.playerId =
       parameters["player"] || window.localStorage.getItem("playerId");
+    this.scene.playerName = window.localStorage.getItem("playerName") || "";
 
     this.websocket = new WebSocket(
       "ws://" + window.location.hostname + ":8080"
@@ -88,6 +89,7 @@ class Client {
     this.scene.layout();
 
     window.localStorage.setItem("playerId", this.scene.playerId);
+    window.localStorage.setItem("playerName", this.scene.playerName);
 
     let [path, parameters] = parseUrl(window.location.href);
 

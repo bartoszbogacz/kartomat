@@ -20,6 +20,7 @@ class Scene {
   public boardId: string = "";
   public gameId: string = "";
   public playerId: string = "";
+  public playerName: string = "";
   public clientId: string = "";
 
   /** Scene graph */
@@ -33,6 +34,7 @@ class Scene {
 
   /** Computed properties */
   public cardsOnDeck: { [key: string]: Card[] } = {};
+  public representingAvatar: Avatar | null = null;
 
   constructor() {
     //
@@ -117,13 +119,9 @@ class Scene {
       }
       item.synchronize(replica);
     }
-  }
 
-  layout() {
-    window.requestAnimationFrame(this._layout.bind(this));
-  }
+    // Compute dependant properties
 
-  private _layout(this: Scene) {
     this.cardsOnDeck = {};
 
     for (const [key, deck] of Object.entries(this.decks)) {
@@ -139,6 +137,36 @@ class Scene {
       }
     }
 
+    // Find and/or assign an avatar to the player
+
+    if (this.representingAvatar === null) {
+      for (const [key, avatar] of Object.entries(this.avatars)) {
+        if (
+          avatar.replica.represents === null ||
+          avatar.replica.represents === this.playerId
+        ) {
+          this.representingAvatar = avatar;
+          avatar.replica.tick = this.tick;
+          avatar.replica.owner = this.playerId;
+          avatar.replica.represents = this.playerId;
+          if (this.playerName === "") {
+            this.playerName = avatar.replica.text;
+          } else {
+            avatar.replica.text = this.playerName;
+          }
+          break;
+        }
+      }
+    } else {
+      this.playerName = this.representingAvatar.replica.text;
+    }
+  }
+
+  layout() {
+    window.requestAnimationFrame(this._layout.bind(this));
+  }
+
+  private _layout(this: Scene) {
     for (const [key, item] of Object.entries(this.boards)) {
       item.layoutByScene(0);
     }
