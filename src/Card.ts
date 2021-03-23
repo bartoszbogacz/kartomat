@@ -35,6 +35,7 @@ class Card {
     this.visElem.className = "Card";
     this.visElem.style.position = "absolute";
     this.visElem.style.userSelect = "none";
+    this.visElem.style.touchAction = "none";
     document.body.appendChild(this.visElem);
 
     this.ownerElem = document.createElement("div");

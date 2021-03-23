@@ -43,6 +43,8 @@ class Deck {
     this.moveElem = document.createElement("div");
     this.moveElem.className = "Control";
     this.moveElem.style.position = "absolute";
+    this.moveElem.style.userSelect = "none";
+    this.moveElem.style.touchAction = "none";
     this.moveElem.style.width = "30px";
     this.moveElem.style.height = "30px";
     this.moveElem.style.backgroundImage = 'url("controls/move.png")';

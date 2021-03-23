@@ -20,20 +20,14 @@ class DragAndDrop {
   constructor(source: HTMLElement, target: Moveable) {
     this.target = target;
 
-    // There is only one place where we use .preventDefault() on
-    // mouse up/down/move and it is not strictly necessary. If we
-    // can do without we may use passive event listeners that do
-    // not block the browser and may be executed concurrently with
-    // DOM rendering.
-
     // https://developers.google.com/web/updates/2016/06/
     // passive-event-listeners
     source.addEventListener("mousedown", this.mouseDown.bind(this), {
-      passive: false,
+      passive: true,
       capture: true,
     });
     source.addEventListener("touchstart", this.mouseDown.bind(this), {
-      passive: false,
+      passive: true,
       capture: true,
     });
   }
@@ -42,7 +36,7 @@ class DragAndDrop {
     let clientX: number = 0;
     let clientY: number = 0;
 
-    if (event.type === "touchmove") {
+    if (event.type === "touchstart") {
       const touches = (event as TouchEvent).touches[0];
       if (touches) {
         clientX = touches.clientX;
@@ -64,16 +58,25 @@ class DragAndDrop {
 
     this.target.take();
 
-    document.onmousemove = this.mouseMove.bind(this);
-    document.onmouseup = this.mouseUp.bind(this);
+    document.addEventListener("mousemove", this.mouseMove.bind(this), {
+      passive: true,
+      capture: true,
+    });
+    document.addEventListener("touchmove", this.mouseMove.bind(this), {
+      passive: true,
+      capture: true,
+    });
+    document.addEventListener("mouseup", this.mouseUp.bind(this), {
+      passive: true,
+      capture: true,
+    });
+    document.addEventListener("touchend", this.mouseUp.bind(this), {
+      passive: true,
+      capture: true,
+    });
   }
 
   mouseMove(event: Event) {
-    // Using preventDefault here precludes textareas working on
-    // mobile. Since we only want to prevent selection and dragging
-    // of elements, preventDefault on mouseMove is enough.
-    event.preventDefault();
-
     if (this.state === null) {
       return;
     }
@@ -111,6 +114,8 @@ class DragAndDrop {
     this.target.place(this.state.wasOutside);
 
     this.state = null;
+    document.ontouchmove = null;
+    document.ontouchend = null;
     document.onmousemove = null;
     document.onmouseup = null;
   }

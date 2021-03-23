@@ -36,6 +36,7 @@ class Avatar {
     this.elem.className = "NoPlayerAvatar";
     this.elem.style.position = "absolute";
     this.elem.style.userSelect = "none";
+    this.elem.style.touchAction = "none";
     document.body.appendChild(this.elem);
 
     new DragAndDrop(this.elem, this);
