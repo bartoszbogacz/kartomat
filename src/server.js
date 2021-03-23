@@ -8,6 +8,10 @@ const path = require("path");
 const httpPort = 8000;
 const wsPort = 8080;
 
+// TODO: Reify client state into a proper class with its own methods
+// for union, difference, equality, hashing, copying (!), and applying
+// of atomic changes.
+
 const KLASSES = [
   "avatars",
   "boards",
@@ -469,10 +473,6 @@ function handleClientMessage(socket, msg) {
     console.log(playerId, "created", gameId, "playing", boardId);
   }
 
-  // FIXME: We need to union _both_ client.scene and server.scene
-  // with changes to get an accurate view of client state and
-  // authorative server state that can be later send to the clients.
-
   // If player not yet part of game, join
   if (!_runningGames[gameId].clients.hasOwnProperty(clientId)) {
     _runningGames[gameId].clients[clientId] = {
@@ -488,7 +488,11 @@ function handleClientMessage(socket, msg) {
   // a game. Never regress tick of clients. Server tick and client
   // tick behave like a Lamport timestamp.
 
-  synchronizeWith(_runningGames[gameId].scene, scene);
+  // Update both the authorative game state of the server and our
+  // view of the game state of the specific clientId.
+
+  unionLeft(_runningGames[gameId].scene, scene);
+  unionLeft(_runningGames[gameId].clients[clientId].scene, scene);
 }
 
 function sendServerMessage() {
@@ -508,7 +512,11 @@ function sendServerMessage() {
 
       // Assume the client received our update and send only differences later.
       // TODO: Better keep track of last known tick.
-      client.scene = game.scene;
+
+      // DO NOT USE client.scene = game.scene here, as client.scene
+      // then simply becomes a reference onto game.scene and reflects
+      // all of its modifications!
+      unionLeft(client.scene, scene);
     }
   }
 }
@@ -523,7 +531,7 @@ function handleClientDisconnected(socket) {
   }
 }
 
-function synchronizeWith(local, remote) {
+function unionLeft(local, remote) {
   local.tick = Math.max(local.tick, remote.tick);
 
   for (const klass of KLASSES) {
@@ -532,14 +540,6 @@ function synchronizeWith(local, remote) {
         !local[klass].hasOwnProperty(key) ||
         remote[klass][key].tick > local[klass][key].tick
       ) {
-        if (remote[klass].hasOwnProperty(key)) {
-          console.log(
-            key,
-            local[klass][key].tick,
-            "<--",
-            remote[klass][key].tick
-          );
-        }
         local[klass][key] = remote[klass][key];
       }
     }
@@ -569,15 +569,6 @@ function differenceTo(local, remote, playerId, clientId) {
         local[klass][key].tick > remote[klass][key].tick
       ) {
         changes[klass][key] = local[klass][key];
-        if (remote[klass].hasOwnProperty(key)) {
-          console.log(
-            key,
-            local[klass][key].tick,
-            "-->",
-            clientId,
-            remote[klass][key].tick
-          );
-        }
       }
     }
   }
