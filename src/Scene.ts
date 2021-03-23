@@ -339,7 +339,15 @@ class Scene {
 
       const priv = this.overlapsPrivateArea(other);
       const area = this.pixelsOverlap(card, other);
-      const ownsOther = other.replica.owner === card.replica.owner;
+
+      let ownsOther: boolean = false;
+      if (other.replica.onDeck === null) {
+        ownsOther = other.replica.owner === card.replica.owner;
+      } else {
+        ownsOther =
+          this.decks[other.replica.onDeck]?.replica.owner ===
+          card.replica.owner;
+      }
 
       if (area > pixels && ((priv && ownsOther) || !priv)) {
         pixels = area;
