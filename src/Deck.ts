@@ -119,7 +119,7 @@ class Deck {
     this.replica = remote;
   }
 
-  layoutByScene(zOffset: number) {
+  layoutByScene(_: number) {
     //
   }
 
@@ -211,7 +211,7 @@ class Deck {
     this.render();
   }
 
-  place(this: Deck, wasOutside: boolean) {
+  place(this: Deck, _: boolean) {
     const other = this.scene.overlapsCard(this);
     if (other === null) {
       return;

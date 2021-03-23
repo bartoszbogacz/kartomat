@@ -469,8 +469,9 @@ function handleClientMessage(socket, msg) {
     console.log(playerId, "created", gameId, "playing", boardId);
   }
 
-  // TODO: Refactor client record setup
-  // TODO: Use local and remote instead of board and scene
+  // FIXME: We need to union _both_ client.scene and server.scene
+  // with changes to get an accurate view of client state and
+  // authorative server state that can be later send to the clients.
 
   // If player not yet part of game, join
   if (!_runningGames[gameId].clients.hasOwnProperty(clientId)) {
@@ -531,6 +532,14 @@ function synchronizeWith(local, remote) {
         !local[klass].hasOwnProperty(key) ||
         remote[klass][key].tick > local[klass][key].tick
       ) {
+        if (remote[klass].hasOwnProperty(key)) {
+          console.log(
+            key,
+            local[klass][key].tick,
+            "<--",
+            remote[klass][key].tick
+          );
+        }
         local[klass][key] = remote[klass][key];
       }
     }
@@ -560,6 +569,15 @@ function differenceTo(local, remote, playerId, clientId) {
         local[klass][key].tick > remote[klass][key].tick
       ) {
         changes[klass][key] = local[klass][key];
+        if (remote[klass].hasOwnProperty(key)) {
+          console.log(
+            key,
+            local[klass][key].tick,
+            "-->",
+            clientId,
+            remote[klass][key].tick
+          );
+        }
       }
     }
   }

@@ -130,11 +130,11 @@ class Scene {
 
     this.cardsOnDeck = {};
 
-    for (const [key, deck] of Object.entries(this.decks)) {
+    for (const [key, _] of Object.entries(this.decks)) {
       this.cardsOnDeck[key] = [];
     }
 
-    for (const [key, card] of Object.entries(this.cards)) {
+    for (const [_, card] of Object.entries(this.cards)) {
       if (card.replica.onDeck !== null) {
         const cards = this.cardsOnDeck[card.replica.onDeck];
         if (cards) {
@@ -147,14 +147,14 @@ class Scene {
 
     this.playerNames = {};
 
-    for (const [key, avatar] of Object.entries(this.avatars)) {
+    for (const [_, avatar] of Object.entries(this.avatars)) {
       if (avatar.replica.represents !== null) {
         this.playerNames[avatar.replica.represents] = avatar.replica.text;
       }
     }
 
     if (this.playerNames[this.playerId] === undefined) {
-      for (const [key, avatar] of Object.entries(this.avatars)) {
+      for (const [_, avatar] of Object.entries(this.avatars)) {
         if (avatar.replica.represents === null) {
           avatar.replica.tick = this.tick;
           avatar.replica.owner = this.playerId;
@@ -172,31 +172,31 @@ class Scene {
 
     // Propagate new computed properties
 
-    for (const [key, item] of Object.entries(this.boards)) {
+    for (const [_, item] of Object.entries(this.boards)) {
       item.layoutByScene(0);
     }
 
-    for (const [key, item] of Object.entries(this.notepads)) {
+    for (const [_, item] of Object.entries(this.notepads)) {
       item.layoutByScene(1);
     }
 
-    for (const [key, item] of Object.entries(this.avatars)) {
+    for (const [_, item] of Object.entries(this.avatars)) {
       item.layoutByScene(10);
     }
 
-    for (const [key, item] of Object.entries(this.privateAreas)) {
+    for (const [_, item] of Object.entries(this.privateAreas)) {
       item.layoutByScene(100);
     }
 
-    for (const [key, item] of Object.entries(this.decks)) {
+    for (const [_, item] of Object.entries(this.decks)) {
       item.layoutByScene(20000);
     }
 
-    for (const [key, item] of Object.entries(this.cards)) {
+    for (const [_, item] of Object.entries(this.cards)) {
       item.layoutByScene(20000);
     }
 
-    for (const [key, item] of Object.entries(this.marbles)) {
+    for (const [_, item] of Object.entries(this.marbles)) {
       item.layoutByScene(30000);
     }
   }
@@ -287,19 +287,19 @@ class Scene {
     // TODO: Items themselves should say how much z space they
     // require, however, statically just as it is now.
 
-    for (const [cardId, deck] of Object.entries(this.decks)) {
+    for (const [_, deck] of Object.entries(this.decks)) {
       if (deck.replica.z + 100 > z) {
         z = deck.replica.z + 100;
       }
     }
 
-    for (const [cardId, card] of Object.entries(this.cards)) {
+    for (const [_, card] of Object.entries(this.cards)) {
       if (card.replica.z > z) {
         z = card.replica.z;
       }
     }
 
-    for (const [cardId, marble] of Object.entries(this.marbles)) {
+    for (const [_, marble] of Object.entries(this.marbles)) {
       if (marble.replica.z > z) {
         z = marble.replica.z;
       }
@@ -319,7 +319,7 @@ class Scene {
   }
 
   overlapsPrivateArea(card: Card): PrivateArea | null {
-    for (const [areaId, area] of Object.entries(this.privateAreas)) {
+    for (const [_, area] of Object.entries(this.privateAreas)) {
       if (this.pixelsOverlap(card, area) > 0) {
         return area;
       }
@@ -332,7 +332,7 @@ class Scene {
     let largest: Card | null = null;
     let pixels: number = 500;
 
-    for (const [otherId, other] of Object.entries(this.cards)) {
+    for (const [_, other] of Object.entries(this.cards)) {
       if (other === card) {
         continue;
       }

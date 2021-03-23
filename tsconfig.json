@@ -2,12 +2,14 @@
   "compilerOptions": {
     "target": "es2017",
     "module": "commonjs",
-    "strict": true,
     "outDir": "dist",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true
   },
   "files": [
     "src/Avatar.ts",
