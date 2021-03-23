@@ -18,15 +18,13 @@ class Board {
   private remoteTick: number;
   private replica: ReplicatedBoard;
 
-  private scene: Scene;
   private elem: HTMLElement;
 
-  constructor(key: string, remote: ReplicatedBoard, scene: Scene) {
+  constructor(key: string, remote: ReplicatedBoard, _: Scene) {
     this.key = key;
     this.box = new BoundingBox(0, 0, 0, 100, 100);
     this.remoteTick = remote.tick;
     this.replica = remote;
-    this.scene = scene;
 
     this.elem = document.createElement("div");
     this.elem.className = "Board";

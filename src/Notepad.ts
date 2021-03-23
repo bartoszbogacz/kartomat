@@ -99,7 +99,7 @@ class Notepad {
     }
   }
 
-  textTyped(this: Notepad, ev: Event) {
+  textTyped(this: Notepad, _: Event) {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.text = (this.visElem as any).value;

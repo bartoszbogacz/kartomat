@@ -107,7 +107,7 @@ class Marble {
     this.layout();
   }
 
-  place(wasOutside: boolean) {
+  place(_: boolean) {
     // Nothing happens
   }
 

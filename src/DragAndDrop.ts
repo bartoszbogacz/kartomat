@@ -104,7 +104,7 @@ class DragAndDrop {
     this.target.move(x, y);
   }
 
-  mouseUp(event: Event) {
+  mouseUp(_: Event) {
     if (this.state === null) {
       return;
     }

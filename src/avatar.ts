@@ -75,9 +75,6 @@ class Avatar {
     this.elem.style.zIndex = this.box.z.toString();
     this.elem.style.width = this.box.w + "px";
     this.elem.style.height = this.box.h + "px";
-    this.elem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
-    this.elem.style.backgroundColor = this.replica.color;
-    this.elem.innerHTML = this.replica.represents || "";
 
     if (this.replica.represents === this.scene.playerId) {
       (this.elem as any).disabled = false;
@@ -105,11 +102,11 @@ class Avatar {
     this.render();
   }
 
-  place(wasOutside: boolean) {
+  place(_: boolean) {
     //
   }
 
-  textTyped(this: Avatar, ev: Event) {
+  textTyped(this: Avatar, _: Event) {
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
     this.replica.text = (this.elem as any).value;

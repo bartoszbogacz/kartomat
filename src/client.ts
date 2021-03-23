@@ -49,7 +49,7 @@ class Client {
   }
 
   connect(this: Client) {
-    let [path, parameters] = parseUrl(window.location.href);
+    let [_, parameters] = parseUrl(window.location.href);
 
     this.scene.boardId = parameters["board"] || null;
     this.scene.gameId = parameters["game"] || null;
@@ -63,7 +63,7 @@ class Client {
 
     let outer = this;
 
-    this.websocket.onopen = function (ev: Event) {
+    this.websocket.onopen = function (_: Event) {
       outer.send();
     };
 
@@ -71,11 +71,11 @@ class Client {
       outer.receive(msg.data);
     };
 
-    this.websocket.onerror = function (ev: Event) {
+    this.websocket.onerror = function (_: Event) {
       window.setTimeout(outer.connect.bind(outer), 2000);
     };
 
-    this.websocket.onclose = function (ev: Event) {
+    this.websocket.onclose = function (_: Event) {
       window.setTimeout(outer.connect.bind(outer), 2000);
     };
   }
@@ -91,7 +91,7 @@ class Client {
     window.localStorage.setItem("playerId", this.scene.playerId);
     window.localStorage.setItem("playerName", this.scene.playerName);
 
-    let [path, parameters] = parseUrl(window.location.href);
+    let [_, parameters] = parseUrl(window.location.href);
 
     if (
       parameters.hasOwnProperty("board") === false ||

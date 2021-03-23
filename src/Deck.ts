@@ -259,7 +259,6 @@ class Deck {
   }
 
   gapFor(x: number): [number, number] {
-    let v: number = 0;
     let f: number = 0;
     // We use a small offset to bias card insertion to the left.
     // If you put a card very close on top to another one, the new
@@ -268,7 +267,6 @@ class Deck {
       if (card.box.x + 3 > x) {
         return [f, card.replica.x];
       } else {
-        v = card.box.x;
         f = card.replica.x;
       }
     }

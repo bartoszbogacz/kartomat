@@ -56,7 +56,7 @@ class Card {
     this.replica = remote;
   }
 
-  layoutByScene(zOffset: number) {
+  layoutByScene(_: number) {
     //
   }
 

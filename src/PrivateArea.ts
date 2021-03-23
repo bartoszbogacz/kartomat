@@ -59,13 +59,13 @@ class PrivateArea {
     this.elem.style.width = this.box.w + "px";
     this.elem.style.height = this.box.h + "px";
 
-    for (const [key, deck] of Object.entries(this.scene.decks)) {
+    for (const [_, deck] of Object.entries(this.scene.decks)) {
       if (deck.replica.owner !== this.scene.playerId) {
         deck.layoutByPrivateArea(this.box.z);
       }
     }
 
-    for (const [key, card] of Object.entries(this.scene.cards)) {
+    for (const [_, card] of Object.entries(this.scene.cards)) {
       if (card.replica.owner !== this.scene.playerId) {
         card.layoutByPrivateArea(this.box.z);
       }
@@ -73,13 +73,13 @@ class PrivateArea {
 
     this.elem.style.zIndex = (this.box.z + 10000).toString();
 
-    for (const [key, deck] of Object.entries(this.scene.decks)) {
+    for (const [_, deck] of Object.entries(this.scene.decks)) {
       if (deck.replica.owner === this.scene.playerId) {
         deck.layoutByPrivateArea(this.box.z + 10000);
       }
     }
 
-    for (const [key, card] of Object.entries(this.scene.cards)) {
+    for (const [_, card] of Object.entries(this.scene.cards)) {
       if (card.replica.owner === this.scene.playerId) {
         card.layoutByPrivateArea(this.box.z + 10000);
       }
