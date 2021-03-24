@@ -16,6 +16,7 @@ interface DragState {
 class DragAndDrop {
   private target: Moveable;
   private state: DragState | null = null;
+  private bounce: number = Date.now();
 
   constructor(source: HTMLElement, target: Moveable) {
     this.target = target;
@@ -36,6 +37,10 @@ class DragAndDrop {
   }
 
   mouseDown(event: Event) {
+    if (Date.now() - this.bounce < 10) {
+      return;
+    }
+
     let clientX: number = 0;
     let clientY: number = 0;
 
@@ -80,6 +85,9 @@ class DragAndDrop {
   }
 
   mouseMove(event: Event) {
+    // Dont check for bounces here to avoid querying the high-precision timer
+    // many times per second.
+
     if (this.state === null) {
       return;
     }
@@ -111,11 +119,18 @@ class DragAndDrop {
   }
 
   mouseUp(_: Event) {
+    // Prevent doubly invoking place due to synthetic mouseups generated
+    // from real touchend events.
+    if (Date.now() - this.bounce < 10) {
+      return;
+    }
+
     if (this.state === null) {
       return;
     }
     this.target.place(this.state.wasOutside);
 
+    this.bounce = Date.now();
     this.state = null;
     document.ontouchmove = null;
     document.ontouchend = null;
