@@ -30,6 +30,9 @@ class DragAndDrop {
       passive: true,
       capture: true,
     });
+
+    // FIXME: Clicks fire two series of events on mobile
+    // TODO: Handle clicks separately for turning cards?
   }
 
   mouseDown(event: Event) {
