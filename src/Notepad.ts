@@ -31,6 +31,14 @@ class Notepad {
 
     this.visElem = document.createElement("textarea");
     this.visElem.className = "Notepad";
+    // Binding only onkeydown will not register single
+    // characters being written, since textarea only
+    // updates after onkeyup. Binding onkeyup only
+    // will register repeated input only after a key
+    // has been released, which can be longer than our
+    // grace period for not ovewriteing the textarea.
+    // We need to bind both handlers.
+    this.visElem.onkeydown = this.textTyped.bind(this);
     this.visElem.onkeyup = this.textTyped.bind(this);
     this.visElem.style.position = "absolute";
     this.visElem.style.userSelect = "none";
@@ -73,21 +81,28 @@ class Notepad {
     this.visElem.style.height = this.box.h + "px";
     this.visElem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
 
-    if (
-      this.replica.owner === null ||
-      this.replica.owner === this.scene.playerId ||
-      this.replica.tick + 5 < this.scene.tick
-    ) {
-      (this.visElem as any).disabled = false;
-    } else {
-      (this.visElem as any).disabled = true;
+    // if (
+    //   this.replica.owner === null ||
+    //   this.replica.owner === this.scene.playerId ||
+    //   this.replica.tick + 5 < this.scene.tick
+    // ) {
+    //   (this.visElem as any).disabled = false;
+
+    // We do not want to butt in when the user types, by setting the
+    // the field differnetly, but at some point after user stoppped
+    // typing we synchronize perform the synchronization update.
+    if (this.replica.tick + 5 < this.scene.tick) {
       (this.visElem as any).value = this.replica.text;
     }
+
+    // } else {
+    //   (this.visElem as any).disabled = true;
+    //   (this.visElem as any).value = this.replica.text;
+    // }
 
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + this.box.h + "px";
     this.ownerElem.style.zIndex = this.box.z.toString();
-    this.ownerElem.innerHTML = this.replica.owner || "";
 
     if (
       this.replica.owner === null ||
@@ -96,6 +111,8 @@ class Notepad {
       this.ownerElem.style.visibility = "hidden";
     } else {
       this.ownerElem.style.visibility = "visible";
+      this.ownerElem.innerHTML =
+        this.scene.playerNames[this.replica.owner] || this.replica.owner;
     }
   }
 
