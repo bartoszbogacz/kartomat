@@ -31,6 +31,14 @@ class Avatar {
     this.scene = scene;
 
     this.elem = document.createElement("textarea");
+    // Binding only onkeydown will not register single
+    // characters being written, since textarea only
+    // updates after onkeyup. Binding onkeyup only
+    // will register repeated input only after a key
+    // has been released, which can be longer than our
+    // grace period for not ovewriteing the textarea.
+    // We need to bind both handlers.
+    this.elem.onkeydown = this.textTyped.bind(this);
     this.elem.onkeyup = this.textTyped.bind(this);
     (this.elem as any).value = this.replica.text;
     this.elem.className = "NoPlayerAvatar";
