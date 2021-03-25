@@ -42,10 +42,9 @@ class Scene {
 
   /** Distribute changes from remote */
   synchronize(remote: ReplicatedScene) {
-    // Never regress tick even if server tells us so. Otherwise we may
-    // not be able to change our own objects if their tick is higher than
-    // ours. Client tick and server tick behave like a Lamport timestamp.
-    this.tick = Math.max(this.tick, remote.tick);
+    // Step one tick ahead so that any changes in this tick are
+    // properly propagated to server.
+    this.tick = Math.max(this.tick, remote.tick) + 1;
 
     // Take over settings from server
     this.boardId = remote.boardId;

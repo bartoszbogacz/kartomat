@@ -483,10 +483,11 @@ function handleClientMessage(socket, msg) {
     console.log(clientId, playerId, "joined", gameId, "playing", boardId);
   }
 
-  // Step tick forward is client is ahead of us. Client may have
-  // a newer state if the server failed and dis-connected during
-  // a game. Never regress tick of clients. Server tick and client
-  // tick behave like a Lamport timestamp.
+  // Keep server tick ahead of all client ticks.
+  _runningGames[gameId].scene.tick = Math.max(
+    _runningGames[gameId].scene.tick,
+    scene.tick
+  );
 
   // Update both the authorative game state of the server and our
   // view of the game state of the specific clientId.
@@ -564,8 +565,15 @@ function differenceTo(local, remote, playerId, clientId) {
 
   for (const klass of KLASSES) {
     for (const key of Object.keys(local[klass])) {
+      // FIXME: For proper vector timestamps _both_ the (clientId, tick)
+      // are relevant, as tick !== tick if it comes from different clients.
+      // This is the only place we actually enforce this break ties in
+      // favor of the server (local). Done correctly, any comparison of
+      // ticks anywhere needs to take clientId into account.
+      // TODO: Implement proper VectorClock / LamportTimestamp class.
       if (
         !remote[klass].hasOwnProperty(key) ||
+        local[klass][key].owner !== remote[klass][key].owner ||
         local[klass][key].tick > remote[klass][key].tick
       ) {
         changes[klass][key] = local[klass][key];
