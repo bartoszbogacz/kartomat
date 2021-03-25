@@ -79,6 +79,12 @@ class Avatar {
 
     if (this.replica.represents === this.scene.playerId) {
       (this.elem as any).disabled = false;
+      // We do not want to butt in when the user types, by setting the
+      // the field differnetly, but at some point after user stoppped
+      // typing we synchronize perform the synchronization update.
+      if (this.replica.tick + 5 < this.scene.tick) {
+        (this.elem as any).value = this.replica.text;
+      }
     } else {
       (this.elem as any).disabled = true;
       (this.elem as any).value = this.replica.text;
