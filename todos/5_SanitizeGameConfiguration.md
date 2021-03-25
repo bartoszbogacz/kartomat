@@ -1,1 +1,1 @@
-# Sanitize game configuration
+# Sanitize game configuration and game state
