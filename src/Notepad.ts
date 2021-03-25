@@ -81,24 +81,12 @@ class Notepad {
     this.visElem.style.height = this.box.h + "px";
     this.visElem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
 
-    // if (
-    //   this.replica.owner === null ||
-    //   this.replica.owner === this.scene.playerId ||
-    //   this.replica.tick + 5 < this.scene.tick
-    // ) {
-    //   (this.visElem as any).disabled = false;
-
     // We do not want to butt in when the user types, by setting the
     // the field differnetly, but at some point after user stoppped
     // typing we synchronize perform the synchronization update.
     if (this.replica.tick + 5 < this.scene.tick) {
       (this.visElem as any).value = this.replica.text;
     }
-
-    // } else {
-    //   (this.visElem as any).disabled = true;
-    //   (this.visElem as any).value = this.replica.text;
-    // }
 
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + this.box.h + "px";
