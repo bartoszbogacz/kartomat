@@ -70,8 +70,6 @@ class Marble {
     this.visElem.style.top = this.box.y + "px";
     this.visElem.style.width = this.box.w + "px";
     this.visElem.style.height = this.box.h + "px";
-    this.visElem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
-    this.visElem.style.backgroundColor = this.replica.color;
     this.visElem.style.zIndex = this.box.z.toString();
 
     this.ownerElem.style.left = this.box.x + "px";
