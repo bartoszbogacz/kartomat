@@ -23,6 +23,12 @@
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }
 
+.CardWithNoImage {
+  border-radius: 10%;
+  border: 1px solid black;
+  font-size: 3em;
+}
+
 .Control {
   filter: drop-shadow(3px 3px 5px rgba(95, 95, 95, 0.8));
 }

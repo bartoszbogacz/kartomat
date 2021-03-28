@@ -3,6 +3,7 @@
     "target": "es2017",
     "module": "commonjs",
     "outDir": "dist",
+    "allowJs": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -11,17 +12,5 @@
     "noUnusedParameters": true,
     "strict": true
   },
-  "files": [
-    "src/Avatar.ts",
-    "src/Board.ts",
-    "src/BoundingBox.ts",
-    "src/Card.ts",
-    "src/Client.ts",
-    "src/Deck.ts",
-    "src/DragAndDrop.ts",
-    "src/Marble.ts",
-    "src/Notepad.ts",
-    "src/PrivateArea.ts",
-    "src/Scene.ts"
-  ]
+  "include": ["src/*"]
 }

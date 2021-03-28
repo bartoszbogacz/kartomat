@@ -5,6 +5,8 @@ const fs = require("fs");
 const ws = require("ws");
 const path = require("path");
 
+import { DOG6, DOG8, WIZARD, GameConfig } from "./GameConfig";
+
 const httpPort = 8000;
 const wsPort = 8080;
 
@@ -419,11 +421,13 @@ function initWebSocketServer() {
 // The method assembleBoard will be called by handleHTTPRequest with boardId
 // set by the ?board=Dog query parameter.
 
-function assembleBoard(boardId) {
+function assembleBoard(boardId, gameId) {
   if (boardId === "Dog6") {
-    return generateDog6();
+    return new GameConfig(DOG6, boardId, gameId).hydrate();
   } else if (boardId === "Dog8") {
-    return generateDog8();
+    return new GameConfig(DOG8, boardId, gameId).hydrate();
+  } else if (boardId === "Wizard") {
+    return new GameConfig(WIZARD, boardId, gameId).hydrate();
   } else {
     throw new Error("Board not implemented");
   }
@@ -438,7 +442,7 @@ function resetGame(gameId) {
     return;
   }
 
-  const board = assembleBoard(game.boardId);
+  const board = assembleBoard(game.boardId, gameId);
   for (const klass of KLASSES) {
     for (const [key, item] of Object.entries(board[klass])) {
       item.tick = game.scene.tick;
@@ -463,7 +467,7 @@ function handleClientMessage(socket, msg) {
   // If there is no such game, create it
 
   if (_runningGames.hasOwnProperty(gameId) === false) {
-    const board = assembleBoard(boardId);
+    const board = assembleBoard(boardId, gameId);
 
     _runningGames[gameId] = {
       clients: {},

@@ -9,6 +9,7 @@ interface ReplicatedCard {
   h: number;
 
   onDeck: string | null;
+  texts: string[];
   images: string[];
   colors: string[];
   current: number;
@@ -32,7 +33,6 @@ class Card {
     this.scene = scene;
 
     this.visElem = document.createElement("div");
-    this.visElem.className = "Card";
     this.visElem.style.position = "absolute";
     this.visElem.style.userSelect = "none";
     this.visElem.style.touchAction = "none";
@@ -82,6 +82,7 @@ class Card {
     this.box.w = this.replica.w;
     this.box.h = this.replica.h;
 
+    const text = this.replica.texts[this.replica.current];
     const color = this.replica.colors[this.replica.current];
     const image = this.replica.images[this.replica.current];
 
@@ -90,9 +91,23 @@ class Card {
     this.visElem.style.zIndex = this.box.z.toString();
     this.visElem.style.width = this.box.w + "px";
     this.visElem.style.height = this.box.h + "px";
-    this.visElem.style.backgroundSize = this.box.w + "px " + this.box.h + "px";
-    this.visElem.style.backgroundColor = color ? color : "";
-    this.visElem.style.backgroundImage = "url(" + (image ? image : "") + ")";
+
+    if (text) {
+      this.visElem.innerHTML = text;
+    }
+
+    if (color) {
+      this.visElem.style.backgroundColor = color;
+    }
+
+    if (image) {
+      this.visElem.className = "CardWithImage";
+      this.visElem.style.backgroundImage = "url(" + image + ")";
+      this.visElem.style.backgroundSize =
+        this.box.w + "px " + this.box.h + "px";
+    } else {
+      this.visElem.className = "CardWithNoImage";
+    }
 
     this.ownerElem.style.left = this.box.x + "px";
     this.ownerElem.style.top = this.box.y + this.box.h + "px";
@@ -160,10 +175,15 @@ class Card {
   }
 
   turn() {
+    const sides: number = Math.max(
+      this.replica.texts.length,
+      this.replica.colors.length,
+      this.replica.images.length,
+      1
+    );
     this.replica.tick = this.scene.tick;
     this.replica.owner = this.scene.playerId;
-    this.replica.current =
-      (this.replica.current + 1) % this.replica.images.length;
+    this.replica.current = (this.replica.current + 1) % sides;
     this.render();
   }
 
