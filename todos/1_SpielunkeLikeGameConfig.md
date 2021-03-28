@@ -1,1 +1,0 @@
-# Spielunke like game config
