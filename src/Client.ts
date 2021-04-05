@@ -88,6 +88,9 @@ class Client {
     this.scene.synchronize(JSON.parse(msg));
     this.scene.layout();
 
+    // TODO: Extract playerId, gameId and boardId here instead of
+    // relying on scene to extract these.
+
     window.localStorage.setItem("playerId", this.scene.playerId);
     window.localStorage.setItem("playerName", this.scene.playerName);
 
@@ -95,7 +98,9 @@ class Client {
 
     if (
       parameters.hasOwnProperty("board") === false ||
-      parameters["board"] !== this.scene.boardId
+      parameters["board"] !== this.scene.boardId ||
+      parameters.hasOwnProperty("game") ||
+      parameters["game"] !== this.scene.gameId
     ) {
       history.pushState(
         {},
