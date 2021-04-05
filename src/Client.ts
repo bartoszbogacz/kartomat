@@ -28,16 +28,28 @@ class Client {
   websocket: WebSocket | null = null;
 
   resetElem: HTMLElement;
+  homeElem: HTMLAnchorElement;
 
   constructor() {
     this.scene = new Scene();
 
     const other = this;
+
+    this.homeElem = document.createElement("a");
+    this.homeElem.className = "Button";
+    this.homeElem.style.position = "absolute";
+    this.homeElem.style.left = "800px";
+    this.homeElem.style.top = "30px";
+    this.homeElem.style.userSelect = "none";
+    this.homeElem.innerHTML = "Kartomat";
+    this.homeElem.href = "/";
+    document.body.appendChild(this.homeElem);
+
     this.resetElem = document.createElement("div");
     this.resetElem.className = "Button";
     this.resetElem.style.position = "absolute";
     this.resetElem.style.left = "800px";
-    this.resetElem.style.top = "30px";
+    this.resetElem.style.top = "70px";
     this.resetElem.style.userSelect = "none";
     this.resetElem.innerHTML = "Reset Game";
     this.resetElem.onclick = function () {
