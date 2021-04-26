@@ -111,7 +111,7 @@ class Client {
     if (
       parameters.hasOwnProperty("board") === false ||
       parameters["board"] !== this.scene.boardId ||
-      parameters.hasOwnProperty("game") ||
+      parameters.hasOwnProperty("game") === false ||
       parameters["game"] !== this.scene.gameId
     ) {
       history.pushState(

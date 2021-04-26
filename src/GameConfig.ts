@@ -308,7 +308,9 @@ export class GameConfig {
     private boardId: string,
     private gameId: string
   ) {
-    //
+    // TODO: This should be part of scene.
+    // Scene should be able to instantiate (hydrate) itself from
+    // SceneConfig and serialize (dehydrate) itself back to SceneConfig.
   }
 
   hydrate(): ReplicatedScene {
